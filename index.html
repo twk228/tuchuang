@@ -8,4 +8,10 @@
 <body>
     <img src="./award.png" >
 </body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    axios.get('./twk.json').then(function(data){
+        console.log(data)
+    })
+</script>
 </html>
