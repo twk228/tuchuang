@@ -1,0 +1,12 @@
+[
+    {
+        "id": "classify1",
+        "name": "全部",
+        "icon": "https://picturbed.netlify.app/icon-all.png"
+    },
+    {
+        "id": "classify2",
+        "name": "Vue相关",
+        "icon": "https://picturbed.netlify.app/icon-vue.png"
+    }
+]
