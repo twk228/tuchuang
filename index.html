@@ -5,8 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>图床</title>
 </head>
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+    }
+    .container .header h1, .header h2{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .section-list{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .section-list .item{
+        display: flex;
+        flex-direction: column;
+        margin: 10px;
+    }
+    .section-list .item .img{
+        display: flex;
+        justify-content: center;
+    }
+</style>
 <body>
-    <img src="./award.png" >
+    <div class="container">
+        <div class="header">
+            <h1>唐伟科的图床</h1>
+            <h2>访问示例如下</h2>
+        </div>
+        <div class="section-list">
+            <div class="item">
+                <div class="img">
+                    <a href="./award.png" target="_blank"><img src="./award.png" ></a>
+                </div>
+                <div class="url">https://picturbed.netlify.app/文件名</div>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
