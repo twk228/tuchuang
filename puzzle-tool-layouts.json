@@ -1,0 +1,539 @@
+[
+    {
+        "imgNum": 1,
+        "name": "1张图片",
+        "children": [
+            {
+                "id": "1-1",
+                "imgNum": 1
+            }
+        ]
+    },
+    {
+        "imgNum": 2,
+        "name": "2张图片",
+        "children": [
+            {
+                "id": "2-1",
+                "imgNum": 2,
+                "styleStr": "grid-template-columns: repeat(1, 1fr); grid-template-rows: repeat(2, 1fr);"
+            },
+            {
+                "id": "2-2",
+                "imgNum": 2,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(1, 1fr);"
+            }
+        ]
+    },
+    {
+        "imgNum": 3,
+        "name": "3张图片",
+        "children": [
+            {
+                "id": "3-1",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(1, 1fr);"
+            },
+            {
+                "id": "3-2",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(1, 1fr); grid-template-rows: repeat(3, 1fr);"
+            },
+            {
+                "id": "3-3",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3;"
+                }
+            },
+            {
+                "id": "3-4",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "2": "grid-column-start: 1; grid-column-end: 3;"
+                }
+            },
+            {
+                "id": "3-5",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "3-6",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "1": "grid-column-start: 2; grid-column-end: 3; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "3-7",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 4;",
+                    "2": "grid-column-start: 3; grid-column-end: 4; grid-row-start: 2; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "3-8",
+                "imgNum": 3,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 3;",
+                    "2": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 3; grid-row-end: 4;"
+                }
+            }
+        ]
+    },
+    {
+        "imgNum": 4,
+        "name": "4张图片",
+        "children": [
+            {
+                "id": "4-1",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);"
+            },
+            {
+                "id": "4-2",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(1, 1fr);"
+            },
+            {
+                "id": "4-3",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(1, 1fr); grid-template-rows: repeat(4, 1fr);"
+            },
+            {
+                "id": "4-4",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;"
+                }
+            },
+            {
+                "id": "4-5",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "3": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 2; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "4-6",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "4-7",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 3;",
+                    "1": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;"
+                }
+            },
+            {
+                "id": "4-8",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 3; grid-column-end: 4; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "4-9",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;",
+                    "3": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "4-10",
+                "imgNum": 4,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 3;",
+                    "3": "grid-column-start: 2; grid-column-end: 3; grid-row-start: 2; grid-row-end: 4;"
+                }
+            }
+        ]
+    },
+    {
+        "imgNum": 5,
+        "name": "5张图片",
+        "children": [
+            {
+                "id": "5-1",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 3; grid-column-end: 4; grid-row-start: 1; grid-row-end: 3;",
+                    "3": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 2; grid-row-end: 4;",
+                    "4": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "5-2",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 2; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "5-3",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 4;",
+                    "1": "grid-column-start: 3; grid-column-end: 4; grid-row-start: 1; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "5-4",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "5-5",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;"
+                }
+            },
+            {
+                "id": "5-6",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "5-7",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 1; grid-row-end: 2;",
+                    "2": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3;",
+                    "3": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 2; grid-row-end: 3;",
+                    "4": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 2; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "5-8",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;"
+                }
+            },
+            {
+                "id": "5-9",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 4;",
+                    "1": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;",
+                    "2": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "5-10",
+                "imgNum": 5,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;"
+                }
+            }
+        ]
+    },
+    {
+        "imgNum": 6,
+        "name": "6张图片",
+        "children": [
+            {
+                "id": "6-1",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);"
+            },
+            {
+                "id": "6-2",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);"
+            },
+            {
+                "id": "6-3",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 4; grid-column-end: 5; grid-row-start: 1; grid-row-end: 3;",
+                    "2": "grid-column-start: 4; grid-column-end: 5; grid-row-start: 3; grid-row-end: 5;",
+                    "3": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 2; grid-row-end: 4;",
+                    "4": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 4; grid-row-end: 5;",
+                    "5": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 2; grid-row-end: 5;"
+                }
+            },
+            {
+                "id": "6-4",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 7; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 2; grid-row-end: 3;",
+                    "2": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 2; grid-row-end: 3;",
+                    "3": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 3; grid-row-end: 4;",
+                    "4": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 3; grid-row-end: 4;",
+                    "5": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "6-5",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 1; grid-row-end: 2;",
+                    "2": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 1; grid-row-end: 2;",
+                    "3": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 2; grid-row-end: 3;",
+                    "4": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 2; grid-row-end: 3;",
+                    "5": "grid-column-start: 1; grid-column-end: 7; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "6-6",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 1; grid-row-end: 2;",
+                    "2": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3;",
+                    "3": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 2; grid-row-end: 3;",
+                    "4": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 2; grid-row-end: 3;",
+                    "5": "grid-column-start: 1; grid-column-end: 7; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "6-7",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 2; grid-row-end: 3;",
+                    "2": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "6-8",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 3;",
+                    "1": "grid-column-start: 3; grid-column-end: 4; grid-row-start: 3; grid-row-end: 5;"
+                }
+            },
+            {
+                "id": "6-9",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "6-10",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "6-11",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 6; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "6-12",
+                "imgNum": 6,
+                "styleStr": "grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 2; grid-row-end: 3;"
+                }
+            }
+        ]
+    },
+    {
+        "imgNum": 7,
+        "name": "7张图片",
+        "children": [
+            {
+                "id": "7-1",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 3;",
+                    "1": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 1; grid-row-end: 3;",
+                    "2": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 3; grid-row-end: 5;"
+                }
+            },
+            {
+                "id": "7-13",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 3;",
+                    "1": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 1; grid-row-end: 3;",
+                    "2": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 3; grid-row-end: 4;",
+                    "3": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 4; grid-row-end: 5;",
+                    "4": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 3; grid-row-end: 5;",
+                    "5": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 3; grid-row-end: 4;",
+                    "6": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 4; grid-row-end: 5;"
+                }
+            },
+            {
+                "id": "7-2",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 2; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "7-3",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 2; grid-column-end: 3; grid-row-start: 1; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "7-4",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "7-5",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 2; grid-column-end: 3; grid-row-start: 3; grid-row-end: 5;"
+                }
+            },
+            {
+                "id": "7-6",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;"
+                }
+            },
+            {
+                "id": "7-7",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "7-8",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 1; grid-row-end: 2;",
+                    "2": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3;",
+                    "3": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 2; grid-row-end: 3;",
+                    "4": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 2; grid-row-end: 3;",
+                    "5": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 3; grid-row-end: 4;",
+                    "6": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "7-9",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 2; grid-column-end: 5; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "7-10",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 1; grid-row-end: 3;"
+                }
+            },
+            {
+                "id": "7-11",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 2; grid-row-end: 5;"
+                }
+            },
+            {
+                "id": "7-12",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 2; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "7-14",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 2; grid-column-end: 4; grid-row-start: 3; grid-row-end: 4;"
+                }
+            },
+            {
+                "id": "7-15",
+                "imgNum": 7,
+                "styleStr": "grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(4, 1fr);",
+                "expandStyles": {
+                    "0": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2;",
+                    "1": "grid-column-start: 1; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3;",
+                    "2": "grid-column-start: 3; grid-column-end: 5; grid-row-start: 1; grid-row-end: 3;",
+                    "3": "grid-column-start: 5; grid-column-end: 7; grid-row-start: 1; grid-row-end: 3;",
+                    "4": "grid-column-start: 1; grid-column-end: 4; grid-row-start: 3; grid-row-end: 5;",
+                    "5": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 3; grid-row-end: 4;",
+                    "6": "grid-column-start: 4; grid-column-end: 7; grid-row-start: 4; grid-row-end: 5;"
+                }
+            }
+        ]
+    }
+]
