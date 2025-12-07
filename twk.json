@@ -129,5 +129,135 @@
             "Vue相关"
         ],
         "answerContent": "<p>Vue 的 nextTick 其本质是对 JavaScript 执行原理 EventLoop 的一种应用。</p><p><br></p><p>nextTick 的核心是利用了如 Promise 、MutationObserver、setImmediate、setTimeout的原生 JavaScript 方法来模拟对应的微/宏任务的实现，本质是为了利用 JavaScript 的这些异步回调任务队列来实现 Vue 框架中自己的异步回调队列。</p><p><br></p><p>nextTick 不仅是 Vue 内部的异步队列的调用方法，同时也允许开发者在实际项目中使用这个方法来满足实际应用中对 DOM 更新数据时机的后续逻辑处理</p><p><br></p><p>nextTick 是典型的将底层 JavaScript 执行原理应用到具体案例中的示例，引入异步更新队列机制的原因∶</p><ul><li>如果是同步更新，则多次对一个或多个属性赋值，会频繁触发 UI/DOM 的渲染，可以减少一些无用渲染</li><li>同时由于 VirtualDOM 的引入，每一次状态发生变化后，状态变化的信号会发送给组件，组件内部使用 VirtualDOM 进行计算得出需要更新的具体的 DOM 节点，然后对 DOM 进行更新操作，每次更新状态后的渲染过程需要更多的计算，而这种无用功也将浪费更多的性能，所以异步渲染变得更加至关重要</li></ul><p><br></p><p>Vue采用了数据驱动视图的思想，但是在一些情况下，仍然需要操作DOM。有时候，可能遇到这样的情况，DOM1的数据发生了变化，而DOM2需要从DOM1中获取数据，那这时就会发现DOM2的视图并没有更新，这时就需要用到了nextTick了。</p><p><br></p><p>由于Vue的DOM操作是异步的，所以，在以下情况下，会用到nextTick：</p><ul><li>在数据变化后执行的某个操作，而这个操作需要使用随数据变化而变化的DOM结构的时候，这个操作就需要方法在nextTick()的回调函数中。</li><li>在vue生命周期中，如果在created()钩子进行DOM操作，也一定要放在nextTick()的回调函数中。</li></ul><p><br></p><p>因为在created()钩子函数中，页面的DOM还未渲染，这时候也没办法操作DOM，所以，此时如果想要操作DOM，必须将操作的代码放在nextTick()的回调函数中。</p>"
+    },
+    {
+        "id": "twk-question11",
+        "topic": "Vue 的生命周期钩子有哪些？它们在什么阶段被调用？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "Vue 的生命周期钩子可以分为8个主要阶段：\n\n1. **创建阶段**\n   - `beforeCreate`：实例刚创建，数据观测和事件配置之前调用\n   - `created`：实例创建完成，数据观测已完成，但DOM还未生成\n\n2. **挂载阶段**\n   - `beforeMount`：模板编译/挂载之前调用\n   - `mounted`：模板编译/挂载完成后调用\n\n3. **更新阶段**\n   - `beforeUpdate`：数据更新时，虚拟DOM重新渲染和打补丁之前调用\n   - `updated`：数据更改导致的虚拟DOM重新渲染和打补丁之后调用\n\n4. **销毁阶段**\n   - `beforeDestroy`：实例销毁之前调用\n   - `destroyed`：实例销毁后调用\n\nVue 3.x 中还新增了：\n- `onRenderTracked` 和 `onRenderTriggered`：用于调试组件的重新渲染"
+    },
+    {
+        "id": "twk-question12",
+        "topic": "Vue 2 和 Vue 3 的主要区别是什么？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "Vue 3 相比 Vue 2 的主要改进：\n\n1. **性能提升**\n   - 使用Proxy代替Object.defineProperty实现响应式\n   - 重写虚拟DOM，优化渲染性能\n   - 更好的Tree Shaking支持\n\n2. **Composition API**\n   - 引入setup函数和组合式API\n   - 更好的逻辑复用和组织代码\n\n3. **TypeScript支持**\n   - 使用TypeScript重写，提供更好的TS支持\n\n4. **片段(Fragments)**\n   - 支持多个根节点的组件\n\n5. **Teleport组件**\n   - 可以将组件内容渲染到DOM的任何位置\n\n6. **Suspense组件**\n   - 更好地处理异步组件加载\n\n7. **更小的体积**\n   - 核心库体积更小，打包后文件更小"
+    },
+    {
+        "id": "twk-question13",
+        "topic": "Vue 中的 computed 和 watch 有什么区别？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "| 特性 | computed | watch |\n|------|---------|-------|\n| 用途 | 计算属性，基于依赖缓存 | 监听数据变化，执行副作用 |\n| 缓存 | 有缓存，依赖不变不重新计算 | 无缓存，每次变化都会执行 |\n| 返回值 | 必须返回一个值 | 不需要返回值 |\n| 异步 | 不支持异步操作 | 支持异步操作 |\n| 使用场景 | 模板中复杂的逻辑计算 | 数据变化时执行异步或开销较大的操作 |\n\n**computed 适用场景**：\n- 需要根据多个数据计算出一个值\n- 需要在模板中使用的复杂表达式\n- 需要缓存优化性能的计算\n\n**watch 适用场景**：\n- 监听数据变化执行异步操作\n- 监听数据变化执行开销较大的操作\n- 需要在数据变化时执行特定业务逻辑"
+    },
+    {
+        "id": "twk-question14",
+        "topic": "Vue 组件间通信的方式有哪些？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "Vue 组件间通信的多种方式：\n\n1. **Props / $emit**\n   - 父组件通过 props 向下传递数据\n   - 子组件通过 $emit 向上发送事件\n\n2. **$parent / $children**\n   - 通过父链/子链直接访问组件实例\n   - 不推荐使用，增加了耦合度\n\n3. **$refs**\n   - 访问子组件实例或 DOM 元素\n\n4. **Event Bus**\n   - 创建一个空的 Vue 实例作为事件中心\n   - 通过 $on, $emit 进行跨组件通信\n\n5. **Vuex**\n   - 状态管理库，用于复杂应用的状态管理\n   - 提供全局状态和可预测的状态变更\n\n6. **provide / inject**\n   - 祖先组件通过 provide 提供数据\n   - 后代组件通过 inject 注入数据\n   - 主要用于高阶插件/组件库\n\n7. **$attrs / $listeners**\n   - $attrs 包含父作用域中不作为 prop 被识别的特性\n   - $listeners 包含父作用域中的 v-on 事件监听器\n\n8. **Vue 3 的 Composition API**\n   - 使用 reactive, ref 等函数创建响应式状态\n   - 通过模块导入的方式共享状态"
+    },
+    {
+        "id": "twk-question15",
+        "topic": "什么是 Vuex？它的核心概念是什么？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "Vuex 是 Vue.js 的状态管理模式+库，用于集中管理应用的所有组件的状态。\n\n**Vuex 的核心概念**：\n\n1. **State**：驱动应用的数据源，单一状态树\n   ```javascript\n   state: {\n     count: 0,\n     user: null\n   }\n   ```\n\n2. **Getters**：从 state 中派生的状态，相当于计算属性\n   ```javascript\n   getters: {\n     doubleCount: state => state.count * 2\n   }\n   ```\n\n3. **Mutations**：更改 state 的唯一方法，同步操作\n   ```javascript\n   mutations: {\n     increment(state, payload) {\n       state.count += payload.amount\n     }\n   }\n   ```\n\n4. **Actions**：提交 mutation，可以包含异步操作\n   ```javascript\n   actions: {\n     incrementAsync({ commit }, payload) {\n       setTimeout(() => {\n         commit('increment', payload)\n       }, 1000)\n     }\n   }\n   ```\n\n5. **Modules**：将 store 分割成模块，每个模块拥有自己的 state、getters、mutations、actions\n\n**Vuex 的工作流程**：\n组件 → Dispatch Actions → Commit Mutations → Mutate State → Render Components"
+    },
+    {
+        "id": "twk-question16",
+        "topic": "Vue 的路由导航守卫有哪些？它们的作用是什么？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "Vue Router 提供了多种导航守卫，用于控制路由的跳转和访问权限。\n\n**全局守卫**：\n1. `router.beforeEach` - 全局前置守卫\n   - 在路由跳转前调用\n   - 常用于权限验证\n   \n2. `router.beforeResolve` - 全局解析守卫\n   - 在导航被确认之前，组件内守卫和异步路由组件被解析之后调用\n   \n3. `router.afterEach` - 全局后置钩子\n   - 在导航完成后调用\n   - 不会接受 next 函数，也不会改变导航本身\n\n**路由独享守卫**：\n- `beforeEnter` - 在路由配置上直接定义\n  ```javascript\n  const routes = [\n    {\n      path: '/admin',\n      component: Admin,\n      beforeEnter: (to, from, next) => {\n        // 验证权限\n      }\n    }\n  ]\n  ```\n\n**组件内守卫**：\n1. `beforeRouteEnter` - 在渲染该组件的对应路由被确认前调用\n   - 不能访问组件实例 `this`\n   \n2. `beforeRouteUpdate` - 在当前路由改变，但该组件被复用时调用\n   - 可以访问组件实例 `this`\n   \n3. `beforeRouteLeave` - 导航离开该组件的对应路由时调用\n   - 常用于提示用户保存未保存的修改\n\n**守卫参数**：\n- `to`：即将要进入的目标路由对象\n- `from`：当前导航正要离开的路由\n- `next`：函数，必须调用 resolve 这个钩子\n  - `next()`：进行管道中的下一个钩子\n  - `next(false)`：中断当前的导航\n  - `next('/')` 或 `next({ path: '/' })`：跳转到一个不同的地址"
+    },
+    {
+        "id": "twk-question17",
+        "topic": "Vue 的响应式原理是什么？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "### Vue 2 的响应式原理\n\nVue 2 使用 **Object.defineProperty** 实现响应式：\n\n1. **数据劫持**：遍历 data 对象的所有属性，使用 Object.defineProperty 设置 getter 和 setter\n2. **依赖收集**：在 getter 中收集依赖（Watcher）\n3. **派发更新**：在 setter 中通知依赖更新，触发重新渲染\n\n**实现过程**：\n```javascript\n// 简化版实现\nfunction defineReactive(obj, key, val) {\n  Object.defineProperty(obj, key, {\n    enumerable: true,\n    configurable: true,\n    get: function reactiveGetter() {\n      // 收集依赖\n      if (Dep.target) {\n        dep.depend();\n      }\n      return val;\n    },\n    set: function reactiveSetter(newVal) {\n      if (newVal === val) return;\n      val = newVal;\n      // 通知更新\n      dep.notify();\n    }\n  });\n}\n```\n\n**局限性**：\n- 无法检测对象属性的添加或删除（需使用 Vue.set/Vue.delete）\n- 无法检测数组索引和长度的变化\n- 需要对原始数据对象进行递归遍历\n\n### Vue 3 的响应式原理\n\nVue 3 使用 **Proxy** 实现响应式：\n\n1. **代理对象**：使用 Proxy 代理整个对象\n2. **拦截操作**：拦截各种操作（get、set、deleteProperty等）\n3. **惰性响应**：只在访问属性时创建响应式\n\n**优势**：\n- 可以检测到对象属性的添加和删除\n- 可以检测数组索引和长度的变化\n- 性能更好，不需要递归遍历所有属性\n- 支持 Map、Set、WeakMap、WeakSet 等数据结构\n\n```javascript\n// 简化版实现\nfunction reactive(obj) {\n  return new Proxy(obj, {\n    get(target, key, receiver) {\n      // 收集依赖\n      track(target, key);\n      return Reflect.get(target, key, receiver);\n    },\n    set(target, key, value, receiver) {\n      // 通知更新\n      trigger(target, key);\n      return Reflect.set(target, key, value, receiver);\n    },\n    deleteProperty(target, key) {\n      // 通知更新\n      trigger(target, key);\n      return Reflect.deleteProperty(target, key);\n    }\n  });\n}\n```"
+    },
+    {
+        "id": "twk-question18",
+        "topic": "什么是虚拟 DOM？Vue 中虚拟 DOM 的作用是什么？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "### 什么是虚拟 DOM？\n\n虚拟 DOM（Virtual DOM）是一个轻量级的 JavaScript 对象，它是真实 DOM 的抽象表示。虚拟 DOM 节点（VNode）描述了真实 DOM 节点的标签名、属性、子节点等信息。\n\n### Vue 中虚拟 DOM 的作用\n\n1. **提高性能**：\n   - 减少直接操作真实 DOM 的次数\n   - 通过 diff 算法找出最小变更，批量更新 DOM\n   - 避免不必要的 DOM 操作，提高渲染性能\n\n2. **跨平台能力**：\n   - 虚拟 DOM 是 JavaScript 对象，不依赖具体平台\n   - 可以在浏览器、Native、小程序等不同平台渲染\n\n3. **简化开发**：\n   - 开发者只需关注数据变化，不需要手动操作 DOM\n   - Vue 自动处理视图更新\n\n### Vue 的虚拟 DOM 工作流程\n\n1. **编译阶段**：模板编译为渲染函数\n2. **渲染阶段**：执行渲染函数，生成虚拟 DOM 树\n3. **挂载阶段**：将虚拟 DOM 树转换为真实 DOM\n4. **更新阶段**：数据变化时生成新的虚拟 DOM 树\n5. **对比阶段**：对比新旧虚拟 DOM 树（diff 算法）\n6. **打补丁**：将差异应用到真实 DOM\n\n### Vue 3 的虚拟 DOM 优化\n\nVue 3 对虚拟 DOM 进行了多项优化：\n\n1. **静态提升**：将静态节点提升到渲染函数外部，避免重复创建\n2. **Patch Flags**：为动态节点添加标记，优化 diff 过程\n3. **Tree Flattening**：减少嵌套层级，优化渲染性能\n4. **缓存事件处理函数**：避免不必要的重新渲染\n\n这些优化使得 Vue 3 的虚拟 DOM 比 Vue 2 更加高效。"
+    },
+    {
+        "id": "twk-question19",
+        "topic": "Vue 中的 key 属性有什么作用？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "### key 属性的作用\n\nkey 是 Vue 中一个特殊的属性，主要用在 v-for 列表中，它的作用是：\n\n1. **标识节点身份**：帮助 Vue 识别哪些节点是被添加、修改或删除的\n2. **优化渲染性能**：通过 key 可以更高效地更新虚拟 DOM\n3. **维持组件状态**：避免组件状态在列表重新渲染时丢失\n\n### 为什么需要 key\n\n没有 key 时，Vue 会使用一种\"就地复用\"的策略：\n- 默认使用\"就地复用\"策略\n- 如果数据项的顺序被改变，Vue 不会移动 DOM 元素\n- 而是尝试就地修改现有元素\n\n这可能导致：\n- 性能问题：需要修改更多的 DOM 元素\n- 状态问题：组件状态可能被错误地复用\n\n### 如何正确使用 key\n\n1. **使用唯一标识**：key 应该是每个节点的唯一标识，通常使用 id\n   ```html\n   <!-- 正确 -->\n   <div v-for=\"item in items\" :key=\"item.id\">\n     {{ item.name }}\n   </div>\n   \n   <!-- 错误 -->\n   <div v-for=\"item in items\" :key=\"index\">\n     {{ item.name }}\n   </div>\n   ```\n\n2. **避免使用索引**：不要使用数组索引作为 key，除非列表是静态的\n   - 索引会随着数组排序变化而变化\n   - 可能导致组件状态混乱\n\n3. **结合 transition-group**：在使用 `<transition-group>` 时，必须提供 key\n\n### key 的其他用途\n\n除了在 v-for 中使用，key 还可以：\n\n1. **强制替换元素/组件**：\n   ```html\n   <component :is=\"currentComponent\" :key=\"componentKey\"></component>\n   ```\n   改变 key 会强制 Vue 替换组件而不是复用它\n\n2. **触发过渡效果**：通过改变 key 可以触发元素的进入/离开过渡\n\n### Vue 3 中的变化\n\nVue 3 对 key 的使用更加严格：\n- 在 v-if/v-else-if/v-else 分支中，如果使用了相同的元素标签，需要添加 key\n- 否则 Vue 会尝试复用元素而不是替换它们"
+    },
+    {
+        "id": "twk-question20",
+        "topic": "Vue 3 的 Composition API 与 Options API 有什么区别？",
+        "isShowAnswer": false,
+        "renderType": "markdown",
+        "classifyIds": [
+            "classify2"
+        ],
+        "tagList": [
+            "Vue相关"
+        ],
+        "answerContent": "### Options API vs Composition API\n\n**Options API** 是 Vue 2 的主要 API 风格，通过选项对象组织代码：\n```javascript\nexport default {\n  data() {\n    return {\n      count: 0\n    }\n  },\n  methods: {\n    increment() {\n      this.count++\n    }\n  },\n  computed: {\n    doubleCount() {\n      return this.count * 2\n    }\n  }\n}\n```\n\n**Composition API** 是 Vue 3 引入的新 API 风格，通过函数组织代码：\n```javascript\nimport { ref, computed } from 'vue'\n\nexport default {\n  setup() {\n    const count = ref(0)\n    \n    function increment() {\n      count.value++\n    }\n    \n    const doubleCount = computed(() => count.value * 2)\n    \n    return {\n      count,\n      increment,\n      doubleCount\n    }\n  }\n}\n```\n\n### 主要区别\n\n| 特性 | Options API | Composition API |\n|------|-------------|-----------------|\n| 代码组织 | 按选项类型组织（data、methods等） | 按逻辑功能组织 |\n| 逻辑复用 | Mixins（有命名冲突问题） | 自定义组合函数 |\n| TypeScript 支持 | 一般 | 更好 |\n| 学习曲线 | 较低，易于初学者理解 | 较高，需要理解响应式原理 |\n| 灵活性 | 较低 | 更高，可以更灵活地组织代码 |\n| 代码复用 | 困难，尤其是跨组件逻辑 | 容易，通过组合函数 |\n| 代码量 | 通常更多 | 通常更少 |\n\n### Composition API 的优势\n\n1. **更好的逻辑组织**：\n   - 相关代码可以组织在一起，而不是分散在不同选项中\n   - 提高了代码的可读性和可维护性\n\n2. **更好的逻辑复用**：\n   - 可以创建自定义组合函数，轻松复用逻辑\n   - 避免了 Mixins 的命名冲突和来源不明确问题\n\n3. **更好的 TypeScript 支持**：\n   - 提供更好的类型推断\n   - 更容易编写类型安全的代码\n\n4. **更灵活的代码组织**：\n   - 可以在多个地方使用 setup 函数\n   - 可以按功能而不是选项类型组织代码\n\n5. **更小的打包体积**：\n   - 更好的 Tree Shaking 支持\n   - 只打包使用的 API\n\n### 使用场景\n\n- **Options API**：适合简单的组件和小型项目\n- **Composition API**：适合复杂的组件和大型项目，需要更好的逻辑组织和复用\n\nVue 3 仍然支持 Options API，开发者可以根据项目需求选择合适的 API 风格。"
     }
 ]

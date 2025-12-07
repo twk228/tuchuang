@@ -1,55 +1,370 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图床</title>
+    <title>唐伟科的图床</title>
 </head>
 <style>
-    *{
+    * {
         padding: 0;
         margin: 0;
+        box-sizing: border-box;
     }
-    .container .header h1, .header h2{
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        line-height: 1.6;
     }
-    .section-list{
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .header h2 {
+        font-size: 1.2rem;
+        font-weight: normal;
+        opacity: 0.9;
+    }
+    
+    .section-list {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
+        gap: 20px;
     }
-    .section-list .item{
+    
+    .section-list .item {
         display: flex;
         flex-direction: column;
-        margin: 10px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        width: 300px;
     }
-    .section-list .item .img{
+    
+    .section-list .item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .section-list .item .img {
         display: flex;
         justify-content: center;
+        align-items: center;
+        height: 250px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+    
+    .section-list .item .img img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    
+    .section-list .item:hover .img img {
+        transform: scale(1.05);
+    }
+    
+    .url-container {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .url-text {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border: 1px solid #ced4da;
+        padding: 8px 12px;
+        border-radius: 4px;
+        background-color: white;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+    
+    .url-text:hover {
+        background-color: #e9ecef;
+    }
+    
+    .copy-btn {
+        margin-left: 8px;
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    
+    .copy-btn:hover {
+        background-color: #0069d9;
+    }
+    
+    .copy-btn.copied {
+        background-color: #28a745;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .stats {
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stats span {
+        font-weight: bold;
+        color: #007bff;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .section-list .item {
+            width: 100%;
+            max-width: 350px;
+        }
     }
 </style>
 <body>
     <div class="container">
         <div class="header">
             <h1>唐伟科的图床</h1>
-            <h2>访问示例如下</h2>
+            <h2>访问示例</h2>
         </div>
-        <div class="section-list">
-            <div class="item">
-                <div class="img">
-                    <a href="./award.png" target="_blank"><img src="./award.png" ></a>
-                </div>
-                <div class="url">https://picturbed.netlify.app/文件名</div>
+        
+        <div class="stats">
+            共找到 <span id="imageCount">0</span> 张图片
+        </div>
+        
+        <div class="section-list" id="imageContainer">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <div>正在加载图片...</div>
             </div>
         </div>
     </div>
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    axios.get('./twk.json').then(function(data){
-        console.log(data)
-    })
+    function copyToClipboard(text, button) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        
+        // 改变按钮状态
+        const originalText = button.innerText;
+        button.innerText = "已复制";
+        button.classList.add("copied");
+        
+        // 2秒后恢复原状态
+        setTimeout(() => {
+            button.innerText = originalText;
+            button.classList.remove("copied");
+        }, 2000);
+    }
+    
+    function createImageItem(imageUrl) {
+        const item = document.createElement('div');
+        item.className = 'item';
+        
+        // 获取文件名用于显示
+        const fileName = imageUrl.split('/').pop() || 'image';
+        
+        item.innerHTML = `
+            <div class="img">
+                <a href="${imageUrl}" target="_blank">
+                    <img src="${imageUrl}" alt="${fileName}">
+                </a>
+            </div>
+            <div class="url-container">
+                <div class="url-text" title="${imageUrl}" onclick="navigator.clipboard.writeText('${imageUrl}')">${imageUrl}</div>
+                <button class="copy-btn" onclick="copyToClipboard('${imageUrl}', this)">复制</button>
+            </div>
+        `;
+        
+        return item;
+    }
+    
+    // 常见的本地图片文件名模式
+    const commonImageNames = [
+        'award', 'cry', 'heart', 'home-share', 'icon-all', 'icon-vue', 
+        'location-maker1', 'mst_banner', 'music', 'rose_qrcode', 
+        'shuangxi-share', 'shuangxi', 'smile', 'tongzhi', 'wedding-bg', 
+        'wedding-bg2', 'wedding-page1-bg', 'wedding-page1-hua', 
+        'wedding-page1-pic', 'wedding-page1-xingxing', 'wedding-page2-pic', 
+        'wedding-page3-pic1', 'wedding-page3-pic2', 'wedding-page3-pic3', 
+        'wedding-page3-pic4', '花边', '花边2', '花边3', '花边4'
+    ];
+    
+    // 常见的图片扩展名
+    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
+    
+    // 检查图片是否存在
+    function checkImageExists(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = url;
+        });
+    }
+    
+    // 动态检测本地图片
+    async function detectLocalImages() {
+        const localImages = [];
+        
+        // 生成可能的图片URL组合并检测是否存在
+        for (const name of commonImageNames) {
+            for (const ext of imageExtensions) {
+                const url = `./${name}${ext}`;
+                if (await checkImageExists(url)) {
+                    localImages.push(url.replace('./', 'https://picturbed.netlify.app/'));
+                }
+            }
+        }
+        
+        return localImages;
+    }
+    
+    // 收集所有图片URL
+    const imageUrls = [];
+    
+    // 更新图片计数
+    function updateImageCount() {
+        const countElement = document.getElementById('imageCount');
+        if (countElement) {
+            countElement.textContent = imageUrls.length;
+        }
+    }
+    
+    // 主函数
+    async function loadAllImages() {
+        const container = document.getElementById('imageContainer');
+        
+        try {
+            // 检测本地图片
+            const localImages = await detectLocalImages();
+            
+            // 添加本地图片到列表
+            localImages.forEach(url => {
+                if (!imageUrls.includes(url)) {
+                    imageUrls.push(url);
+                }
+            });
+            
+            // 从classify-list.json中提取图标URL
+            try {
+                const classifyResponse = await axios.get('./classify-list.json');
+                classifyResponse.data.forEach(item => {
+                    if (item.icon && !imageUrls.includes(item.icon)) {
+                        imageUrls.push(item.icon);
+                    }
+                });
+            } catch (e) {
+                console.log('无法加载classify-list.json');
+            }
+            
+            // 从twk.json中提取可能的图片URL
+            try {
+                const twkResponse = await axios.get('./twk.json');
+                twkResponse.data.forEach(item => {
+                    // 在answerContent中查找图片URL
+                    const imgRegex = /https?:\/\/[^\s]+?\.(?:png|jpg|jpeg|gif|svg|webp)/gi;
+                    const matches = item.answerContent ? item.answerContent.match(imgRegex) : [];
+                    if (matches) {
+                        matches.forEach(url => {
+                            if (!imageUrls.includes(url)) {
+                                imageUrls.push(url);
+                            }
+                        });
+                    }
+                });
+            } catch (e) {
+                console.log('无法加载twk.json');
+            }
+            
+            // 显示所有图片
+            container.innerHTML = '';
+            imageUrls.forEach(url => {
+                container.appendChild(createImageItem(url));
+            });
+            
+            // 更新图片计数
+            updateImageCount();
+            
+            if (imageUrls.length === 0) {
+                container.innerHTML = '<div class="loading">未找到图片</div>';
+            }
+        } catch (error) {
+            console.error('Error loading data:', error);
+            container.innerHTML = '<div class="loading">加载失败，请检查网络连接</div>';
+        }
+    }
+    
+    // 页面加载完成后开始检测图片
+    window.addEventListener('DOMContentLoaded', loadAllImages);
 </script>
 </html>
