@@ -1,0 +1,1252 @@
+[
+    {
+        "id": "css-interview-1",
+        "topic": "Tailwind 的响应式断点（如 `md:`）底层如何实现?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### Tailwind 响应式断点底层实现\n\nTailwind 的响应式断点本质是 **CSS 媒体查询（Media Queries）** 的封装。\n\n#### 1. 核心原理\n- 每个断点（如 `md:`）对应一个预定义的媒体查询规则：\n  ```css\n  /* md: 对应 768px 及以上屏幕 */\n  @media (min-width: 768px) {\n    .md\\:block {\n      display: block;\n    }\n  }\n  ```\n- 前缀 `md:` 会被编译为对应的媒体查询包裹，只有在满足屏幕尺寸条件时才生效。\n\n#### 2. 默认断点配置\nTailwind 默认断点：\n| 前缀 | 最小宽度 | 对应设备 |\n| :--- | :--- | :--- |\n| `sm:` | 640px | 平板 |\n| `md:` | 768px | 小屏笔记本 |\n| `lg:` | 1024px | 桌面 |\n| `xl:` | 1280px | 大屏桌面 |\n| `2xl:` | 1536px | 超大屏 |\n\n#### 3. 自定义断点\n可在 `tailwind.config.js` 中修改或扩展断点：\n```javascript\nmodule.exports = {\n  theme: {\n    screens: {\n      'tablet': '640px',\n      'laptop': '1024px',\n      'desktop': '1280px'\n    }\n  }\n}\n```\n\n### 总结\nTailwind 响应式断点是 **媒体查询的语法糖**，通过前缀 + 类名的方式，让开发者无需手写媒体查询，即可快速实现响应式布局。"
+    },
+    {
+        "id": "css-interview-2",
+        "topic": "Tailwind 是怎么解决样式冲突的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### Tailwind 解决样式冲突的核心手段\n\n#### 1. **原子化 CSS 设计**\n- 每个类名只对应**单一 CSS 属性**，如 `p-4` 只控制 padding，`text-red-500` 只控制颜色；\n- 避免了传统 CSS 中复杂的选择器嵌套和优先级问题。\n\n#### 2. **明确的优先级规则**\n- 同优先级类名：**后写的覆盖先写的**（CSS 层叠规则）；\n- 响应式前缀：`md:` 等断点类名优先级高于基础类；\n- 伪类前缀：`hover:`/`focus:` 优先级高于基础类；\n- 重要修饰符：`!` 前缀（如 `!p-4`）会添加 `!important`，优先级最高。\n\n#### 3. **Preflight 重置样式**\n- 内置 `preflight` 样式重置，统一浏览器默认样式；\n- 避免浏览器默认样式与 Tailwind 类名冲突。\n\n#### 4. **工具类不可继承**\n- Tailwind 工具类大多是**不可继承**的属性（如 `margin`/`padding`/`width`），避免继承导致的样式覆盖问题；\n- 继承属性（如 `color`/`font-size`）通过明确类名控制。\n\n#### 5. **JIT 编译模式（推荐）**\n- JIT 模式下，只编译使用到的类名，避免冗余样式；\n- 生成的 CSS 体积更小，冲突概率更低。\n\n### 总结\nTailwind 通过 **原子化设计 + 明确优先级 + 样式重置 + JIT 编译**，从根源上避免了传统 CSS 的样式冲突问题。"
+    },
+    {
+        "id": "css-interview-3",
+        "topic": "怎么实现一个固定宽高比（如16:9）的容器",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 实现固定宽高比容器的三种方案\n\n#### 方案一：padding-top 百分比法（兼容性最好）\n```css\n.container {\n  width: 100%;\n  position: relative;\n  /* 16:9 → padding-top = 9/16 = 56.25% */\n  padding-top: 56.25%;\n}\n.content {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n}\n```\n- 原理：`padding-top` 百分比是相对于**父元素宽度**计算的，通过设置 `padding-top` 实现固定比例的高度占位。\n\n#### 方案二：aspect-ratio 属性（现代浏览器推荐）\n```css\n.container {\n  aspect-ratio: 16/9;\n  width: 100%;\n}\n```\n- 原理：CSS 原生 `aspect-ratio` 属性直接指定宽高比，代码最简洁；\n- 兼容性：Chrome 88+、Firefox 87+、Safari 15+。\n\n#### 方案三：Grid 布局法\n```css\n.container {\n  display: grid;\n  grid-template-columns: 1fr;\n  grid-template-rows: auto 1fr;\n}\n.container::before {\n  content: '';\n  padding-top: 56.25%;\n  grid-row: 1 / 2;\n}\n.content {\n  grid-row: 1 / 2;\n}\n```\n- 原理：通过 Grid 布局和伪元素实现比例占位。\n\n### 总结\n- **兼容性优先**：使用 `padding-top` 方案；\n- **现代浏览器**：直接使用 `aspect-ratio` 属性，代码最简洁。"
+    },
+    {
+        "id": "css-interview-4",
+        "topic": "你都了解哪些 CSS 布局技术？它们各自的特点和适用场景是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 主流 CSS 布局技术对比\n\n| 布局技术 | 核心特点 | 适用场景 |\n| :--- | :--- | :--- |\n| **流式布局（Flow）** | 浏览器默认布局，块级元素垂直堆叠，行内元素水平排列 | 基础文档流、简单页面结构 |\n| **浮动布局（Float）** | 元素脱离文档流，实现文字环绕效果 | 早期图文混排、多列布局（已逐渐被 Flex/Grid 替代） |\n| **定位布局（Position）** | 通过 `static`/`relative`/`absolute`/`fixed`/`sticky` 精确定位元素 | 弹窗、导航栏、固定元素、吸顶效果 |\n| **Flexbox 布局** | 一维布局，主轴/交叉轴控制元素排列，自动弹性伸缩 | 导航栏、列表、卡片、表单等**一维布局**场景 |\n| **Grid 布局** | 二维布局，同时控制行和列，支持网格线和区域划分 | 页面整体布局、仪表盘、商品列表等**二维布局**场景 |\n| **多列布局（Multi-column）** | 将内容分割为多列，类似报纸排版 | 文章、新闻等长文本排版 |\n| **Table 布局** | 模拟表格结构，单元格对齐 | 数据表格（不推荐用于页面布局） |\n\n---\n\n### 核心选型建议\n- **简单页面**：流式布局 + 定位布局；\n- **一维布局（行/列）**：Flexbox 布局（首选）；\n- **二维布局（网格）**：Grid 布局（首选）；\n- **图文混排**：Flexbox 或 Grid 替代浮动布局；\n- **长文本排版**：多列布局。\n\n### 总结\n现代前端布局以 **Flexbox + Grid** 为核心，配合定位布局，几乎可以实现所有复杂页面布局，兼容性和灵活性都极佳。"
+    },
+    {
+        "id": "css-interview-5",
+        "topic": "说说你对原子化 CSS 的了解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 原子化 CSS（Atomic CSS）是什么？\n原子化 CSS 是一种 CSS 架构理念：**将样式拆分为单一功能的原子类**，每个类名只对应一个 CSS 属性，通过组合类名实现复杂样式。\n\n#### 核心特点\n- **单一职责**：一个类名只做一件事，如 `p-4`（padding: 1rem）、`text-red-500`（color: #ef4444）；\n- **可组合**：通过拼接多个原子类实现复杂样式，如 `<div class=\"p-4 bg-white shadow-md\">`；\n- **无嵌套**：避免复杂选择器嵌套，样式冲突概率低；\n- **可复用**：原子类可在任何组件中复用，减少代码冗余。\n\n#### 代表工具\n- **Tailwind CSS**：最流行的原子化 CSS 框架，内置丰富工具类，支持 JIT 编译；\n- **Windi CSS**：Tailwind 的轻量级替代，性能更好；\n- **Tachyons**：早期原子化 CSS 框架，理念先驱。\n\n#### 优势\n- **开发效率高**：无需写自定义 CSS，直接在 HTML 中组合类名；\n- **样式一致性**：统一设计系统，避免随意写样式；\n- **可维护性好**：样式与 HTML 绑定，删除组件时自动清理样式；\n- **体积小**：JIT 模式下只编译使用到的类名，CSS 体积最小。\n\n#### 缺点\n- **HTML 可读性差**：类名过多导致 HTML 冗长；\n- **学习成本**：需要记忆大量类名；\n- **灵活性受限**：复杂样式需要自定义配置或 `@apply`。\n\n### 总结\n原子化 CSS 是**高效、可复用、可维护**的现代 CSS 方案，尤其适合中大型项目和设计系统统一的场景，是当前前端开发的趋势之一。"
+    },
+    {
+        "id": "css-interview-6",
+        "topic": "position 的 sticky 有什么应用场景?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### `position: sticky` 核心特性\n`sticky` 是 `relative` 和 `fixed` 的结合：\n- 元素在正常文档流中（相对定位）；\n- 当滚动到指定阈值时，变为固定定位（`fixed`），吸附在容器边缘。\n\n#### 语法\n```css\n.sticky {\n  position: sticky;\n  top: 0; /* 吸附到顶部 0px 位置 */\n}\n```\n\n---\n\n### 典型应用场景\n\n#### 1. **导航栏吸顶**\n- 页面滚动时，导航栏吸附在顶部，始终可见；\n```css\n.navbar {\n  position: sticky;\n  top: 0;\n}\n```\n\n#### 2. **表格表头固定**\n- 长表格滚动时，表头吸附在顶部，方便查看列名；\n```css\n.table th {\n  position: sticky;\n  top: 0;\n  background: white;\n}\n```\n\n#### 3. **侧边栏目录吸附**\n- 文章目录吸附在侧边，随滚动始终可见，方便跳转；\n```css\n.sidebar {\n  position: sticky;\n  top: 20px;\n}\n```\n\n#### 4. **分类标题吸附**\n- 商品分类标题吸附在顶部，切换分类时始终可见；\n```css\n.category-title {\n  position: sticky;\n  top: 0;\n}\n```\n\n#### 5. **广告栏固定**\n- 页面滚动时，广告栏吸附在底部或侧边，不随滚动消失。\n\n---\n\n### 注意事项\n- 必须指定 `top`/`right`/`bottom`/`left` 中的至少一个阈值；\n- 父元素不能有 `overflow: hidden`/`auto`/`scroll`，否则会失效；\n- 兼容性：Chrome 56+、Firefox 59+、Safari 13+，IE 不支持。\n\n### 总结\n`position: sticky` 是实现**吸顶、吸附、固定**效果的最佳方案，无需 JavaScript，纯 CSS 即可实现，体验流畅。"
+    },
+    {
+        "id": "css-interview-7",
+        "topic": "说说你对 CSS 变量的了解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS 变量（CSS Custom Properties）是什么？\nCSS 变量是允许开发者在 CSS 中定义**可复用值**的特性，语法为 `--var-name: value`，通过 `var(--var-name)` 调用。\n\n#### 核心语法\n```css\n/* 定义变量：全局（:root）或局部选择器 */\n:root {\n  --primary-color: #2563eb;\n  --spacing: 1rem;\n}\n\n/* 使用变量 */\n.button {\n  background-color: var(--primary-color);\n  padding: var(--spacing);\n}\n\n/* 变量默认值 */\n.button {\n  color: var(--text-color, #333);\n}\n```\n\n---\n\n### 核心特性\n1. **动态性**：可通过 JavaScript 动态修改，实时生效；\n   ```javascript\n   document.documentElement.style.setProperty('--primary-color', '#dc2626')\n   ```\n2. **作用域**：变量只在定义的选择器及其子元素中生效；\n   ```css\n   .dark {\n     --primary-color: #3b82f6; /* 仅在 .dark 类下生效 */\n   }\n   ```\n3. **继承性**：子元素可继承父元素定义的变量；\n4. **类型无关**：可存储任何 CSS 值（颜色、长度、字符串等）。\n\n---\n\n### 应用场景\n- **主题切换**：通过修改根变量实现亮色/暗色主题切换；\n- **设计系统**：统一管理颜色、间距、字体等设计令牌；\n- **响应式布局**：在不同断点下修改变量，实现自适应；\n- **组件复用**：组件内部定义变量，方便自定义样式。\n\n---\n\n### 兼容性\n- 现代浏览器均支持（Chrome 49+、Firefox 31+、Safari 9+）；\n- IE 不支持，可通过 PostCSS 插件（如 `postcss-custom-properties`）降级处理。\n\n### 总结\nCSS 变量是**动态、可复用、可继承**的现代 CSS 特性，极大提升了 CSS 的灵活性和可维护性，是主题切换和设计系统的核心技术。"
+    },
+    {
+        "id": "css-interview-8",
+        "topic": "gap 属性是用来设置什么的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### `gap` 属性作用\n`gap` 是用来设置 **Flexbox 或 Grid 布局中子元素之间间距** 的 CSS 属性，替代了传统的 `margin` 方案。\n\n#### 语法\n```css\n/* 同时设置行间距和列间距 */\ngap: 1rem;\n\n/* 分别设置行间距 row-gap 和列间距 column-gap */\ngap: 1rem 2rem;\n```\n\n---\n\n### 支持的布局\n1. **Flexbox 布局**：\n   ```css\n   .flex-container {\n     display: flex;\n     gap: 1rem; /* 子元素之间的间距 */\n   }\n   ```\n2. **Grid 布局**：\n   ```css\n   .grid-container {\n     display: grid;\n     grid-template-columns: repeat(3, 1fr);\n     gap: 1rem; /* 网格行和列之间的间距 */\n   }\n   ```\n3. **多列布局（Multi-column）**：\n   ```css\n   .multi-column {\n     column-count: 3;\n     gap: 2rem; /* 列之间的间距 */\n   }\n   ```\n\n---\n\n### 优势 vs `margin`\n- **无边缘溢出**：`gap` 只在子元素之间生成间距，不会在容器边缘产生多余 margin；\n- **代码简洁**：一行代码控制所有子元素间距，无需手动处理 `:last-child`；\n- **布局友好**：与 Flex/Grid 布局完美配合，自动适应主轴方向。\n\n---\n\n### 兼容性\n- 现代浏览器均支持（Chrome 84+、Firefox 75+、Safari 14.1+）；\n- 旧版浏览器需使用 `grid-gap`/`row-gap`/`column-gap` 别名。\n\n### 总结\n`gap` 是 Flex/Grid 布局中**设置子元素间距**的最佳方案，代码简洁、无冗余、兼容性好，是现代布局的首选。"
+    },
+    {
+        "id": "css-interview-9",
+        "topic": "怎么实现一段文字颜色渐变的效果?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 实现文字渐变效果的核心方案\n\n#### 方案一：background-clip + text-fill-color（现代浏览器推荐）\n```css\n.gradient-text {\n  background: linear-gradient(90deg, #ff0000, #00ff00);\n  -webkit-background-clip: text;\n  background-clip: text;\n  -webkit-text-fill-color: transparent;\n  color: transparent; /* 兼容标准写法 */\n}\n```\n- 原理：将渐变背景裁剪到文字区域，隐藏文字本身颜色，只显示渐变背景。\n- 兼容性：Chrome、Safari、Edge、Firefox 支持良好。\n\n#### 方案二：mask-image（更灵活，支持复杂渐变）\n```css\n.gradient-text {\n  position: relative;\n  color: #000;\n}\n.gradient-text::after {\n  content: attr(data-text);\n  position: absolute;\n  top: 0;\n  left: 0;\n  background: linear-gradient(90deg, #ff0000, #00ff00);\n  -webkit-background-clip: text;\n  background-clip: text;\n  -webkit-text-fill-color: transparent;\n  color: transparent;\n}\n```\n- 原理：通过伪元素覆盖原文字，实现渐变效果，不影响原文本选择。\n\n#### 方案三：SVG text 渐变（兼容性最好，支持 IE）\n```svg\n<svg width=\"200\" height=\"50\">\n  <defs>\n    <linearGradient id=\"grad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n      <stop offset=\"0%\" stop-color=\"#ff0000\" />\n      <stop offset=\"100%\" stop-color=\"#00ff00\" />\n    </linearGradient>\n  </defs>\n  <text x=\"0\" y=\"40\" font-size=\"40\" fill=\"url(#grad)\">渐变文字</text>\n</svg>\n```\n- 原理：使用 SVG 的 `linearGradient` 给文字填充渐变，兼容性最好。\n\n---\n\n### 总结\n- **现代浏览器**：推荐使用 `background-clip: text` 方案，代码最简洁；\n- **兼容 IE**：使用 SVG text 渐变方案；\n- **复杂场景**：使用 `mask-image` 或伪元素方案。"
+    },
+    {
+        "id": "css-interview-10",
+        "topic": "未知高度和宽度元素的水平垂直居中的方案有哪些，简单手写一下?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 未知宽高元素水平垂直居中的 5 种方案\n\n#### 方案一：Flexbox 布局（最推荐，现代浏览器首选）\n```css\n.parent {\n  display: flex;\n  justify-content: center; /* 水平居中 */\n  align-items: center;     /* 垂直居中 */\n}\n```\n\n#### 方案二：Grid 布局（简洁，二维场景首选）\n```css\n.parent {\n  display: grid;\n  place-items: center; /* 等价于 justify-items + align-items */\n}\n```\n\n#### 方案三：absolute + transform（兼容性好，支持 IE9+）\n```css\n.parent {\n  position: relative;\n}\n.child {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n}\n```\n\n#### 方案四：absolute + margin: auto（需知道宽高？不，未知也可）\n```css\n.parent {\n  position: relative;\n}\n.child {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin: auto;\n  /* 无需指定宽高 */\n}\n```\n\n#### 方案五：table-cell 布局（兼容旧版浏览器）\n```css\n.parent {\n  display: table-cell;\n  text-align: center;\n  vertical-align: middle;\n}\n.child {\n  display: inline-block;\n}\n```\n\n---\n\n### 方案对比\n| 方案 | 兼容性 | 代码量 | 适用场景 |\n| :--- | :--- | :--- | :--- |\n| Flexbox | 现代浏览器 | 最少 | 绝大多数场景 |\n| Grid | 现代浏览器 | 最少 | 二维布局、复杂页面 |\n| absolute + transform | IE9+ | 中等 | 绝对定位场景 |\n| absolute + margin: auto | IE8+ | 中等 | 需撑满父容器场景 |\n| table-cell | IE8+ | 较多 | 兼容旧版浏览器 |\n\n### 总结\n- **现代项目**：优先使用 **Flexbox** 或 **Grid** 方案，代码最简洁、维护成本最低；\n- **兼容旧版**：使用 `absolute + transform` 或 `table-cell` 方案。"
+    },
+    {
+        "id": "css-interview-11",
+        "topic": "浏览器如何解析css选择器?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 浏览器解析 CSS 选择器的核心规则\n\n#### 1. **从右向左解析（关键特性）**\n浏览器解析选择器时是**从右往左**匹配的，而非从左到右。\n- 例如：`div .list .item` → 先找所有 `.item`，再向上找父级是否是 `.list`，再向上找是否是 `div`；\n- 原因：从右往左能更快过滤掉不匹配的元素，提升匹配效率。\n\n#### 2. **匹配优先级（ specificity 权重）**\n选择器优先级由四部分权重组成（从高到低）：\n- `!important` > 行内样式 > ID 选择器 > 类/伪类/属性选择器 > 元素/伪元素选择器 > 通配符 `*`；\n- 权重计算：\n  - ID：`1-0-0`\n  - 类/伪类/属性：`0-1-0`\n  - 元素/伪元素：`0-0-1`\n  - 通配符：`0-0-0`\n- 示例：`#app .nav li.active` → 权重 `1-1-2`（1 个 ID + 1 个类 + 2 个元素）。\n\n#### 3. **层叠与继承**\n- **层叠**：多个选择器匹配同一元素时，按优先级高的生效；优先级相同，后写的覆盖先写的；\n- **继承**：可继承属性（如 `color`/`font-size`）会从父元素继承到子元素，不可继承属性（如 `margin`/`padding`）不会。\n\n#### 4. **性能优化建议**\n- 避免嵌套过深（如 `div ul li a span`），减少匹配次数；\n- 避免使用通用选择器 `*` 和低效选择器（如 `[type='text']`）；\n- 优先使用类选择器，避免 ID 选择器滥用；\n- 避免使用 `div:first-child` 等结构伪类，性能较差。\n\n### 总结\n浏览器通过**从右向左解析 + 权重计算 + 层叠继承**，高效匹配元素并应用样式，核心是**性能优先**的匹配策略。"
+    },
+    {
+        "id": "css-interview-12",
+        "topic": "CSS 尺寸单位有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS 尺寸单位分类与详解\n\n#### 1. **绝对单位（固定值，不随环境变化）**\n| 单位 | 含义 | 换算 |\n| :--- | :--- | :--- |\n| `px` | 像素（最常用） | 屏幕最小显示单位 |\n| `cm` | 厘米 | 1cm = 96px/2.54 ≈ 37.8px |\n| `mm` | 毫米 | 1mm = 0.1cm |\n| `in` | 英寸 | 1in = 2.54cm = 96px |\n| `pt` | 点（印刷） | 1pt = 1/72in ≈ 1.33px |\n| `pc` | 派卡 | 1pc = 12pt |\n\n#### 2. **相对单位（相对其他值计算，响应式首选）**\n| 单位 | 相对基准 | 适用场景 |\n| :--- | :--- | :--- |\n| `em` | 父元素 `font-size` | 字体大小、组件内间距 |\n| `rem` | 根元素 `html` 的 `font-size` | 全局响应式布局、字体 |\n| `vw` | 视口宽度的 1% | 响应式宽度、字体 |\n| `vh` | 视口高度的 1% | 响应式高度、全屏布局 |\n| `vmin` | `vw` 和 `vh` 中较小值 | 适配横竖屏 |\n| `vmax` | `vw` 和 `vh` 中较大值 | 适配横竖屏 |\n| `%` | 父元素对应属性 | 流式布局、百分比宽度 |\n| `ch` | 数字 `0` 的宽度 | 等宽字体排版 |\n| `ex` | 字体 x 高度（小写 x 的高度） | 垂直对齐、特殊排版 |\n\n#### 3. **现代布局单位（CSS3 新增）**\n- `fr`：Grid 布局中剩余空间的比例，如 `grid-template-columns: 1fr 2fr`；\n- `minmax(min, max)`：Grid 中设置最小/最大尺寸；\n- `auto-fill`/`auto-fit`：Grid 中自动填充列。\n\n---\n\n### 选型建议\n- **固定尺寸**：使用 `px`（如边框、图标）；\n- **响应式字体/布局**：使用 `rem`/`vw`/`vh`；\n- **组件内间距**：使用 `em`（相对组件字体）；\n- **Grid 布局**：使用 `fr`/`minmax`。\n\n### 总结\nCSS 单位分为**绝对单位**和**相对单位**，现代响应式开发以 `rem`/`vw`/`vh`/`fr` 为主，兼顾灵活性和适配性。"
+    },
+    {
+        "id": "css-interview-13",
+        "topic": "css 中三栏布局的实现方案有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS 三栏布局（左右固定，中间自适应）的 5 种实现方案\n\n#### 方案一：Float 布局（传统方案）\n```css\n.left { float: left; width: 200px; }\n.right { float: right; width: 200px; }\n.center { margin: 0 200px; }\n```\n- 优点：兼容性好，支持 IE6+；\n- 缺点：需要清除浮动，中间栏最后渲染，影响语义。\n\n#### 方案二：Flexbox 布局（现代首选）\n```css\n.container {\n  display: flex;\n}\n.left { width: 200px; }\n.right { width: 200px; }\n.center { flex: 1; /* 占满剩余空间 */ }\n```\n- 优点：代码简洁、语义清晰、自适应完美；\n- 缺点：IE10+ 支持，旧版浏览器需前缀。\n\n#### 方案三：Grid 布局（最简洁，二维场景）\n```css\n.container {\n  display: grid;\n  grid-template-columns: 200px 1fr 200px;\n}\n```\n- 优点：代码最少，布局直观，支持复杂响应式；\n- 缺点：现代浏览器支持，IE 不支持。\n\n#### 方案四：绝对定位布局\n```css\n.container {\n  position: relative;\n}\n.left { position: absolute; left: 0; width: 200px; }\n.right { position: absolute; right: 0; width: 200px; }\n.center { margin: 0 200px; }\n```\n- 优点：脱离文档流，不影响中间栏；\n- 缺点：高度塌陷，需手动处理。\n\n#### 方案五：圣杯布局 / 双飞翼布局（经典方案）\n- **圣杯布局**：\n  ```css\n  .container { padding: 0 200px; }\n  .left { float: left; width: 200px; margin-left: -100%; position: relative; left: -200px; }\n  .center { float: left; width: 100%; }\n  .right { float: left; width: 200px; margin-left: -200px; position: relative; right: -200px; }\n  ```\n- **双飞翼布局**：在中间栏内部嵌套子元素，通过 `margin` 实现，避免 `position: relative`。\n- 优点：语义化好，中间栏优先渲染；\n- 缺点：代码复杂，理解成本高。\n\n---\n\n### 方案对比\n| 方案 | 代码量 | 兼容性 | 推荐度 |\n| :--- | :--- | :--- | :--- |\n| Flexbox | 最少 | IE10+ | ⭐⭐⭐⭐⭐ |\n| Grid | 最少 | 现代浏览器 | ⭐⭐⭐⭐ |\n| Float | 中等 | IE6+ | ⭐⭐⭐ |\n| 绝对定位 | 中等 | IE8+ | ⭐⭐ |\n| 圣杯/双飞翼 | 最多 | IE6+ | ⭐ |\n\n### 总结\n现代开发优先使用 **Flexbox** 或 **Grid** 方案，代码简洁、维护成本低；兼容旧版浏览器使用 **Float** 方案。"
+    },
+    {
+        "id": "css-interview-14",
+        "topic": "CSS 中的文档流是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 文档流（Normal Flow）是什么？\n文档流是浏览器渲染元素的**默认规则**：元素按照 HTML 书写顺序，从左到右、从上到下依次排列，占据各自的空间。\n\n#### 核心规则\n1. **块级元素（Block）**：\n   - 独占一行，宽度默认占满父容器；\n   - 可设置 `width`/`height`/`margin`/`padding`；\n   - 示例：`div`/`p`/`h1`/`ul`/`li`。\n2. **行内元素（Inline）**：\n   - 与其他行内元素在同一行，宽度由内容决定；\n   - 不可设置 `width`/`height`，上下 `margin`/`padding` 无效；\n   - 示例：`span`/`a`/`strong`/`em`。\n3. **行内块元素（Inline-block）**：\n   - 与其他行内元素在同一行，可设置 `width`/`height`/`margin`/`padding`；\n   - 示例：`img`/`button`/`input`。\n\n#### 脱离文档流的情况\n元素脱离文档流后，不再占据默认空间，其他元素会填补其位置：\n- `float: left/right`：元素浮动，文字环绕；\n- `position: absolute/fixed`：元素绝对定位/固定定位，脱离文档流。\n\n#### 示例\n```html\n<!-- 文档流：div 独占一行，span 在同一行 -->\n<div>块级元素1</div>\n<span>行内元素1</span>\n<span>行内元素2</span>\n<div>块级元素2</div>\n```\n\n### 总结\n文档流是浏览器的**默认渲染规则**，块级元素垂直堆叠，行内元素水平排列；浮动和绝对定位会让元素脱离文档流，影响布局。"
+    },
+    {
+        "id": "css-interview-15",
+        "topic": "说下 css 中的 BFC、IFC、GFC 和 FFC 分别指什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS 格式化上下文（Formatting Context）详解\n\n格式化上下文是页面中一块**独立的渲染区域**，规定了内部元素的布局规则，与外部区域互不影响。\n\n#### 1. **BFC（Block Formatting Context）块级格式化上下文**\n- **触发条件**：\n  - `float: left/right`；\n  - `overflow: hidden/auto/scroll`（非 `visible`）；\n  - `display: inline-block/flex/grid/table-cell`；\n  - `position: absolute/fixed`；\n- **布局规则**：\n  - 内部块级元素垂直排列；\n  - 垂直方向 `margin` 会折叠；\n  - BFC 区域不会与浮动元素重叠；\n  - 计算 BFC 高度时，浮动子元素也会参与计算（清除浮动）；\n- **应用场景**：清除浮动、避免 margin 折叠、实现两栏布局。\n\n#### 2. **IFC（Inline Formatting Context）行内格式化上下文**\n- **触发条件**：包含行内元素的块级容器；\n- **布局规则**：\n  - 内部行内元素水平排列，一行放不下时换行；\n  - 垂直方向对齐由 `vertical-align` 控制；\n  - 行框高度由最高的行内元素决定；\n- **应用场景**：文字排版、行内元素对齐。\n\n#### 3. **GFC（Grid Formatting Context）网格格式化上下文**\n- **触发条件**：`display: grid/inline-grid`；\n- **布局规则**：\n  - 内部元素按二维网格布局；\n  - 可定义行、列、间距、区域；\n- **应用场景**：复杂页面布局、仪表盘、商品列表。\n\n#### 4. **FFC（Flex Formatting Context）弹性格式化上下文**\n- **触发条件**：`display: flex/inline-flex`；\n- **布局规则**：\n  - 内部元素按一维弹性布局（主轴/交叉轴）；\n  - 自动弹性伸缩，自适应分配空间；\n- **应用场景**：导航栏、列表、卡片、表单等一维布局。\n\n---\n\n### 总结\n- **BFC**：块级元素布局规则，核心是**独立区域、清除浮动**；\n- **IFC**：行内元素布局规则，核心是**水平排列、垂直对齐**；\n- **FFC**：Flexbox 布局规则，核心是**弹性伸缩**；\n- **GFC**：Grid 布局规则，核心是**二维网格**。\n\n它们是 CSS 布局的底层规则，决定了元素如何排列和渲染。"
+    },
+    {
+        "id": "css-interview-16",
+        "topic": "CSS 伪类和伪元素有哪些，它们的区别和实际应用",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS 伪类 vs 伪元素\n\n#### 1. **核心区别**\n| 对比维度 | 伪类（Pseudo-class） | 伪元素（Pseudo-element） |\n| :--- | :--- | :--- |\n| **语法** | 单冒号 `:hover` | 双冒号 `::before`（CSS3 规范，单冒号 `:before` 兼容旧版） |\n| **本质** | 匹配元素的**状态/位置**，如 `:hover`/`:first-child` | 创建**不存在于 DOM 中的虚拟元素**，如 `::before`/`::after` |\n| **数量** | 多个伪类可同时作用于一个元素 | 一个元素最多有 2 个伪元素（`::before`/`::after`） |\n| **优先级** | 与类选择器相同（`0-1-0`） | 与元素选择器相同（`0-0-1`） |\n\n#### 2. **常见伪类**\n- **状态伪类**：`:hover`/`:active`/`:focus`/`:visited`（链接状态）；\n- **结构伪类**：`:first-child`/`:last-child`/`:nth-child(n)`/`:nth-of-type(n)`；\n- **表单伪类**：`:checked`/`:disabled`/`:required`/`:valid`/`:invalid`；\n- **其他**：`:not()`/`:is()`/`:where()`。\n\n#### 3. **常见伪元素**\n- `::before`：在元素内容前插入虚拟元素；\n- `::after`：在元素内容后插入虚拟元素；\n- `::first-line`：匹配元素第一行文本；\n- `::first-letter`：匹配元素第一个字符；\n- `::selection`：匹配用户选中的文本。\n\n---\n\n### 实际应用\n#### 伪类应用\n- 按钮 hover 效果：`.btn:hover { background: #000; }`；\n- 列表隔行变色：`li:nth-child(even) { background: #f5f5f5; }`；\n- 表单验证：`input:invalid { border: 1px solid red; }`。\n\n#### 伪元素应用\n- 清除浮动：`.clearfix::after { content: ''; display: block; clear: both; }`；\n- 图标装饰：`.icon::before { content: '★'; color: red; }`；\n- 文字首字母大写：`p::first-letter { font-size: 2em; float: left; }`；\n- 选中文字样式：`::selection { background: yellow; color: black; }`。\n\n### 总结\n- **伪类**：描述元素的**状态/位置**，用单冒号；\n- **伪元素**：创建**虚拟元素**，用双冒号，用于装饰和扩展内容。\n\n两者都是 CSS 中强大的选择器，极大提升了样式的灵活性和可维护性。"
+    },
+    {
+        "id": "css-interview-17",
+        "topic": "PostCSS 是什么，有什么作用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### PostCSS 是什么？\nPostCSS 是一个**用 JavaScript 工具转换 CSS 的平台**，本身不做任何转换，而是通过插件实现各种功能，类似 Babel 之于 JavaScript。\n\n#### 核心特性\n- **插件化**：所有功能由插件实现，可按需选择；\n- **现代 CSS 支持**：将未来 CSS 语法转换为浏览器兼容的 CSS；\n- **性能优化**：压缩 CSS、自动加前缀、优化代码；\n- ** lint 检查**：检查 CSS 语法错误、规范问题；\n- **模块化**：支持 CSS Modules、自定义变量等。\n\n#### 常用插件\n1. **autoprefixer**：自动添加浏览器前缀（如 `-webkit-`/`-moz-`），兼容不同浏览器；\n2. **postcss-preset-env**：将现代 CSS 语法（如 `aspect-ratio`/`custom-media`）转换为兼容 CSS；\n3. **cssnano**：压缩 CSS，移除冗余代码、空格、注释；\n4. **postcss-modules**：实现 CSS Modules，避免样式冲突；\n5. **stylelint**：检查 CSS 代码规范，避免错误；\n6. **postcss-import**：合并 `@import` 导入的 CSS 文件。\n\n#### 工作流程\n1. 读取 CSS 源码；\n2. 解析为 AST（抽象语法树）；\n3. 插件遍历 AST 进行转换；\n4. 生成最终 CSS 代码。\n\n#### 应用场景\n- **现代 CSS 开发**：使用最新 CSS 语法，兼容旧版浏览器；\n- **工程化构建**：与 Webpack/Vite/Rollup 集成，自动处理 CSS；\n- **样式优化**：压缩、前缀、模块化等；\n- **代码规范**：lint 检查，保证团队代码一致。\n\n### 总结\nPostCSS 是**现代 CSS 工程化的核心工具**，通过插件生态实现 CSS 转换、优化、规范等功能，让开发者能使用最新 CSS 语法，同时保证兼容性和性能。"
+    },
+    {
+        "id": "css-interview-18",
+        "topic": "html 元素节点上，有多个 class 名称，这几个 class 名称对应的样式渲染优先级是如何的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 多个 class 样式优先级规则\n\n#### 1. **优先级权重相同**\n多个 class 选择器的权重是相同的（均为 `0-1-0`），因此：\n- **后定义的 class 会覆盖先定义的 class**（CSS 层叠规则）；\n- 与 HTML 中 class 顺序无关，只与 CSS 中定义顺序有关。\n\n#### 2. **示例验证**\n```css\n/* CSS 定义顺序 */\n.red { color: red; }\n.blue { color: blue; }\n```\n```html\n<!-- HTML 中 class 顺序不影响结果 -->\n<div class=\"red blue\">文字颜色是 blue（后定义覆盖先定义）</div>\n<div class=\"blue red\">文字颜色也是 blue（后定义覆盖先定义）</div>\n```\n\n#### 3. **特殊情况**\n- 如果某个 class 带有 `!important`，则优先级最高，会覆盖其他所有 class；\n- 如果某个 class 是嵌套选择器（如 `.parent .child`），则权重更高（`0-2-0`），会覆盖单一 class；\n- 行内样式（`style='color: green;'`）权重高于所有 class，会覆盖 class 样式。\n\n#### 4. **优先级计算规则**\n- 权重：`!important` > 行内样式 > ID 选择器 > 类/伪类/属性选择器 > 元素/伪元素选择器；\n- 多个 class 权重相加：`.a.b.c` 权重为 `0-3-0`，高于单一 class `.a`（`0-1-0`）；\n- 权重相同，后定义的覆盖先定义的。\n\n### 总结\n多个 class 样式优先级由 **CSS 定义顺序** 决定：**后定义的 class 覆盖先定义的 class**；如果权重不同，则按权重高低决定，与 HTML 中 class 顺序无关。"
+    },
+    {
+        "id": "css-interview-19",
+        "topic": "如何避免全局样式污染?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 避免全局样式污染的 5 种核心方案\n\n#### 方案一：CSS Modules（推荐，组件化场景）\n- 原理：将 CSS 类名编译为哈希值，实现局部作用域；\n- 示例：\n  ```css\n  /* style.module.css */\n  .title { color: red; }\n  ```\n  ```vue\n  <script setup>\n  import styles from './style.module.css'\n  </script>\n  <template>\n    <h1 :class=\"styles.title\">Hello</h1>\n  </template>\n  ```\n- 优点：彻底避免样式冲突，天然局部作用域；\n- 缺点：类名冗长，需配合构建工具。\n\n#### 方案二：Scoped CSS（Vue 内置，Vue/React 均有类似实现）\n- 原理：给组件内 CSS 选择器添加唯一属性选择器（如 `[data-v-7ba5bd90]`），实现局部作用域；\n- 示例（Vue）：\n  ```vue\n  <style scoped>\n  .title { color: red; } /* 编译为 .title[data-v-7ba5bd90] */\n  </style>\n  ```\n- 优点：开箱即用，无需手动处理；\n- 缺点：无法直接作用于子组件根元素，需使用 `:deep()` 穿透。\n\n#### 方案三：BEM 命名规范（手动规范，无构建依赖）\n- 原理：约定类名格式 `Block__Element--Modifier`，避免全局命名冲突；\n- 示例：`.button--primary`/`.card__header`；\n- 优点：无需构建工具，兼容性好；\n- 缺点：类名冗长，需团队严格遵守规范。\n\n#### 方案四：CSS-in-JS（React 生态常用）\n- 原理：将 CSS 写在 JS 中，生成唯一类名，实现局部作用域；\n- 示例（Styled Components）：\n  ```javascript\n  import styled from 'styled-components'\n  const Title = styled.h1`color: red;`\n  // 使用 <Title>Hello</Title>\n  ```\n- 优点：动态样式、局部作用域、组件化友好；\n- 缺点：学习成本高，运行时开销。\n\n#### 方案五：原子化 CSS（Tailwind CSS 等）\n- 原理：每个类名只对应单一属性，通过组合类名实现样式，避免全局样式；\n- 示例：`<div class=\"text-red-500 p-4\">`；\n- 优点：开发效率高，样式一致性好；\n- 缺点：HTML 可读性差，学习成本高。\n\n---\n\n### 总结\n- **Vue 项目**：优先使用 **Scoped CSS**；\n- **React 项目**：优先使用 **CSS Modules** 或 **CSS-in-JS**；\n- **无构建依赖**：使用 **BEM 命名规范**；\n- **现代工程化**：推荐 **原子化 CSS** 或 **CSS Modules**。\n\n核心目标是**实现样式局部作用域**，避免全局样式污染。"
+    },
+    {
+        "id": "css-interview-20",
+        "topic": "全局样式命名冲突和样式覆盖问题怎么解决?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### 解决全局样式命名冲突和样式覆盖的方案\n\n#### 1. **命名规范：BEM/OOCSS/SUITCSS**\n- **BEM**：`Block__Element--Modifier`，如 `.button--primary`；\n- **OOCSS**：分离结构和皮肤，如 `.btn`（结构）+ `.btn-red`（皮肤）；\n- **SUITCSS**：`ComponentName-descendantName--modifierName`，如 `.Button--primary`；\n- 作用：通过约定命名避免冲突，可读性强，可维护性好。\n\n#### 2. **局部作用域：CSS Modules / Scoped CSS**\n- **CSS Modules**：将类名编译为哈希值，天然局部作用域，彻底避免冲突；\n- **Scoped CSS**：Vue 内置，通过属性选择器实现局部作用域，开箱即用；\n- 作用：样式只作用于当前组件，不会污染全局。\n\n#### 3. **CSS-in-JS**\n- 如 Styled Components、Emotion 等，将 CSS 写在 JS 中，生成唯一类名；\n- 作用：动态样式、局部作用域、组件化友好，避免冲突。\n\n#### 4. **原子化 CSS（Tailwind CSS）**\n- 每个类名只对应单一属性，通过组合类名实现样式；\n- 作用：无需自定义类名，避免命名冲突，开发效率高。\n\n#### 5. **命名空间（Namespace）**\n- 给所有类名添加项目/模块前缀，如 `.myapp-button`/`.admin-page-title`；\n- 作用：从命名上隔离不同模块，避免冲突。\n\n#### 6. **优先级控制**\n- 避免使用 `!important`，减少高优先级样式；\n- 合理使用嵌套选择器，避免过度嵌套导致优先级过高；\n- 按组件/模块拆分 CSS，避免全局样式覆盖。\n\n#### 7. **工具辅助**\n- 使用 Stylelint 检查命名规范和冲突；\n- 使用 PostCSS 插件自动添加前缀或转换类名；\n- 使用 CSS 变量统一管理颜色、间距等，避免重复定义。\n\n---\n\n### 总结\n解决全局样式冲突和覆盖的核心是**「局部作用域 + 规范命名 + 工具辅助」**：\n- 局部作用域（CSS Modules/Scoped CSS/CSS-in-JS）从根源上避免冲突；\n- 命名规范（BEM/前缀）从命名上隔离样式；\n- 工具辅助（Stylelint/PostCSS）保证规范执行。"
+    },
+    {
+        "id": "css-interview-21",
+        "topic": "css module 是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS Module 是什么？\nCSS Module 是一种**CSS 模块化方案**，通过构建工具将类名编译为**全局唯一的哈希值**，实现样式的**局部作用域**，避免全局样式污染和命名冲突。\n\n#### 核心原理\n- 构建时，将 `.module.css` 文件中的类名（如 `.title`）编译为哈希字符串（如 `.title__hash123`）；\n- 同时导出一个 JS 对象，映射原类名到编译后的类名；\n- 组件中通过 JS 对象引用类名，确保样式只作用于当前组件。\n\n#### 基本使用\n```css\n/* style.module.css */\n.title {\n  color: red;\n}\n.content {\n  font-size: 14px;\n}\n```\n```jsx\n// React 组件中使用\nimport styles from './style.module.css'\n\nexport default function MyComponent() {\n  return (\n    <div>\n      <h1 className={styles.title}>Hello</h1>\n      <p className={styles.content}>CSS Module</p>\n    </div>\n  )\n}\n```\n\n#### 优势\n- **局部作用域**：样式默认局部，不会污染全局；\n- **避免命名冲突**：哈希类名保证全局唯一；\n- **与构建工具无缝集成**：Webpack/Vite/Rollup 均支持；\n- **保留 CSS 语法**：无需学习新语法，纯 CSS 编写。\n\n#### 缺点\n- 类名冗长，可读性差；\n- 动态类名需使用 `styles[dynamicName]`；\n- 无法直接作用于全局样式，需通过 `:global` 声明。\n\n### 总结\nCSS Module 是**轻量级、无侵入**的 CSS 模块化方案，通过**哈希类名 + 局部作用域**解决了全局样式污染问题，是 React/Vue 项目中常用的样式隔离方案。"
+    },
+    {
+        "id": "css-interview-22",
+        "topic": "CSS 属性值计算 - calc 怎么使用，具体有哪些使用场景?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### `calc()` 是什么？\n`calc()` 是 CSS 原生的**计算函数**，允许在 CSS 属性值中进行**加减乘除运算**，支持混合单位（如 `px`/`%`/`rem`/`vw`）。\n\n#### 语法规则\n```css\n/* 基本语法 */\nproperty: calc(expression)\n\n/* 示例：宽度 = 100% - 200px */\nwidth: calc(100% - 200px);\n\n/* 支持 + - * /，运算符前后必须加空格 */\nwidth: calc(50% + 2rem);\nheight: calc(100vh / 2);\nmargin: calc(1rem * 2);\n```\n\n#### 注意事项\n- 运算符前后必须有**空格**（如 `calc(100% - 20px)` 正确，`calc(100%-20px)` 错误）；\n- 支持嵌套：`calc(calc(100% - 20px) - 10px)`；\n- 除法运算中，除数必须是无单位数值（如 `calc(100px / 2)` 正确，`calc(100px / 2px)` 错误）。\n\n#### 典型使用场景\n1. **自适应布局**：\n   ```css\n   /* 中间栏宽度 = 父容器宽度 - 左右边栏宽度 */\n   .center { width: calc(100% - 400px); }\n   ```\n2. **响应式字体**：\n   ```css\n   /* 字体大小 = 基础大小 + 视口宽度比例 */\n   font-size: calc(14px + 0.5vw);\n   ```\n3. **精确间距控制**：\n   ```css\n   /* 高度 = 视口高度 - 头部高度 */\n   .main { height: calc(100vh - 60px); }\n   ```\n4. **网格布局**：\n   ```css\n   /* 列宽 = (100% - 间距总和) / 列数 */\n   grid-template-columns: repeat(3, calc((100% - 20px * 2) / 3));\n   ```\n5. **垂直居中**：\n   ```css\n   /* 未知高度元素垂直居中 */\n   .child { top: calc(50% - 50px); }\n   ```\n\n### 总结\n`calc()` 是 CSS 中**灵活的计算工具**，支持混合单位运算，广泛用于**自适应布局、响应式设计、精确间距控制**等场景，让 CSS 布局更灵活、更强大。"
+    },
+    {
+        "id": "css-interview-23",
+        "topic": "怎么给某个元素的背景设置渐变色?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS 背景渐变实现方案\n\n#### 1. **线性渐变（linear-gradient）**\n- 语法：`background: linear-gradient(direction, color-stop1, color-stop2, ...)`\n- 方向：`to right`/`to bottom`/`to top left`/`45deg` 等；\n- 示例：\n  ```css\n  /* 从左到右：红 → 绿 → 蓝 */\n  background: linear-gradient(to right, red, green, blue);\n  /* 45° 角：红 0% → 绿 50% → 蓝 100% */\n  background: linear-gradient(45deg, red 0%, green 50%, blue 100%);\n  ```\n\n#### 2. **径向渐变（radial-gradient）**\n- 语法：`background: radial-gradient(shape size at position, color-stop1, color-stop2, ...)`\n- 形状：`circle`/`ellipse`；\n- 示例：\n  ```css\n  /* 中心向外：红 → 黄 → 绿 */\n  background: radial-gradient(circle, red, yellow, green);\n  /* 右上角为中心：红 → 蓝 */\n  background: radial-gradient(circle at top right, red, blue);\n  ```\n\n#### 3. **圆锥渐变（conic-gradient）**\n- 语法：`background: conic-gradient(from angle, color-stop1, color-stop2, ...)`\n- 用于饼图、色轮等；\n- 示例：\n  ```css\n  /* 饼图：红 0-90°，绿 90-180°，蓝 180-360° */\n  background: conic-gradient(red 0deg 90deg, green 90deg 180deg, blue 180deg 360deg);\n  ```\n\n#### 4. **重复渐变**\n- `repeating-linear-gradient`：重复线性渐变；\n- `repeating-radial-gradient`：重复径向渐变；\n- 示例：\n  ```css\n  /* 条纹背景 */\n  background: repeating-linear-gradient(45deg, red, red 10px, blue 10px, blue 20px);\n  ```\n\n#### 5. **多背景渐变**\n- 多个渐变用逗号分隔，实现叠加效果；\n- 示例：\n  ```css\n  background: \n    linear-gradient(to right, rgba(255,0,0,0.5), rgba(0,255,0,0.5)),\n    linear-gradient(to bottom, rgba(0,0,255,0.5), rgba(255,255,0,0.5));\n  ```\n\n### 总结\n- **线性渐变**：适合水平/垂直/角度渐变；\n- **径向渐变**：适合圆形/椭圆形扩散渐变；\n- **圆锥渐变**：适合饼图、环形渐变；\n- **重复渐变**：适合条纹、网格等重复图案。\n\n所有渐变都可通过 `background` 属性设置，支持透明度、多背景叠加，灵活性极强。"
+    },
+    {
+        "id": "css-interview-24",
+        "topic": "less 文件中怎么使用函数?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### Less 函数使用指南\n\nLess 内置了丰富的函数，同时支持**自定义函数**，用于处理颜色、字符串、数学运算等。\n\n#### 1. **内置函数（常用分类）**\n\n##### 颜色函数\n- `lighten(color, amount)`：提亮颜色；\n- `darken(color, amount)`：变暗颜色；\n- `saturate(color, amount)`：增加饱和度；\n- `desaturate(color, amount)`：降低饱和度；\n- `fade(color, amount)`：设置透明度；\n- `mix(color1, color2, weight)`：混合两种颜色；\n- 示例：\n  ```less\n  .box {\n    color: lighten(#ff0000, 20%); /* 提亮 20% → #ff6666 */\n    background: darken(#00ff00, 10%); /* 变暗 10% → #00e600 */\n  }\n  ```\n\n##### 数学函数\n- `round(number)`：四舍五入；\n- `ceil(number)`：向上取整；\n- `floor(number)`：向下取整；\n- `percentage(number)`：转换为百分比；\n- `sqrt(number)`：平方根；\n- 示例：\n  ```less\n  .box {\n    width: round(123.45px); /* 123px */\n    height: percentage(0.5); /* 50% */\n  }\n  ```\n\n##### 字符串函数\n- `escape(string)`：URL 编码；\n- `e(string)`：原样输出字符串；\n- `format(string, ...args)`：格式化字符串；\n- 示例：\n  ```less\n  @url: \"https://example.com\"\n  .box::after {\n    content: escape(@url); /* \"https%3A%2F%2Fexample.com\" */\n  }\n  ```\n\n#### 2. **自定义函数（Mixin 模拟函数）**\nLess 没有真正的函数，但可以通过 **Mixin** 模拟函数，接收参数并输出样式。\n\n##### 基本语法\n```less\n/* 定义带参数的 Mixin（函数） */\n.size(@width, @height) {\n  width: @width;\n  height: @height;\n}\n\n/* 使用函数 */\n.box {\n  .size(100px, 200px); /* 输出 width: 100px; height: 200px; */\n}\n```\n\n##### 带默认参数\n```less\n.size(@width: 100px, @height: 100px) {\n  width: @width;\n  height: @height;\n}\n\n.box {\n  .size(); /* 使用默认值：width: 100px; height: 100px; */\n}\n```\n\n##### 带返回值（通过变量传递）\n```less\n/* 计算宽度并返回变量 */\n.calc-width(@total, @count) {\n  @result: (@total - (@count - 1) * 20px) / @count;\n}\n\n.box {\n  .calc-width(100%, 3);\n  width: @result; /* (100% - 40px) / 3 */\n}\n```\n\n### 总结\n- **内置函数**：直接调用，处理颜色、数学、字符串等；\n- **自定义函数**：通过 Mixin 模拟，接收参数、输出样式或计算结果；\n- Less 函数让 CSS 更灵活、更复用，适合复杂样式逻辑和设计系统。"
+    },
+    {
+        "id": "css-interview-25",
+        "topic": "请使用 css 实现卡片翻转的动画",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### CSS 卡片翻转动画实现\n\n#### 核心原理\n- 使用 `transform: rotateY()` 实现 3D 翻转；\n- 使用 `perspective` 营造 3D 透视效果；\n- 使用 `backface-visibility: hidden` 隐藏背面；\n- 使用 `transition` 或 `animation` 控制翻转动画。\n\n#### 完整代码\n```html\n<div class=\"card\">\n  <div class=\"card-inner\">\n    <div class=\"card-front\">正面</div>\n    <div class=\"card-back\">背面</div>\n  </div>\n</div>\n```\n```css\n/* 容器：设置透视 */\n.card {\n  width: 200px;\n  height: 300px;\n  perspective: 1000px; /* 3D 透视距离 */\n  cursor: pointer;\n}\n\n/* 内层：3D 变换容器 */\n.card-inner {\n  width: 100%;\n  height: 100%;\n  position: relative;\n  transform-style: preserve-3d; /* 保留 3D 变换 */\n  transition: transform 0.6s; /* 翻转动画 */\n}\n\n/* 翻转状态 */\n.card:hover .card-inner {\n  transform: rotateY(180deg); /* 沿 Y 轴翻转 180° */\n}\n\n/* 通用面样式 */\n.card-front, .card-back {\n  width: 100%;\n  height: 100%;\n  position: absolute;\n  backface-visibility: hidden; /* 隐藏背面 */\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 24px;\n  border-radius: 8px;\n}\n\n/* 正面 */\n.card-front {\n  background: #2563eb;\n  color: white;\n}\n\n/* 背面：默认翻转 180° */\n.card-back {\n  background: #dc2626;\n  color: white;\n  transform: rotateY(180deg);\n}\n```\n\n#### 关键属性说明\n- `perspective: 1000px`：给父容器设置 3D 透视，让翻转更有立体感；\n- `transform-style: preserve-3d`：让子元素保留 3D 变换，否则背面会被压扁；\n- `backface-visibility: hidden`：隐藏元素的背面，避免翻转时正面和背面重叠；\n- `transform: rotateY(180deg)`：沿 Y 轴翻转 180°，实现水平翻转效果；\n- `transition: transform 0.6s`：给翻转添加过渡动画，让效果更流畅。\n\n#### 扩展：自动翻转动画\n```css\n/* 自动翻转动画 */\n@keyframes flip {\n  0% { transform: rotateY(0deg); }\n  50% { transform: rotateY(180deg); }\n  100% { transform: rotateY(360deg); }\n}\n\n.card-inner {\n  animation: flip 4s infinite linear;\n}\n```\n\n### 总结\n通过 `perspective` + `transform-style: preserve-3d` + `rotateY()` + `backface-visibility: hidden`，可以完美实现 3D 卡片翻转动画，支持 hover 触发或自动播放。"
+    },
+    {
+        "id": "css-interview-26",
+        "topic": "css 中的 animation、transition、transform 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### `animation` vs `transition` vs `transform` 核心区别\n\n| 对比维度 | `transform` | `transition` | `animation` |\n| :--- | :--- | :--- | :--- |\n| **本质** | **静态变换**：改变元素的形状/位置/大小/角度 | **过渡动画**：从一个状态到另一个状态的平滑过渡 | **关键帧动画**：自定义多阶段、循环的复杂动画 |\n| **触发方式** | 无动画，直接应用变换 | 需要触发条件（如 `:hover`/`focus`/JS 修改属性） | 自动播放，或通过 JS 控制 |\n| **控制粒度** | 仅控制最终状态 | 控制两个状态之间的过渡 | 控制多个关键帧、循环次数、方向等 |\n| **循环支持** | 不支持 | 不支持 | 支持无限循环（`infinite`） |\n| **核心属性** | `translate`/`rotate`/`scale`/`skew`/`perspective` | `transition-property`/`duration`/`timing-function`/`delay` | `animation-name`/`duration`/`timing-function`/`delay`/`iteration-count`/`direction`/`fill-mode`/`play-state` |\n| **典型场景** | 平移、旋转、缩放、倾斜、3D 变换 | hover 效果、展开/折叠、切换状态 | 加载动画、轮播、自动翻页、复杂交互动画 |\n\n---\n\n### 代码示例对比\n\n#### `transform`：静态变换\n```css\n.box {\n  transform: translate(100px, 50px) rotate(45deg) scale(1.2);\n}\n```\n\n#### `transition`：过渡动画\n```css\n.box {\n  width: 100px;\n  transition: width 0.3s ease; /* 宽度变化时过渡 */\n}\n.box:hover {\n  width: 200px; /* hover 触发过渡 */\n}\n```\n\n#### `animation`：关键帧动画\n```css\n/* 定义关键帧 */\n@keyframes move {\n  0% { transform: translateX(0); }\n  50% { transform: translateX(200px); }\n  100% { transform: translateX(0); }\n}\n\n/* 应用动画 */\n.box {\n  animation: move 2s infinite alternate; /* 2s 循环，往返播放 */\n}\n```\n\n### 总结\n- **`transform`**：**静态变换**，只改变元素外观，无动画效果；\n- **`transition`**：**过渡动画**，用于两个状态之间的平滑过渡，需要触发；\n- **`animation`**：**关键帧动画**，用于复杂、多阶段、循环的动画，自动播放。\n\n三者常结合使用：`transform` 定义状态，`transition`/`animation` 控制动画过渡。"
+    },
+    {
+        "id": "css-interview-27",
+        "topic": "flex 布局下，怎么改变元素的顺序?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### Flex 布局下改变元素顺序的两种方法\n\n#### 方法一：`order` 属性（推荐）\n- 给 Flex 子元素设置 `order` 属性，数值越小，排列越靠前；\n- 默认 `order: 0`，可设置正/负整数；\n- 示例：\n  ```html\n  <div class=\"flex-container\">\n    <div class=\"item1\">1</div>\n    <div class=\"item2\">2</div>\n    <div class=\"item3\">3</div>\n  </div>\n  ```\n  ```css\n  .flex-container { display: flex; }\n  .item1 { order: 3; } /* 排最后 */\n  .item2 { order: 1; } /* 排最前 */\n  .item3 { order: 2; } /* 排中间 */\n  ```\n  - 渲染顺序：`item2` → `item3` → `item1`\n\n#### 方法二：`flex-direction` + `row-reverse`/`column-reverse`\n- 改变 Flex 容器的主轴方向，整体反转顺序；\n- 适用于**整体顺序反转**的场景；\n- 示例：\n  ```css\n  .flex-container {\n    display: flex;\n    flex-direction: row-reverse; /* 水平反转：从右到左 */\n    /* flex-direction: column-reverse; 垂直反转：从下到上 */\n  }\n  ```\n  - 原顺序：`item1` → `item2` → `item3`\n  - 反转后：`item3` → `item2` → `item1`\n\n---\n\n### 对比与最佳实践\n| 方法 | 适用场景 | 优点 | 缺点 |\n| :--- | :--- | :--- | :--- |\n| `order` | 局部调整顺序、自定义排序 | 灵活，可单独控制每个元素 | 视觉顺序与 DOM 顺序不一致，可能影响无障碍和 SEO |\n| `flex-direction: reverse` | 整体顺序反转 | 简单直观，保持 DOM 顺序与视觉顺序的逻辑关联 | 只能整体反转，无法单独调整 |\n\n### 注意事项\n- `order` 只改变**视觉顺序**，不改变 DOM 结构；\n- 屏幕阅读器会按 DOM 顺序读取，过度使用 `order` 可能影响无障碍访问；\n- 推荐优先使用 `flex-direction: reverse`，需要精细控制时再使用 `order`。\n\n### 总结\n- **整体反转**：使用 `flex-direction: row-reverse`/`column-reverse`；\n- **局部调整**：给子元素设置 `order` 属性，数值越小越靠前。"
+    },
+    {
+        "id": "css-interview-28",
+        "topic": "flex: auto; 是什么意思?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### `flex: auto` 完整解析\n\n`flex: auto` 是 `flex-grow`/`flex-shrink`/`flex-basis` 的简写，等价于：\n```css\nflex: 1 1 auto;\n```\n\n#### 三个子属性含义\n1. **`flex-grow: 1`**：\n   - 当容器有剩余空间时，该元素会**自动扩展**，占满剩余空间；\n   - 数值越大，占比越高（多个元素时按比例分配）。\n2. **`flex-shrink: 1`**：\n   - 当容器空间不足时，该元素会**自动收缩**，适应容器大小；\n   - 数值越大，收缩越多（默认 `1`，所有元素等比例收缩）。\n3. **`flex-basis: auto`**：\n   - 元素的**初始大小**，由内容或 `width`/`height` 决定；\n   - 等价于「自动大小」，优先使用元素本身的尺寸。\n\n#### 行为表现\n- **空间充足时**：元素会扩展，占满剩余空间；\n- **空间不足时**：元素会收缩，适应容器大小；\n- **初始大小**：由内容或 `width` 决定，不是 `0`。\n\n#### 对比其他常用 `flex` 简写\n| 简写 | 等价于 | 行为 |\n| :--- | :--- | :--- |\n| `flex: auto` | `flex: 1 1 auto` | 可扩展、可收缩，初始大小自动 |\n| `flex: 1` | `flex: 1 1 0` | 可扩展、可收缩，初始大小为 0（完全弹性） |\n| `flex: none` | `flex: 0 0 auto` | 不可扩展、不可收缩，固定大小 |\n| `flex: initial` | `flex: 0 1 auto` | 不可扩展、可收缩，初始大小自动（默认值） |\n\n#### 典型使用场景\n```css\n/* 自适应布局：中间栏占满剩余空间 */\n.container {\n  display: flex;\n}\n.left { width: 200px; flex: none; }\n.center { flex: auto; } /* 占满剩余空间，可扩展可收缩 */\n.right { width: 200px; flex: none; }\n```\n\n### 总结\n`flex: auto` 表示：**元素可自动扩展、可自动收缩，初始大小由内容或 `width` 决定**，是实现自适应布局的常用简写。"
+    },
+    {
+        "id": "css-interview-29",
+        "topic": "object-fit 用法",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### `object-fit` 是什么？\n`object-fit` 用于控制**替换元素**（如 `<img>`/`<video>`/`<iframe>`）的内容如何适应其容器大小，类似 `background-size` 但作用于替换元素。\n\n#### 语法\n```css\nobject-fit: fill | contain | cover | none | scale-down;\n```\n\n#### 各属性值详解\n\n| 属性值 | 含义 | 视觉效果 |\n| :--- | :--- | :--- |\n| **`fill`**（默认） | 填充容器，**拉伸/压缩**内容，使内容完全填满容器，可能变形 | 填满容器，可能变形 |\n| **`contain`** | 包含容器，**等比缩放**内容，使内容完整显示在容器内，可能留空白 | 完整显示，无变形，有留白 |\n| **`cover`** | 覆盖容器，**等比缩放**内容，使内容完全覆盖容器，超出部分被裁剪 | 覆盖容器，无变形，可能裁剪 |\n| **`none`** | 不缩放，**保持原始大小**，超出容器部分被裁剪 | 原始大小，可能溢出或过小 |\n| **`scale-down`** | 取 `contain` 和 `none` 中**较小的尺寸**，等比缩放 | 完整显示，无变形，不会放大 |\n\n#### 代码示例\n```html\n<div class=\"img-container\">\n  <img src=\"image.jpg\" alt=\"示例图片\">\n</div>\n```\n```css\n.img-container {\n  width: 300px;\n  height: 200px;\n  border: 1px solid #ccc;\n}\n.img-container img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover; /* 等比覆盖，裁剪超出部分 */\n  /* object-fit: contain; 等比包含，完整显示 */\n}\n```\n\n#### 配合 `object-position` 使用\n`object-position` 控制内容在容器中的位置，类似 `background-position`：\n```css\nimg {\n  object-fit: cover;\n  object-position: center top; /* 水平居中，垂直靠上 */\n  /* object-position: 50% 50%; 居中（默认） */\n}\n```\n\n#### 应用场景\n- **头像裁剪**：`object-fit: cover` 实现圆形/方形头像，避免变形；\n- **商品图展示**：`object-fit: contain` 完整显示商品，避免裁剪；\n- **视频容器**：`object-fit: cover` 让视频铺满容器，保持比例。\n\n### 总结\n`object-fit` 是控制替换元素内容适应容器的核心属性，**`cover` 和 `contain` 最常用**，分别实现「覆盖裁剪」和「完整包含」，配合 `object-position` 可精确定位内容。"
+    },
+    {
+        "id": "css-interview-30",
+        "topic": "CSS3 中 transition 和 animation 的属性分别有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify3"
+        ],
+        "tagList": [
+            "CSS相关"
+        ],
+        "answerContent": "### `transition` vs `animation` 属性对比\n\n---\n\n#### 一、`transition` 过渡属性\n`transition` 控制**两个状态之间的平滑过渡**，是简写属性，包含 4 个子属性：\n\n| 属性 | 含义 | 取值示例 |\n| :--- | :--- | :--- |\n| `transition-property` | 要过渡的 CSS 属性 | `all`/`width`/`transform`/`opacity` |\n| `transition-duration` | 过渡持续时间 | `0.3s`/`500ms` |\n| `transition-timing-function` | 过渡时间曲线 | `ease`/`linear`/`ease-in`/`ease-out`/`ease-in-out`/`cubic-bezier(n,n,n,n)` |\n| `transition-delay` | 过渡延迟时间 | `0.1s`/`200ms` |\n\n##### 完整简写语法\n```css\ntransition: [property] [duration] [timing-function] [delay];\n```\n##### 示例\n```css\n.box {\n  transition: all 0.3s ease 0.1s;\n  /* 等价于：\n     transition-property: all;\n     transition-duration: 0.3s;\n     transition-timing-function: ease;\n     transition-delay: 0.1s;\n  */\n}\n```\n\n---\n\n#### 二、`animation` 动画属性\n`animation` 控制**关键帧动画**，是简写属性，包含 8 个子属性：\n\n| 属性 | 含义 | 取值示例 |\n| :--- | :--- | :--- |\n| `animation-name` | 关键帧名称 | `@keyframes` 定义的名称（如 `move`） |\n| `animation-duration` | 动画持续时间 | `2s`/`1500ms` |\n| `animation-timing-function` | 动画时间曲线 | 同 `transition-timing-function` |\n| `animation-delay` | 动画延迟时间 | `0.5s` |\n| `animation-iteration-count` | 动画循环次数 | `1`/`infinite`（无限循环） |\n| `animation-direction` | 动画方向 | `normal`/`reverse`/`alternate`（往返）/`alternate-reverse` |\n| `animation-fill-mode` | 动画前后状态 | `none`/`forwards`（保持最后一帧）/`backwards`（应用第一帧）/`both` |\n| `animation-play-state` | 动画播放状态 | `running`/`paused` |\n\n##### 完整简写语法\n```css\nanimation: [name] [duration] [timing-function] [delay] [iteration-count] [direction] [fill-mode] [play-state];\n```\n##### 示例\n```css\n.box {\n  animation: move 2s ease-in-out 0.5s infinite alternate forwards;\n  /* 等价于：\n     animation-name: move;\n     animation-duration: 2s;\n     animation-timing-function: ease-in-out;\n     animation-delay: 0.5s;\n     animation-iteration-count: infinite;\n     animation-direction: alternate;\n     animation-fill-mode: forwards;\n  */\n}\n```\n\n---\n\n### 总结\n- **`transition`**：专注于**状态过渡**，属性少、简单直观，适合简单交互；\n- **`animation`**：专注于**关键帧动画**，属性多、控制粒度更细，适合复杂循环动画。\n\n两者都用于实现 CSS 动画，`transition` 是「过渡」，`animation` 是「主动画」。"
+    },
+  {
+    "id": "css-interview-31",
+    "topic": "说说你对 CSS 模块化的理解",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 模块化是什么？\nCSS 模块化是指**将 CSS 代码拆分为独立、可复用、低耦合的模块**，通过构建工具或语法规范实现**样式隔离**，解决全局样式污染、命名冲突、代码复用难等问题。\n\n#### 核心目标\n- **作用域隔离**：确保样式只作用于当前组件，不污染全局；\n- **代码复用**：抽离公共样式，避免重复编写；\n- **可维护性**：样式与组件结构绑定，便于定位和修改；\n- **可扩展性**：按需加载样式，减小打包体积。\n\n#### 主流实现方案\n1. **CSS Module（最常用）**\n   - 原理：构建工具（Webpack/Vite）将类名编译为**全局唯一的哈希值**；\n   - 特点：局部作用域、保留 CSS 语法、与组件无缝集成；\n   - 示例：\n     ```css\n     /* title.module.css */\n     .title { color: red; }\n     ```\n     ```jsx\n     import styles from './title.module.css'\n     <h1 className={styles.title}>\n     ```\n\n2. **CSS-in-JS**\n   - 原理：在 JS/TS 中编写 CSS，动态生成样式；\n   - 特点：动态样式、完全隔离、支持逻辑；\n   - 常用库：Styled Components、Emotion、Tailwind CSS（原子化）。\n\n3. **预处理器（Sass/Less）**\n   - 原理：通过嵌套、变量、混合器等语法，组织 CSS 结构；\n   - 特点：代码组织更清晰，支持逻辑运算；\n   - 注意：本身不实现模块化，需配合 CSS Module 或构建工具。\n\n4. **原子化 CSS（Tailwind）**\n   - 原理：单一职责的原子类，组合实现样式；\n   - 特点：无命名冲突、开发效率高、样式一致性好。\n\n#### 演进历程\n- 原始 CSS → 命名规范（BEM） → CSS 预处理器 → CSS Module → CSS-in-JS → 原子化 CSS\n\n### 总结\nCSS 模块化是**前端工程化的必然趋势**，核心是**「局部作用域 + 代码复用 + 可维护性」**。现代项目中，CSS Module 或原子化 CSS 是最常用的方案，分别兼顾了「轻量」和「灵活」。"
+  },
+  {
+    "id": "css-interview-32",
+    "topic": "::before 和::after 中双冒号和单冒号有什么区别、作用?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 单冒号 vs 双冒号：核心区别\n\n#### 1. **语法规范不同**\n- **单冒号 `:before` / `:after`**：CSS2 语法，兼容所有浏览器（包括 IE6-8）；\n- **双冒号 `::before` / `::after`**：CSS3 语法，用于**区分伪类（单冒号）和伪元素（双冒号）**；\n- 本质：伪元素（如 `::before`）是创建**虚拟元素**，伪类（如 `:hover`）是匹配**元素状态**。\n\n#### 2. **作用完全相同**\n无论是单冒号还是双冒号，都用于在元素内容**前/后**插入虚拟内容，且都**必须设置 `content` 属性**（否则不显示）。\n\n#### 3. **使用建议**\n- **现代项目**：推荐使用**双冒号**（`::before`/`::after`），符合 CSS3 规范；\n- **兼容旧项目**：单冒号（`:before`/`:after`）可兼容 IE 低版本；\n- **伪类与伪元素区分**：CSS3 明确规定「伪类用单冒号，伪元素用双冒号」，避免混淆。\n\n#### 代码示例\n```css\n/* 正确：双冒号（CSS3） */\n.box::before {\n  content: \"前置\";\n  color: red;\n}\n\n/* 兼容：单冒号（CSS2） */\n.box:after {\n  content: \"后置\";\n  color: blue;\n}\n```\n\n#### 关键特性\n- **不在 DOM 中**：虚拟元素，无法通过 JS 获取 DOM 节点；\n- **可设置宽高**：块级特性，可设置 `width`/`height`/`display`；\n- **可叠加**：一个元素可以同时有 `::before` 和 `::after`；\n- **继承性**：继承父元素的样式。\n\n### 总结\n- **区别**：语法规范不同（CSS2 vs CSS3），权重相同；\n- **作用**：在元素内容前/后插入虚拟内容，必须配合 `content`；\n- **选型**：现代项目用双冒号 `::`，兼容旧版用单冒号 `:`。"
+  },
+  {
+    "id": "css-interview-33",
+    "topic": "position: fixed 一定是相对于浏览器窗口进行定位吗?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `position: fixed` 定位基准\n**不一定**。`fixed` 定位的参考系取决于**父元素是否存在 `transform`/`perspective`/`filter` 属性**。\n\n#### 核心规则（CSS 规范）\n当元素的**父级（含自身）**包含以下属性时，`fixed` 会**相对于该父元素**定位，而非视口：\n- `transform: ...`（值不为 `none`）；\n- `perspective: ...`（值不为 `none`）；\n- `filter: ...`（值不为 `none`）；\n- `backdrop-filter: ...`（值不为 `none`）。\n\n#### 原理\n这些属性会创建**新的包含块（Containing Block）**，使 `fixed` 定位失效，变为「相对该容器的固定定位」。\n\n#### 代码示例对比\n\n##### 情况一：正常 fixed（相对于视口）\n```css\n.box {\n  position: fixed;\n  top: 20px;\n  left: 20px;\n  /* 相对于浏览器窗口定位 */\n}\n```\n\n##### 情况二：父元素有 transform（fixed 相对于父容器）\n```css\n.parent {\n  transform: translateZ(0); /* 创建新的包含块 */\n  width: 300px;\n  height: 300px;\n}\n\n.box {\n  position: fixed;\n  top: 20px;\n  left: 20px;\n  /* 相对于 .parent 定位，而不是视口 */\n}\n```\n\n#### 应用场景\n- **弹窗容器**：父容器有 `transform`，弹窗 `fixed` 相对于父容器居中；\n- **遮罩层**：在滚动容器内，`fixed` 相对于容器固定；\n- **3D 场景**：配合 `perspective`，`fixed` 元素随 3D 空间移动。\n\n#### 兼容性\n- 所有现代浏览器均支持此规则；\n- 是 CSS 布局中的常见「坑」，面试常考。\n\n### 总结\n- **正常情况**：相对于**浏览器视口**；\n- **特殊情况**：父元素有 `transform`/`perspective`/`filter` 时，相对于**该父元素**。"
+  },
+  {
+    "id": "css-interview-34",
+    "topic": "单行文本怎么实现两端对齐?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 单行文本两端对齐实现\n\n#### 核心原理\n单行文本两端对齐需结合 **`text-align: justify`** 和 **`text-align-last`** 或 **伪元素撑开宽度** 实现。\n\n#### 方法一：`text-align: justify` + 伪元素（最常用、最稳定）\n通过伪元素 `::after` 撑开文本宽度，强制两端对齐。\n```css\n.text {\n  width: 200px; /* 固定宽度 */\n  text-align: justify; /* 两端对齐 */\n  text-align-last: justify; /* 强制最后一行两端对齐（单行时生效） */\n  /* 兼容方案：添加伪元素 */\n  &::after {\n    content: \"\";\n    display: inline-block;\n    width: 100%;\n  }\n}\n```\n- 原理：`justify` 会让文字填满容器，伪元素让单行也触发两端对齐。\n\n#### 方法二：`text-align: justify` + 空字符（简易）\n```css\n.text {\n  width: 200px;\n  text-align: justify;\n  /* 需在 HTML 中添加空字符：&nbsp; 或 \u200B */\n}\n```\n\n#### 方法三：`text-align-last: justify`（现代浏览器）\n直接设置两端对齐，无需伪元素，但兼容性略低。\n```css\n.text {\n  width: 200px;\n  text-align: justify;\n  text-align-last: justify; /* 直接两端对齐 */\n}\n```\n\n#### 注意事项\n1. **必须设置宽度**：`width`/`min-width` 等，否则无法对齐；\n2. **单行生效**：多行时需配合 `text-align-last`；\n3. **兼容性**：上述方法均支持现代浏览器，IE 需使用伪元素方案。\n\n#### 应用场景\n- 表单标签对齐（如「姓名：」「联系电话：」）；\n- 标题两端对齐；\n- 商品规格、价格等需要整齐排列的文本。\n\n### 总结\n单行文本两端对齐的核心是：**`text-align: justify` + 确保容器宽度**，配合 `::after` 伪元素可兼容所有场景。"
+  },
+  {
+    "id": "css-interview-35",
+    "topic": "使用 css 实现一个无限循环动画",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 无限循环动画实现\n\n#### 核心技术\n- 使用 **`@keyframes` 定义关键帧**；\n- 设置 **`animation-iteration-count: infinite`** 实现无限循环；\n- 配合 `animation-direction` 控制播放方向。\n\n#### 示例 1：基础无限循环（线性移动）\n```css\n/* 定义关键帧 */\n@keyframes loop {\n  0% { transform: translateX(0); }\n  100% { transform: translateX(100%); }\n}\n\n/* 应用动画 */\n.box {\n  width: 100px;\n  height: 100px;\n  background: #2563eb;\n  animation: loop 2s linear infinite; /* 2s 线性，无限循环 */\n}\n```\n\n#### 示例 2：往返循环（alternate）\n```css\n.box {\n  animation: loop 2s ease-in-out infinite alternate; /* 往返播放 */\n}\n```\n\n#### 示例 3：旋转无限循环（加载动画）\n```css\n@keyframes rotate {\n  0% { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n.loader {\n  width: 50px;\n  height: 50px;\n  border: 4px solid #f3f3f3;\n  border-top: 4 solid #3498db;\n  border-radius: 50%;\n  animation: rotate 1s linear infinite;\n}\n```\n\n#### 示例 4：平滑滚动循环（无缝滚动）\n```css\n@keyframes scroll {\n  0% { transform: translateX(0); }\n  100% { transform: translateX(-100%); }\n}\n\n.scroll-container {\n  overflow: hidden;\n}\n\n.scroll-content {\n  display: flex;\n  width: 200%; /* 双倍宽度，实现无缝 */\n  animation: scroll 10s linear infinite;\n}\n```\n\n#### 关键属性说明\n| 属性 | 含义 | 取值 |\n| :--- | :--- | :--- |\n| `animation` | 简写属性 | `name duration timing-function iteration-count direction` |\n| `infinite` | 无限循环 | 循环次数关键字 |\n| `linear` | 线性速度 | 匀速播放 |\n| `alternate` | 往返方向 | 去程+回程循环 |\n\n#### 应用场景\n- **加载动画**：旋转加载图标；\n- **轮播图**：自动轮播；\n- **跑马灯**：文字/图片横向滚动；\n- **按钮状态**：无限点击动画。\n\n### 总结\n无限循环动画的核心是：**定义关键帧 + 设置 `infinite` 循环次数**。根据需求，可使用 `linear` 匀速或 `ease` 缓动，配合 `alternate` 实现往返效果。"
+  },
+  {
+    "id": "css-interview-36",
+    "topic": "怎么触发BFC，BFC有什么应用场景?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### BFC 是什么？\nBFC（Block Formatting Context，块级格式化上下文）是页面中的一块**独立渲染区域**，区域内元素的布局不会影响外部元素，外部元素也不会影响内部。\n\n#### 一、如何触发 BFC？\n满足以下任一条件即可触发 BFC：\n1. **根元素**（`<html>`）；\n2. **浮动元素**：`float: left/right`（非 `none`）；\n3. **绝对/固定定位**：`position: absolute/fixed`；\n4. **行内块**：`display: inline-block`；\n5. **弹性容器**：`display: flex/inline-flex`（子元素进入 BFC）；\n6. **网格容器**：`display: grid/inline-grid`；\n7. **溢出属性**：`overflow: hidden/auto/scroll`（非 `visible`）；\n8. **表格单元格**：`display: table-cell`；\n9. **表格标题**：`display: table-caption`。\n\n#### 二、BFC 的核心特性\n1. **内部块级元素垂直排列**；\n2. **垂直方向 margin 折叠**（BFC 内部不会与外部折叠）；\n3. **BFC 区域不会与浮动元素重叠**；\n4. **计算 BFC 高度时，浮动子元素也参与计算**（清除浮动）；\n5. **独立隔离**：内部元素与外部元素互不影响。\n\n#### 三、应用场景（面试必问）\n\n##### 场景 1：清除内部浮动（解决高度塌陷）\n父元素有浮动子元素时，父元素高度为 0（高度塌陷），触发 BFC 可清除。\n```css\n.parent {\n  overflow: hidden; /* 触发 BFC，清除浮动 */\n}\n.child {\n  float: left;\n}\n```\n\n##### 场景 2：避免 margin 折叠\n两个相邻 div 的 margin 会重叠，给其中一个套入 BFC 容器可避免。\n```css\n.wrapper {\n  overflow: hidden;\n}\n.box {\n  margin: 20px;\n}\n```\n\n##### 场景 3：两栏/三栏自适应布局\n左侧固定，右侧自适应，避免与浮动元素重叠。\n```css\n.left {\n  float: left;\n  width: 200px;\n}\n.right {\n  overflow: hidden; /* 触发 BFC，不与左侧重叠 */\n}\n```\n\n##### 场景 4：防止文字环绕（吸顶/定位）\n避免文字环绕浮动元素，保持布局整洁。\n\n### 总结\n- **触发方式**：`overflow: hidden` 是最常用、无副作用的方式；\n- **核心价值**：**隔离布局**，解决浮动、margin 折叠、自适应布局等问题。"
+  },
+  {
+    "id": "css-interview-37",
+    "topic": "怎么实现一个宽高自适应的正方形?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 实现自适应正方形的 3 种方案\n\n#### 方案一：`padding-top` 百分比法（兼容性最好）\n```css\n.square {\n  width: 100%;\n  position: relative;\n  /* padding-top 百分比 = 高度/宽度 → 正方形 = 100% */\n  padding-top: 100%;\n}\n.square-content {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n}\n```\n- 原理：`padding-top` 百分比是相对于**父元素宽度**计算的，`padding-top: 100%` 让高度等于宽度。\n\n#### 方案二：`aspect-ratio` 属性（现代浏览器推荐）\n```css\n.square {\n  width: 100%;\n  aspect-ratio: 1 / 1; /* 宽高比 1:1 → 正方形 */\n}\n```\n- 原理：CSS 原生 `aspect-ratio` 直接指定宽高比，代码最简洁；\n- 兼容性：Chrome 88+、Firefox 87+、Safari 15+。\n\n#### 方案三：Grid 布局法\n```css\n.square {\n  display: grid;\n  grid-template-columns: 1fr;\n}\n.square::before {\n  content: '';\n  padding-top: 100%;\n  grid-row: 1 / 2;\n}\n.square-content {\n  grid-row: 1 / 2;\n}\n```\n- 原理：通过 Grid 布局和伪元素实现比例占位。\n\n#### 方案四：`vw` 单位（固定视口宽度）\n```css\n.square {\n  width: 50vw;\n  height: 50vw; /* 宽高 = 视口宽度的 50% → 正方形 */\n}\n```\n- 原理：`vw` 是视口宽度的 1%，`width` 和 `height` 用相同 `vw` 值。\n\n### 总结\n- **兼容性优先**：使用 `padding-top: 100%`；\n- **现代浏览器**：直接使用 `aspect-ratio: 1/1`，代码最简洁；\n- **自适应**：所有方案都能随父容器宽度变化自动调整大小。"
+  },
+  {
+    "id": "css-interview-38",
+    "topic": "z-index属性在什么情况下会失效?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `z-index` 失效的 6 种常见场景\n\n#### 1. **未设置定位（非 `static`）**\n`z-index` 只对**定位元素**生效（`position: relative/absolute/fixed/sticky`），默认 `static` 元素设置 `z-index` 无效。\n```css\n/* 无效：static 元素 */\n.box {\n  z-index: 999;\n}\n/* 有效：定位元素 */\n.box {\n  position: relative;\n  z-index: 999;\n}\n```\n\n#### 2. **父元素创建了堆叠上下文（Stacking Context）**\n子元素的 `z-index` 只在父元素的堆叠上下文中生效，无法突破父元素层级。\n```css\n.parent {\n  position: relative;\n  z-index: 1; /* 创建堆叠上下文 */\n}\n.child {\n  position: absolute;\n  z-index: 999; /* 最大层级不超过 parent 的层级 */\n}\n```\n\n#### 3. **元素设置了 `opacity < 1`**\n`opacity < 1` 会创建新的堆叠上下文，导致 `z-index` 失效。\n```css\n.box {\n  position: relative;\n  z-index: 999;\n  opacity: 0.8; /* 创建堆叠上下文，z-index 失效 */\n}\n```\n\n#### 4. **元素设置了 `transform`/`perspective`/`filter`**\n这些属性会创建新的堆叠上下文，导致 `z-index` 失效。\n```css\n.box {\n  position: relative;\n  z-index: 999;\n  transform: scale(1); /* 创建堆叠上下文，z-index 失效 */\n}\n```\n\n#### 5. **`z-index` 为 `auto`（默认值）**\n未显式设置 `z-index` 时，默认 `auto`，不会创建堆叠上下文，层级由文档流决定。\n\n#### 6. **Flex/Grid 子元素**\n在 Flex/Grid 布局中，子元素的 `z-index` 会在父容器的堆叠上下文中生效，可能与预期不同。\n\n### 总结\n`z-index` 失效的核心原因是：**未定位** 或 **父元素/自身创建了堆叠上下文**。解决方法：\n- 确保元素是**定位元素**；\n- 避免父元素设置 `z-index`/`opacity`/`transform` 等创建堆叠上下文；\n- 合理规划堆叠上下文层级。"
+  },
+  {
+    "id": "css-interview-39",
+    "topic": "说说对 CSS 工程化的理解",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 工程化是什么？\nCSS 工程化是指**将 CSS 纳入前端工程化体系**，通过工具、规范、流程，解决大型项目中 CSS 的可维护性、可扩展性、性能、协作等问题。\n\n#### 核心目标\n- **可维护性**：样式隔离、命名规范、模块化；\n- **可复用性**：变量、混合器、函数、组件化样式；\n- **性能优化**：压缩、Tree-shaking、按需加载；\n- **协作效率**：统一规范、自动校验、自动修复；\n- **兼容性**：自动加前缀、降级处理。\n\n#### 核心技术与方案\n\n##### 1. **模块化与隔离**\n- **CSS Module**：哈希类名，局部作用域；\n- **Scoped CSS**：Vue 内置，属性选择器隔离；\n- **CSS-in-JS**：JS 中写 CSS，动态生成类名；\n- **原子化 CSS**：Tailwind CSS，单一职责类名。\n\n##### 2. **预处理器与增强**\n- **Sass/Less/Stylus**：变量、嵌套、混合器、函数；\n- **PostCSS**：插件生态，自动前缀、未来语法、压缩。\n\n##### 3. **构建与优化**\n- **代码分割**：按路由/组件拆分 CSS；\n- **Tree-shaking**：移除未使用的 CSS；\n- **压缩混淆**：cssnano 压缩，移除空格、注释；\n- **CDN 缓存**：静态资源 CDN 加速。\n\n##### 4. **规范与校验**\n- **Stylelint**：CSS 代码规范检查；\n- **Prettier**：代码格式化；\n- **BEM/OOCSS**：命名规范，避免冲突。\n\n##### 5. **自动化流程**\n- **Git Hooks**：提交前自动校验、格式化；\n- **CI/CD**：自动化构建、部署、性能监控。\n\n### 总结\nCSS 工程化是**大型前端项目的必然选择**，核心是**「工具化 + 规范化 + 模块化」**，让 CSS 从「写样式」升级为「工程化管理样式」，提升开发效率、代码质量和性能。"
+  },
+  {
+    "id": "css-interview-40",
+    "topic": "Sass、Less 是什么? 为什么要使用他们?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### Sass/Less 是什么？\nSass 和 Less 都是 **CSS 预处理器（CSS Preprocessor）**，在 CSS 语法基础上扩展了变量、嵌套、混合器、函数等特性，让 CSS 更像编程语言，提升可维护性和复用性。\n\n#### 核心区别\n| 特性 | Sass | Less |\n| :--- | :--- | :--- |\n| 语法 | `.sass`（缩进）/`.scss`（大括号） | `.less`（大括号，类似 CSS） |\n| 变量 | `$var` | `@var` |\n| 混合器 | `@mixin`/`@include` | `.mixin()`/`.mixin()` |\n| 函数 | 内置函数 + 自定义函数 | 内置函数 + 自定义函数 |\n| 编译工具 | Ruby/SassC/Dart Sass | Less.js（浏览器/Node） |\n\n#### 为什么要使用 Sass/Less？\n\n##### 1. **变量复用**\n统一管理颜色、间距、字体等，修改一处即可全局生效。\n```scss\n$primary-color: #2563eb;\n.button { color: $primary-color; }\n.link { color: $primary-color; }\n```\n\n##### 2. **嵌套结构**\n模拟 HTML 层级，代码更直观，避免重复写选择器。\n```scss\n.nav {\n  ul { list-style: none; }\n  li { float: left; }\n  a { color: white; }\n}\n```\n\n##### 3. **混合器（Mixin）复用逻辑**\n抽离公共样式，避免重复代码。\n```scss\n@mixin flex-center {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n.box { @include flex-center; }\n```\n\n##### 4. **函数与运算**\n支持数学运算、颜色函数，动态计算样式。\n```scss\nwidth: 100% - 20px;\ncolor: lighten(#ff0000, 20%);\n```\n\n##### 5. **模块化与导入**\n拆分文件，按需导入，便于维护。\n```scss\n@import './variables.scss';\n@import './mixins.scss';\n```\n\n### 总结\nSass/Less 是 **CSS 的增强版**，通过**变量、嵌套、混合器、函数**等特性，解决了原生 CSS 代码冗余、可维护性差、复用难等问题，是现代前端开发的标配工具。"
+  },
+  {
+    "id": "css-interview-41",
+    "topic": "怎么实现单行、多行文本溢出隐藏?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、单行文本溢出隐藏（面试必问）\n核心是 `overflow: hidden` + `white-space: nowrap` + `text-overflow: ellipsis`。\n```css\n.single-line {\n  width: 200px;\n  white-space: nowrap; /* 强制不换行 */\n  overflow: hidden; /* 超出隐藏 */\n  text-overflow: ellipsis; /* 显示省略号 */\n}\n```\n- **必备条件**：\n  1. 必须设置固定宽度 `width`/`min-width`；\n  2. `white-space: nowrap` 必须设置（否则不会溢出）；\n  3. `overflow: hidden` 必须设置（否则省略号不显示）。\n\n### 二、多行文本溢出隐藏（兼容方案）\n多行实现需结合 `-webkit-line-clamp`（限制行数）和 `-webkit-box` 布局，兼容性针对 WebKit 内核（Chrome、Safari、微信小程序等）。\n```css\n.multi-line {\n  width: 200px;\n  display: -webkit-box; /* 转为弹性盒子 */\n  -webkit-line-clamp: 2; /* 限制显示 2 行 */\n  -webkit-box-orient: vertical; /* 垂直排列 */\n  overflow: hidden; /* 超出隐藏 */\n  text-overflow: ellipsis; /* 显示省略号 */\n}\n```\n- **注意**：\n  - `display: -webkit-box` 是 WebKit 私有属性，不支持所有浏览器；\n  - 若需兼容所有浏览器，需结合 JS 计算字符数或使用 `clamp()` 相关方案。\n\n### 三、通用替代方案（现代浏览器）\n使用 `text-wrap: balance` + `overflow` 结合（部分现代浏览器支持），或直接使用伪元素模拟。\n\n### 总结\n- **单行**：`white-space: nowrap` + `overflow: hidden` + `text-overflow: ellipsis`；\n- **多行**：`-webkit-line-clamp` + `-webkit-box`（WebKit 环境）。"
+  },
+  {
+    "id": "css-interview-42",
+    "topic": "CSS 预处理器/后处理器是什么? 为什么要使用它们?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、CSS 预处理器（CSS Preprocessor）\n#### 1. 定义\n在 CSS 语法基础上扩展了**变量、嵌套、混合器、函数、继承**等特性，需要编译为原生 CSS 才能在浏览器中运行。\n\n#### 2. 常用工具\n- **Sass (SCSS)**：功能最强大，生态最丰富；\n- **Less**：语法简单，与 JS 结合紧密；\n- **Stylus**：灵活度极高，缩进语法。\n\n#### 3. 为什么使用？\n- **变量**：统一管理颜色、字体、间距，修改一处全局生效；\n- **嵌套**：模拟 HTML 层级，代码更直观，避免重复选择器；\n- **混合器 (Mixin)**：抽离公共样式，实现代码复用；\n- **函数/运算**：支持数学运算、颜色函数，动态计算样式；\n- **模块化**：拆分代码，按需导入，便于维护。\n\n### 二、CSS 后处理器（CSS Postprocessor）\n#### 1. 定义\n在 CSS 编译完成后，对 CSS 进行**转换、优化、兼容处理**的工具，基于 PostCSS 生态。\n\n#### 2. 常用工具\n- **PostCSS**：核心平台，通过插件实现各种功能；\n- **autoprefixer**：自动添加浏览器前缀（如 `-webkit-`/`-moz-`）；\n- **cssnano**：压缩 CSS，移除冗余代码、注释；\n- **postcss-preset-env**：将未来 CSS 语法转换为兼容 CSS；\n- **stylelint**：CSS 代码规范检查。\n\n#### 3. 为什么使用？\n- **自动兼容**：自动添加前缀，适配不同浏览器；\n- **代码优化**：压缩、Tree-shaking，减小打包体积；\n- **未来语法**：使用最新 CSS 语法（如 `aspect-ratio`/`custom-properties`），自动降级；\n- **代码规范**：检查代码错误，保证团队代码质量。\n\n### 总结\n- **预处理器**：**写 CSS 更高效**，增强 CSS 语言能力（Sass/Less）；\n- **后处理器**：**让 CSS 更优、更兼容**，处理编译后的 CSS（PostCSS）。\n现代项目中，两者通常结合使用（如 Sass + PostCSS）。"
+  },
+  {
+    "id": "css-interview-43",
+    "topic": "为什么有时候用 translate 来改变位置而不是使用 position 进行定位?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 核心区别与选择原因\n使用 `translate` 改变位置而非 `position`（如 `absolute`/`fixed`），主要得益于 **性能优化** 和 **布局独立性**。\n\n#### 1. 性能优化（最核心）\n- **`translate` 属于合成属性**，修改时只会触发 **「图层合成」**，不会触发页面的 **「重排（Layout）」** 和 **「重绘（Paint）」**；\n- **`position` 改变位置**（如 `top`/`left`），会触发页面的重排和重绘，性能消耗大；\n- 示例：\n  ```css\n  /* translate：高性能 */\n  .box { transform: translate(100px, 50px); }\n  \n  /* position：低性能 */\n  .box { position: absolute; top: 50px; left: 100px; }\n  ```\n\n#### 2. 不影响文档流（布局独立性）\n- `translate` **不会改变元素的布局**，元素在文档流中的位置不变，只是视觉上移动；\n- `absolute`/`fixed` 会**脱离文档流**，可能影响其他元素的布局；\n- 场景：在 Flex/Grid 布局中，使用 `translate` 微调元素位置，不会破坏布局。\n\n#### 3. 3D 变换支持\n- `translate` 支持 `translate3d`/`translateZ`，可配合 `perspective` 实现 3D 效果；\n- `position` 定位无法直接实现 3D 空间变换。\n\n#### 4. 代码简洁性\n- `translate` 可直接在 `transform` 中与 `scale`/`rotate` 等组合使用，实现复杂动画；\n- `position` 需单独设置 `top`/`left`/`right`/`bottom`，代码冗余。\n\n### 总结\n- **使用 `translate` 的场景**：\n  1. 需要**高性能**的动画或移动效果；\n  2. 不想**脱离文档流**，保持布局稳定；\n  3. 需要**组合**其他变换（如 `translate + rotate`）。\n- **使用 `position` 的场景**：\n  1. 需要**脱离文档流**进行布局（如覆盖层、侧边栏）；\n  2. 需要**传统的定位**（如 `absolute` 覆盖）。"
+  },
+  {
+    "id": "css-interview-44",
+    "topic": "transition 和 animation 的区别",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `transition` vs `animation` 核心区别\n\n| 对比维度 | `transition`（过渡） | `animation`（关键帧动画） |\n| :--- | :--- | :--- |\n| **本质** | **两个状态之间的平滑过渡** | **多阶段、自定义的关键帧动画** |\n| **触发方式** | **需触发**（如 `:hover`/`focus`/JS 修改属性） | **自动播放**（或通过 JS 控制） |\n| **控制范围** | 仅控制 **开始** 和 **结束** 两个状态 | 可控制 **多个关键帧**（0%、50%、100%...） |\n| **循环支持** | 不支持（触发一次执行一次） | 支持 **无限循环**（`infinite`） |\n| **方向控制** | 仅两个状态，无方向 | 支持 `alternate`（往返）、`reverse`（反向） |\n| **定义方式** | 直接在元素上设置，无额外代码 | 通过 `@keyframes` 定义动画序列，再应用 |\n| **常用场景** | 简单的交互反馈（如按钮 hover、展开/折叠） | 复杂动画（如加载动画、轮播、跑马灯） |\n\n### 代码示例对比\n\n#### `transition`：过渡动画\n```css\n.box {\n  width: 100px;\n  transition: width 0.3s ease; /* 定义过渡属性和时间 */\n}\n.box:hover {\n  width: 200px; /* hover 触发过渡 */\n}\n```\n\n#### `animation`：关键帧动画\n```css\n/* 定义关键帧 */\n@keyframes move {\n  0% { transform: translateX(0); }\n  50% { transform: translateX(200px); }\n  100% { transform: translateX(0); }\n}\n\n/* 应用动画 */\n.box {\n  animation: move 2s infinite alternate; /* 无限循环，往返播放 */\n}\n```\n\n### 总结\n- **`transition`**：**「过渡」**，专注于状态切换，简单、高效；\n- **`animation`**：**「动画」**，专注于多阶段、循环，功能更强大。\n\n两者可结合使用：`transition` 定义过渡，`animation` 定义关键帧，`transform` 定义变换。"
+  },
+  {
+    "id": "css-interview-45",
+    "topic": "在解决动画卡顿问题时，会引导硬件加速，那么硬件加速的原理是什么?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 硬件加速（Hardware Acceleration）原理\n硬件加速是指利用 **GPU（图形处理器）** 来辅助渲染页面，而非完全依赖 CPU，从而提升动画流畅度。\n\n#### 核心原理\n1. **图层分离（Layerization）**：\n   - 浏览器将页面拆分为多个 **图层（Layers）**；\n   - 使用 `transform: translateZ(0)` 或 `will-change` 等属性，将元素提升为 **独立图层**；\n   - GPU 负责单独渲染该图层，不影响其他图层。\n\n2. **GPU 并行计算**：\n   - CPU 负责计算页面布局和样式；\n   - GPU 负责渲染图层（图形绘制、纹理映射、合成）；\n   - GPU 具有**并行处理能力**，能高效处理动画帧的渲染。\n\n3. **合成线程（Compositor Thread）**：\n   - 浏览器的合成线程单独处理图层合成，不阻塞主线程；\n   - 动画帧由合成线程直接提交给 GPU，避免主线程阻塞导致的卡顿。\n\n#### 常用触发方式\n- **`transform: translateZ(0)` / `translate3d()`**：\n  触发 GPU 加速，创建独立图层；\n  ```css\n  .box {\n    transform: translateZ(0); /* 硬件加速 */\n  }\n  ```\n\n- **`will-change`**：\n  提前告诉浏览器该元素即将变化，浏览器提前优化；\n  ```css\n  .box {\n    will-change: transform;\n  }\n  ```\n\n- **`opacity` / `filter`**：\n  部分浏览器会为这些属性创建独立图层。\n\n#### 注意事项（面试加分点）\n- **图层过多会导致内存溢出**：过度使用硬件加速会导致内存占用过大，反而卡顿；\n- **推荐使用**：`transform` 和 `opacity` 动画（GPU 友好），避免 `width`/`height`/`top`/`left` 动画（CPU 密集）。\n\n### 总结\n硬件加速的核心是：**将元素提升为独立图层，由 GPU 单独渲染**，减少 CPU 负担，提升动画帧率，解决卡顿问题。"
+  },
+  {
+    "id": "css-interview-46",
+    "topic": "什么是硬件加速?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 什么是硬件加速？\n硬件加速（Hardware Acceleration）是指利用 **GPU（图形处理器）** 来处理图形渲染，而非完全依赖 CPU，从而提升渲染性能的技术。\n\n在前端中，硬件加速主要用于 **CSS 动画** 和 **复杂图形渲染**。\n\n#### 核心机制\n1. **图层化（Layerization）**：\n   - 浏览器将页面划分为多个图层；\n   - 当元素触发硬件加速时，它会被提升为 **独立图层**，由 GPU 单独管理。\n\n2. **渲染流水线优化**：\n   - CPU 计算布局和样式；\n   - GPU 负责绘制图层并合成；\n   - 合成操作由 **合成线程** 独立执行，不阻塞主线程。\n\n#### 前端实现方式\n- **`transform: translate3d()` / `translateZ(0)`**：\n  最常用的触发方式，创建 3D 变换，触发 GPU 加速；\n  ```css\n  .box {\n    transform: translate3d(0, 0, 0);\n  }\n  ```\n\n- **`will-change`**：\n  向浏览器预告元素即将变化，浏览器提前分配资源；\n  ```css\n  .box {\n    will-change: transform;\n  }\n  ```\n\n- **`opacity` 动画**：\n  浏览器会自动为 opacity 动画启用硬件加速。\n\n#### 优点与缺点\n- **优点**：\n  - 动画流畅，帧率高（60fps+）；\n  - 不阻塞主线程，页面响应快；\n  - 支持 3D 变换。\n\n- **缺点**：\n  - 过多图层会导致 **内存溢出**（移动端尤明显）；\n  - 滥用可能导致电池消耗过快。\n\n#### 最佳实践\n- **只对需要动画的元素启用**，不要全局启用；\n- **优先使用 `transform` 和 `opacity` 动画**，避免 `width`/`height`/`top`/`left` 动画；\n- **使用 `will-change` 提前优化**，但不要过度使用。\n\n### 总结\n硬件加速是 **「GPU 助力渲染」** 的技术，通过创建独立图层、并行渲染来提升动画流畅度，是解决前端动画卡顿的核心手段。"
+  },
+  {
+    "id": "css-interview-47",
+    "topic": "CSS动画和JS实现的动画分别有哪些优缺点?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 动画 vs JS 动画：核心优缺点对比\n\n| 对比维度 | **CSS 动画** (`transition`/`animation`) | **JS 动画** (`requestAnimationFrame`/GSAP) |\n| :--- | :--- | :--- |\n| **性能** | ✅ **高**：GPU 友好，合成线程渲染，不阻塞主线程 | ⚠️ **中高**：需手动优化，避免重排重绘；优秀库（如 GSAP）可接近 CSS 性能 |\n| **开发难度** | ✅ **低**：声明式语法，代码简洁，无需关心时间线 | ❌ **高**：需手动计算时间、进度、缓动函数，代码量大 |\n| **控制能力** | ❌ **弱**：仅支持简单触发/暂停，复杂交互（如拖拽、滚动联动）难实现 | ✅ **强**：可精确控制暂停、恢复、倒放、进度、逐帧、滚动联动等 |\n| **适用场景** | ✅ 简单交互（hover、过渡、加载动画）、循环动画 | ✅ 复杂交互（游戏、图表、滚动视差、拖拽）、自定义缓动 |\n| **兼容性** | ✅ 现代浏览器支持良好，IE10+ 支持 | ✅ 兼容性更广，可兼容旧浏览器，可降级处理 |\n| **内存占用** | ✅ 低：浏览器原生实现，内存开销小 | ⚠️ 中：JS 执行会占用主线程内存，复杂动画需优化 |\n\n---\n\n### CSS 动画优点\n- **性能最优**：`transform`/`opacity` 动画可触发硬件加速，帧率稳定；\n- **代码简洁**：声明式写法，无需关心时间计算；\n- **浏览器优化**：浏览器自动优化渲染，减少重排重绘；\n- **低侵入性**：不依赖 JS，适合纯展示类动画。\n\n### CSS 动画缺点\n- **控制粒度弱**：无法精确控制动画进度、暂停/恢复；\n- **逻辑受限**：无法结合业务逻辑（如根据数据动态调整动画）；\n- **复杂场景难实现**：滚动联动、拖拽、多动画协同等场景不适合。\n\n---\n\n### JS 动画优点\n- **控制能力极强**：可精确控制每一步动画，支持暂停、倒放、进度条等；\n- **逻辑灵活**：可结合数据、用户交互实现复杂动画；\n- **兼容性更广**：可兼容旧浏览器，可降级处理；\n- **生态丰富**：GSAP、GreenSock 等库提供强大的动画能力。\n\n### JS 动画缺点\n- **开发成本高**：需手动计算时间、缓动，代码量大；\n- **性能风险**：若优化不当，会阻塞主线程，导致卡顿；\n- **依赖 JS**：禁用 JS 时动画失效。\n\n### 总结\n- **优先用 CSS 动画**：简单交互、展示类动画，性能最优；\n- **用 JS 动画**：复杂交互、业务联动、自定义缓动等场景。"
+  },
+  {
+    "id": "css-interview-48",
+    "topic": "前端实现动画有哪些方式?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 前端实现动画的 5 类核心方式\n\n#### 1. **CSS 原生动画（最常用）**\n- **`transition`**：状态过渡动画（如 hover、点击）；\n- **`animation` + `@keyframes`**：关键帧动画（循环、多阶段）；\n- **`transform`**：位移、旋转、缩放、倾斜等变换；\n- **适用场景**：简单交互、加载动画、循环动画；\n- **优点**：性能高、代码简洁、浏览器原生支持。\n\n#### 2. **JavaScript 原生动画**\n- **`setTimeout`/`setInterval`**：早期方案，精度低，易卡顿；\n- **`requestAnimationFrame`**：现代标准，与浏览器刷新率同步，性能最优；\n- **`Web Animation API`**：介于 CSS 和 JS 之间，声明式 + 可编程控制；\n- **适用场景**：复杂交互、业务联动、自定义缓动；\n- **优点**：控制能力强，可结合业务逻辑。\n\n#### 3. **Canvas/SVG 动画**\n- **Canvas**：基于像素绘制，适合复杂图形、游戏、图表；\n- **SVG**：矢量图形，适合图标、路径动画、图表（如 D3.js）；\n- **适用场景**：数据可视化、游戏、复杂图形动画；\n- **优点**：矢量不失真，适合复杂图形渲染。\n\n#### 4. **第三方动画库**\n- **GSAP**：功能最强大的 JS 动画库，性能接近 CSS，控制能力极强；\n- **Anime.js**：轻量级 JS 动画库，支持 SVG、DOM、Canvas；\n- **Lottie**：渲染 AE 导出的 JSON 动画，跨平台一致性好；\n- **适用场景**：复杂交互、动效设计、跨平台动画。\n\n#### 5. **其他方式**\n- **WebGL/Three.js**：3D 动画、VR/AR 场景；\n- **CSS 滚动驱动动画**：`scroll-timeline`，随滚动触发动画（Chrome 115+ 支持）。\n\n### 选型建议\n- **简单交互**：优先用 **CSS 动画**；\n- **复杂交互**：用 **JS + requestAnimationFrame** 或 **GSAP**；\n- **数据可视化**：用 **SVG/Canvas**；\n- **3D 场景**：用 **Three.js/WebGL**。\n\n### 总结\n前端动画实现方式丰富，核心是 **「CSS 简单高效，JS 灵活强大，Canvas/SVG 适合复杂图形」**，根据场景选择最合适的方案。"
+  },
+  {
+    "id": "css-interview-49",
+    "topic": "下面代码中，p标签的背景色是什么?",
+    "notes": "需补充代码示例，此处以常见面试题为例：\n```html\n<style>\n  div { background: red; }\n  p { background: blue; }\n  div p { background: green; }\n</style>\n<div><p>测试文本</p></div>\n```",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：`green`（绿色）\n\n#### 解析：CSS 选择器优先级规则\nCSS 样式优先级由 **选择器权重（Specificity）** 决定，权重越高，样式越优先生效。\n\n##### 权重计算规则（从高到低）\n1. `!important`（最高优先级）\n2. 行内样式（`style=\"...\"`）\n3. ID 选择器（`#id`）\n4. 类选择器/伪类选择器/属性选择器（`.class`/`:hover`/`[attr]`）\n5. 元素选择器/伪元素选择器（`div`/`p`/`::before`）\n6. 通配符（`*`）\n\n##### 本题权重计算\n- `div p`：**2 个元素选择器** → 权重 `0-0-2`\n- `p`：**1 个元素选择器** → 权重 `0-0-1`\n- `div`：**1 个元素选择器** → 权重 `0-0-1`\n\n`div p` 权重最高，因此 `background: green` 生效。\n\n---\n\n### 补充：若代码为\n```html\n<style>\n  div { background: red !important; }\n  p { background: blue; }\n  div p { background: green; }\n</style>\n<div><p>测试文本</p></div>\n```\n则 p 标签背景色为 **`red`**，因为 `!important` 优先级最高。\n\n### 总结\n- 权重相同：**后定义的样式覆盖先定义的**；\n- 权重不同：**权重高的样式生效**；\n- `!important` 会打破优先级规则，慎用。"
+  },
+  {
+    "id": "css-interview-50",
+    "topic": "假设下面样式都作用于同一个节点元素`span`，判断下面哪个样式会生效",
+    "notes": "需补充代码示例，此处以常见面试题为例：\n```css\nspan { color: red; }\n.box span { color: blue; }\n#box span { color: green; }\nspan:hover { color: yellow; }\n```\n```html\n<div id=\"box\" class=\"box\"><span>测试文本</span></div>\n",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：\n- **默认状态**：`color: green`（绿色）\n- **hover 状态**：`color: yellow`（黄色）\n\n#### 解析：CSS 选择器优先级 + 伪类\n\n##### 1. 权重计算\n- `#box span`：**1 个 ID + 1 个元素** → 权重 `1-0-1`\n- `.box span`：**1 个类 + 1 个元素** → 权重 `0-1-1`\n- `span`：**1 个元素** → 权重 `0-0-1`\n- `span:hover`：**1 个元素 + 1 个伪类** → 权重 `0-1-1`\n\n##### 2. 默认状态（未 hover）\n`#box span` 权重最高，因此 `color: green` 生效。\n\n##### 3. hover 状态\n`span:hover` 是伪类选择器，权重 `0-1-1`，但 **伪类在状态匹配时优先级更高**，且 hover 是用户交互状态，会覆盖默认样式。\n\n---\n\n### 补充：若代码为\n```css\nspan { color: red; }\n.box span { color: blue; }\n#box span { color: green !important; }\nspan:hover { color: yellow; }\n```\n则 **hover 状态也为 `green`**，因为 `!important` 优先级最高，覆盖所有样式。\n\n### 总结\n- **默认状态**：按选择器权重判断；\n- **交互状态**（`:hover`/`:active`/`:focus`）：伪类会覆盖默认样式，权重相同则后定义的生效；\n- `!important` 会打破所有优先级规则。"
+  },
+  {
+    "id": "css-interview-51",
+    "topic": "为何CSS不支持父选择器?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 不支持父选择器的核心原因\n\n#### 1. **性能问题（最核心）**\n- CSS 选择器是**从右向左解析**的（如 `div .item` 先找 `.item` 再向上找 `div`）；\n- 若支持父选择器（如 `.item:parent`），则需要**从子元素向上遍历 DOM 树**，性能开销极大；\n- 页面 DOM 结构复杂时，会导致严重的性能卡顿。\n\n#### 2. **渲染流程限制**\n- 浏览器渲染流程：**解析 HTML → 构建 DOM → 解析 CSS → 构建 CSSOM → 合成渲染树 → 布局 → 绘制**；\n- 父选择器需要**子元素先渲染完成**，才能确定父元素样式，会打破「自顶向下」的渲染顺序，导致重排重绘频繁。\n\n#### 3. **设计理念**\n- CSS 设计理念是「**样式继承自父元素**」，而非「子元素影响父元素」；\n- 父选择器会破坏「**样式隔离**」，导致样式依赖混乱，可维护性变差。\n\n#### 4. **替代方案**\n- **JS 实现**：通过 JS 监听子元素状态，动态修改父元素样式；\n- **CSS 伪类**：`has()` 伪类（CSS Selectors Level 4）可模拟父选择器（如 `div:has(.item)`），但兼容性有限（Chrome 105+）；\n- **BEM 命名规范**：通过类名约定实现父子样式关联。\n\n### 总结\nCSS 不支持父选择器，本质是**性能 + 渲染流程 + 设计理念**的综合考量，是为了保证浏览器渲染性能和样式可维护性。"
+  },
+  {
+    "id": "css-interview-52",
+    "topic": "脱离文档流有哪些方法?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 让元素脱离文档流的 3 种核心方法\n\n#### 1. **浮动（Float）**\n- 语法：`float: left/right`；\n- 效果：元素脱离文档流，向左/向右浮动，文字环绕；\n- 影响：父元素高度塌陷，其他元素填补其位置；\n- 示例：\n  ```css\n  .box { float: left; }\n  ```\n\n#### 2. **绝对定位（Absolute）**\n- 语法：`position: absolute`；\n- 效果：元素脱离文档流，相对于最近的**定位父元素**（非 `static`）定位；\n- 影响：完全不占据文档流空间，其他元素填补其位置；\n- 示例：\n  ```css\n  .box { position: absolute; top: 0; left: 0; }\n  ```\n\n#### 3. **固定定位（Fixed）**\n- 语法：`position: fixed`；\n- 效果：元素脱离文档流，相对于**浏览器视口**定位（特殊情况除外）；\n- 影响：完全不占据文档流空间，滚动时位置不变；\n- 示例：\n  ```css\n  .box { position: fixed; top: 0; left: 0; }\n  ```\n\n---\n\n### 补充：`position: sticky` 特殊情况\n- `sticky` 在**未滚动到阈值时**，属于文档流；\n- 滚动到阈值后，变为 `fixed`，临时脱离文档流；\n- 不算完全脱离文档流。\n\n### 总结\n- **完全脱离文档流**：`float`、`position: absolute`、`position: fixed`；\n- **临时脱离文档流**：`position: sticky`；\n- 脱离文档流后，元素不再占据默认空间，其他元素会填补其位置。"
+  },
+  {
+    "id": "css-interview-53",
+    "topic": "第二个子元素的高度是多少",
+    "notes": "以常见面试题代码为例：\n```html\n<style>\n  .parent { height: 200px; }\n  .child1 { height: 100px; }\n  .child2 { }\n</style>\n<div class=\"parent\">\n  <div class=\"child1\"></div>\n  <div class=\"child2\"></div>\n</div>\n```",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：`0px`（或由内容高度决定）\n\n#### 解析：块级元素高度规则\n- 块级元素默认高度为 **`auto`**，由**内容高度**决定；\n- 若子元素无内容、无 `height`/`padding`/`border`，则高度为 `0px`；\n- 父元素高度不会自动继承给子元素，子元素高度默认不占满父元素。\n\n---\n\n### 变体 1：子元素设置 `height: 100%`\n```css\n.child2 { height: 100%; }\n```\n- 若父元素 `height: 200px`，则子元素高度为 **`200px`**（继承父元素高度）；\n- 若父元素高度为 `auto`，则子元素高度为 `0px`（无法继承 `auto` 高度）。\n\n### 变体 2：父元素为 Flex 布局\n```css\n.parent { display: flex; flex-direction: column; height: 200px; }\n.child2 { flex: 1; }\n```\n- 子元素高度为 **`100px`**（`flex: 1` 占满剩余空间：`200px - 100px = 100px`）。\n\n### 总结\n- 无内容、无高度设置：高度为 `0px`；\n- 有内容：高度为内容高度；\n- 设置 `height: 100%`：需父元素有固定高度，否则为 `0px`；\n- Flex 布局：`flex: 1` 占满剩余空间。"
+  },
+  {
+    "id": "css-interview-54",
+    "topic": "CSSOM树和DOM树是同时解析的吗?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：**不是同时解析，而是并行解析，但 CSSOM 会阻塞 DOM 渲染**\n\n#### 1. 解析流程\n- **DOM 树解析**：浏览器逐行解析 HTML，构建 DOM 树，**不会被 CSS 解析阻塞**；\n- **CSSOM 树解析**：浏览器解析 CSS（内联/外链），构建 CSSOM 树，**会阻塞渲染树构建**；\n- 两者是**并行进行**的，但渲染树（Render Tree）必须等待 **DOM + CSSOM 都构建完成** 才能生成。\n\n#### 2. 关键特性\n- **DOM 解析不被 CSS 阻塞**：即使 CSS 未加载完成，DOM 树仍会继续构建；\n- **CSSOM 阻塞渲染**：渲染树需要 DOM + CSSOM 才能生成，因此 CSS 加载会阻塞页面渲染；\n- **JS 会阻塞 DOM 和 CSSOM**：`<script>` 标签会暂停 DOM 解析，等待 CSSOM 构建完成后再执行。\n\n#### 3. 优化建议\n- **CSS 放在 `<head>`**：尽早加载 CSS，加快 CSSOM 构建；\n- **JS 放在 `<body>` 底部**：避免阻塞 DOM 解析；\n- **使用 `media` 属性**：针对不同媒体类型的 CSS 异步加载，不阻塞渲染。\n\n### 总结\n- DOM 和 CSSOM **并行解析**；\n- 渲染树必须等待两者都完成，因此 **CSS 会阻塞页面渲染**，但不会阻塞 DOM 解析。"
+  },
+  {
+    "id": "css-interview-55",
+    "topic": "怎么实现样式隔离?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 实现样式隔离的 5 种核心方案\n\n#### 1. **CSS Module（最常用）**\n- 原理：构建工具将类名编译为**全局唯一哈希值**，实现局部作用域；\n- 示例：\n  ```css\n  /* style.module.css */\n  .title { color: red; }\n  ```\n  ```jsx\n  import styles from './style.module.css'\n  <h1 className={styles.title}>\n  ```\n- 优点：彻底隔离，无命名冲突。\n\n#### 2. **Scoped CSS（Vue 内置）**\n- 原理：给组件内 CSS 选择器添加**唯一属性选择器**（如 `[data-v-7ba5bd90]`）；\n- 示例：\n  ```vue\n  <style scoped>\n  .title { color: red; }\n  </style>\n  ```\n- 优点：开箱即用，无需手动处理。\n\n#### 3. **CSS-in-JS（React 生态）**\n- 原理：在 JS 中编写 CSS，动态生成**唯一类名**；\n- 示例（Styled Components）：\n  ```js\n  const Title = styled.h1`color: red;`\n  ```\n- 优点：动态样式，完全隔离。\n\n#### 4. **BEM 命名规范**\n- 原理：约定类名格式 `Block__Element--Modifier`，避免全局命名冲突；\n- 示例：`.button--primary`/`.card__header`；\n- 优点：无需构建工具，兼容性好。\n\n#### 5. **Shadow DOM（Web Components）**\n- 原理：创建独立的 DOM 子树，样式完全隔离，外部样式无法侵入；\n- 示例：\n  ```js\n  const shadow = element.attachShadow({ mode: 'open' });\n  shadow.innerHTML = `<style>.title { color: red; }</style><h1>Hello</h1>`;\n  ```\n- 优点：真正的样式隔离，适合组件化。\n\n### 总结\n- **Vue 项目**：优先用 **Scoped CSS**；\n- **React 项目**：优先用 **CSS Module** 或 **CSS-in-JS**；\n- **原生组件**：用 **Shadow DOM**；\n- **无构建依赖**：用 **BEM 命名规范**。"
+  },
+  {
+    "id": "css-interview-56",
+    "topic": "position: absolute绝对定位，是相对于谁的定位?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：**相对于最近的「定位父元素」（非 `static` 定位的祖先元素），若没有则相对于 `<html>` 根元素**\n\n#### 核心规则\n1. **定位父元素**：指 `position` 为 `relative/absolute/fixed/sticky` 的**最近祖先元素**；\n2. **默认情况**：若所有祖先元素都是 `static`（默认），则相对于 `<html>` 根元素定位；\n3. **特殊情况**：若父元素有 `transform`/`perspective`/`filter`，则相对于该父元素定位（打破视口规则）。\n\n#### 代码示例\n```css\n.parent { position: relative; } /* 定位父元素 */\n.child { position: absolute; top: 0; left: 0; } /* 相对于 .parent 定位 */\n```\n```css\n/* 无定位父元素 → 相对于 <html> 定位 */\n.child { position: absolute; top: 0; left: 0; }\n```\n\n#### 对比 `fixed`\n- `absolute`：相对于**定位父元素**；\n- `fixed`：相对于**浏览器视口**（特殊情况除外）。\n\n### 总结\n`absolute` 定位的参考系是：**最近的非 `static` 祖先元素**，否则是 `<html>` 根元素。"
+  },
+  {
+    "id": "css-interview-57",
+    "topic": "下面这段代码中，class为content的元素，实际高度是100px吗?",
+    "notes": "以常见面试题代码为例：\n```html\n<style>\n  .box { height: 200px; padding: 20px; }\n  .content { height: 100%; }\n</style>\n<div class=\"box\">\n  <div class=\"content\"></div>\n</div>\n```",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：**不是 100px，实际高度为 200px（父元素内容高度）**\n\n#### 解析：`height: 100%` 继承规则\n- `height: 100%` 是相对于**父元素的内容高度**（`content height`）计算的；\n- 父元素 `.box` 高度为 `200px`，无 `box-sizing: border-box`，因此：\n  - 父元素内容高度 = `200px`；\n  - 子元素 `.content` 高度 = `200px`；\n  - 父元素总高度 = `200px + 20px*2 = 240px`。\n\n---\n\n### 变体 1：父元素设置 `box-sizing: border-box`\n```css\n.box { box-sizing: border-box; height: 200px; padding: 20px; }\n```\n- 父元素内容高度 = `200px - 20px*2 = 160px`；\n- 子元素高度 = `160px`。\n\n### 变体 2：子元素设置 `box-sizing: border-box`\n```css\n.content { box-sizing: border-box; height: 100%; padding: 10px; }\n```\n- 子元素内容高度 = `200px - 10px*2 = 180px`；\n- 子元素总高度 = `200px`。\n\n### 总结\n- `height: 100%` 继承父元素的**内容高度**，而非总高度；\n- 实际高度需结合 `box-sizing` 和 `padding`/`border` 计算。"
+  },
+  {
+    "id": "css-interview-58",
+    "topic": "怎么做移动端的样式适配?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 移动端样式适配的 4 种核心方案\n\n#### 1. **viewport 适配（基础）**\n- 设置 `<meta name=\"viewport\">` 标签，控制视口大小：\n  ```html\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n  ```\n- 作用：\n  - `width=device-width`：视口宽度等于设备宽度；\n  - `initial-scale=1.0`：初始缩放比例为 1；\n  - 禁止用户缩放，保证布局稳定。\n\n#### 2. **rem 适配（主流）**\n- 原理：`rem` 相对于根元素 `html` 的 `font-size`，动态设置根字体大小实现适配；\n- 示例：\n  ```js\n  // 动态设置根字体大小\n  document.documentElement.style.fontSize = document.documentElement.clientWidth / 10 + 'px';\n  ```\n  ```css\n  /* 设计稿 375px → 1rem = 37.5px */\n  .box { width: 2rem; /* 75px */ }\n  ```\n\n#### 3. **vw/vh 适配（现代）**\n- 原理：`vw` 是视口宽度的 1%，`vh` 是视口高度的 1%，天然适配不同设备；\n- 示例：\n  ```css\n  .box { width: 20vw; /* 视口宽度的 20% */ }\n  ```\n- 优点：无需 JS，代码简洁；\n- 兼容性：Chrome 36+、iOS 8+。\n\n#### 4. **Flex/Grid 布局适配**\n- 使用弹性布局/网格布局，实现自适应：\n  ```css\n  .container { display: flex; flex-wrap: wrap; }\n  .item { flex: 1; min-width: 100px; }\n  ```\n- 作用：自动适应不同屏幕宽度，避免固定尺寸。\n\n#### 5. **媒体查询（Media Query）**\n- 针对不同屏幕尺寸设置不同样式：\n  ```css\n  @media (max-width: 768px) {\n    .box { width: 100%; }\n  }\n  ```\n- 作用：断点适配，针对小屏幕/平板/桌面端分别设置样式。\n\n### 总结\n- **基础**：viewport 标签；\n- **主流**：rem 适配（配合 flexible.js）；\n- **现代**：vw/vh 适配；\n- **布局**：Flex/Grid 自适应布局；\n- **断点**：媒体查询针对不同设备。"
+  },
+  {
+    "id": "css-interview-59",
+    "topic": "行内元素和块级元素有什么区别",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 行内元素 vs 块级元素：核心区别\n\n| 对比维度 | **块级元素（Block）** | **行内元素（Inline）** |\n| :--- | :--- | :--- |\n| **默认宽度** | 占满父容器宽度 | 由内容宽度决定 |\n| **默认高度** | 由内容高度决定 | 由内容高度决定 |\n| **是否独占一行** | ✅ 独占一行 | ❌ 与其他行内元素在同一行 |\n| **可设置宽高** | ✅ 可设置 `width`/`height` | ❌ 不可设置（`width`/`height` 无效） |\n| **可设置上下 margin/padding** | ✅ 可设置 | ❌ 上下 `margin`/`padding` 无效（左右有效） |\n| **可包含子元素** | ✅ 可包含块级元素和行内元素 | ❌ 只能包含行内元素和文本（不能包含块级元素） |\n| **常见元素** | `div`/`p`/`h1`-`h6`/`ul`/`li`/`section` | `span`/`a`/`strong`/`em`/`img`/`button` |\n\n---\n\n### 行内块元素（Inline-block）\n- 介于两者之间：\n  - 与其他行内元素在同一行；\n  - 可设置 `width`/`height`/`margin`/`padding`；\n  - 常见元素：`img`/`button`/`input`。\n\n### 总结\n- **块级元素**：独占一行，可设置宽高，适合布局；\n- **行内元素**：同行排列，不可设置宽高，适合文本；\n- **行内块元素**：同行排列，可设置宽高，适合图标/按钮。"
+  },
+  {
+    "id": "css-interview-60",
+    "topic": "使用原生js实现以下效果：点击容器内的图标，图标边框变成border:1px solid red，点击空白处重置",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 原生 JS 实现代码\n\n#### HTML\n```html\n<div class=\"container\">\n  <div class=\"icon\">📌</div>\n  <div class=\"icon\">🔖</div>\n  <div class=\"icon\">📍</div>\n</div>\n```\n\n#### CSS\n```css\n.icon {\n  display: inline-block;\n  padding: 8px;\n  margin: 4px;\n  font-size: 24px;\n  cursor: pointer;\n  transition: border 0.2s;\n}\n.icon.active {\n  border: 1px solid red;\n}\n```\n\n#### JS\n```javascript\nconst container = document.querySelector('.container');\nlet activeIcon = null;\n\n// 点击图标：添加边框\ncontainer.addEventListener('click', (e) => {\n  if (e.target.classList.contains('icon')) {\n    // 重置之前的 active 图标\n    if (activeIcon) {\n      activeIcon.classList.remove('active');\n    }\n    // 设置当前图标为 active\n    e.target.classList.add('active');\n    activeIcon = e.target;\n  } else {\n    // 点击空白处：重置所有边框\n    if (activeIcon) {\n      activeIcon.classList.remove('active');\n      activeIcon = null;\n    }\n  }\n});\n```\n\n#### 核心逻辑\n1. **事件委托**：给容器 `.container` 绑定点击事件，而非每个图标，提升性能；\n2. **状态管理**：用 `activeIcon` 变量记录当前激活的图标；\n3. **点击图标**：移除之前图标的 `active` 类，给当前图标添加 `active`；\n4. **点击空白处**：移除所有图标 `active` 类，重置状态。\n\n### 总结\n通过**事件委托** + **类名控制**，实现点击图标高亮、点击空白重置的效果，代码简洁、性能高效。"
+  },
+  {
+    "id": "css-interview-61",
+    "topic": "CSS 垂直居中有哪些实现方式?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 垂直居中的 6 种实现方式\n\n#### 1. **Flex 布局（现代首选，最推荐）**\n```css\n.parent {\n  display: flex;\n  align-items: center; /* 垂直居中 */\n}\n```\n- 优点：代码简洁、兼容性好（IE10+）、支持未知高度。\n\n#### 2. **Grid 布局（最简洁）**\n```css\n.parent {\n  display: grid;\n  place-items: center; /* 水平+垂直居中 */\n}\n```\n- 优点：代码最少，支持复杂布局。\n\n#### 3. **绝对定位 + transform（未知高度）**\n```css\n.parent { position: relative; }\n.child {\n  position: absolute;\n  top: 50%;\n  transform: translateY(-50%);\n}\n```\n- 优点：支持未知高度，兼容性好（IE9+）。\n\n#### 4. **绝对定位 + margin: auto（已知高度）**\n```css\n.parent { position: relative; }\n.child {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  margin: auto 0;\n  height: 100px; /* 必须固定高度 */\n}\n```\n- 优点：兼容性好，适合固定高度元素。\n\n#### 5. **line-height 法（单行文本）**\n```css\n.child {\n  line-height: 200px; /* 等于父元素高度 */\n  height: 200px;\n}\n```\n- 优点：简单高效，适合单行文本。\n\n#### 6. **table-cell 法（兼容旧浏览器）**\n```css\n.parent {\n  display: table-cell;\n  vertical-align: middle;\n}\n```\n- 优点：兼容 IE6-8，适合旧项目。\n\n### 总结\n- **现代项目**：优先用 **Flex/Grid**；\n- **未知高度**：用 **absolute + transform**；\n- **单行文本**：用 **line-height**；\n- **旧浏览器**：用 **table-cell**。"
+  },
+  {
+    "id": "css-interview-62",
+    "topic": "怎么让 CSS flex 布局最后一行列表左对齐?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### Flex 布局最后一行左对齐的 3 种方案\n\n#### 1. **用 `justify-content: flex-start` + 占位元素（最常用）**\n```css\n.parent {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start; /* 默认左对齐 */\n  gap: 20px; /* 间距 */\n}\n.child {\n  width: calc(25% - 20px); /* 每行 4 个 */\n}\n/* 最后一行不足时，添加空占位元素，宽度与子元素相同 */\n.placeholder {\n  width: calc(25% - 20px);\n}\n```\n- 原理：用空元素填充最后一行，让实际元素左对齐。\n\n#### 2. **用 `grid` 布局替代（最简洁）**\n```css\n.parent {\n  display: grid;\n  grid-template-columns: repeat(4, 1fr); /* 每行 4 个 */\n  gap: 20px;\n}\n```\n- 优点：Grid 天然支持最后一行左对齐，无需额外代码。\n\n#### 3. **用 `:nth-child` 控制最后一行（固定列数）**\n```css\n/* 每行 4 个，最后一行的元素左对齐 */\n.parent {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 20px;\n}\n.child {\n  width: calc(25% - 20px);\n}\n/* 最后一行第 1 个元素左对齐 */\n.child:nth-child(4n+1):nth-last-child(-n+4) {\n  /* 针对最后一行的元素，无需额外样式，默认左对齐 */\n}\n```\n- 优点：无需占位元素，适合固定列数场景。\n\n### 总结\n- **灵活场景**：用 **占位元素 + flex**；\n- **简洁场景**：用 **Grid 布局**；\n- **固定列数**：用 **`:nth-child` 选择器**。"
+  },
+  {
+    "id": "css-interview-63",
+    "topic": "相邻的两个 inline-block 节点为什么会出现间隔, 该如何解决?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 原因：HTML 换行符/空格被解析为空白字符\n相邻 `inline-block` 元素之间的**换行符、空格、制表符**会被浏览器解析为**空白字符**，从而产生间隔。\n\n```html\n<!-- 会产生间隔：两个 div 之间有换行 -->\n<div class=\"box\">1</div>\n<div class=\"box\">2</div>\n```\n\n---\n\n### 解决方法（4 种）\n\n#### 1. **移除 HTML 中的换行/空格（最直接）**\n```html\n<!-- 无换行，无间隔 -->\n<div class=\"box\">1</div><div class=\"box\">2</div>\n```\n\n#### 2. **设置父元素 `font-size: 0`**\n```css\n.parent {\n  font-size: 0; /* 清除空白字符宽度 */\n}\n.child {\n  display: inline-block;\n  font-size: 16px; /* 恢复子元素字体大小 */\n}\n```\n- 优点：简单高效，适合所有场景。\n\n#### 3. **用 `letter-spacing`/`word-spacing` 负值**\n```css\n.parent {\n  letter-spacing: -4px; /* 负值缩小间距，需根据字体调整 */\n}\n.child {\n  display: inline-block;\n  letter-spacing: 0; /* 恢复子元素字间距 */\n}\n```\n- 注意：不同字体的空白宽度不同，需微调。\n\n#### 4. **用 Flex 布局替代（现代方案）**\n```css\n.parent {\n  display: flex;\n  gap: 0; /* 无间隔 */\n}\n```\n- 优点：彻底避免空白字符问题，代码简洁。\n\n### 总结\n- **原因**：HTML 换行/空格被解析为空白字符；\n- **推荐方案**：**Flex 布局** 或 **父元素 `font-size: 0`**。"
+  },
+  {
+    "id": "css-interview-64",
+    "topic": "display 有哪些取值?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `display` 常用取值分类\n\n#### 1. **基础布局类**\n- `none`：隐藏元素，不占据空间；\n- `block`：块级元素，独占一行，可设置宽高；\n- `inline`：行内元素，同行排列，不可设置宽高；\n- `inline-block`：行内块元素，同行排列，可设置宽高；\n- `list-item`：列表项，类似 `block`，带项目符号。\n\n#### 2. **现代布局类**\n- `flex`：弹性容器，子元素为弹性项；\n- `inline-flex`：行内弹性容器；\n- `grid`：网格容器，子元素为网格项；\n- `inline-grid`：行内网格容器；\n- `table`：表格容器，类似 `<table>`；\n- `table-cell`：表格单元格，类似 `<td>`；\n- `table-row`：表格行，类似 `<tr>`。\n\n#### 3. **其他常用值**\n- `inherit`：继承父元素 `display`；\n- `initial`：初始值（`inline`）；\n- `unset`：重置为继承或初始值；\n- `contents`：元素本身不渲染，子元素直接进入父级布局；\n- `run-in`：根据上下文决定是 `block` 还是 `inline`（兼容性差）。\n\n#### 4. **实验性值**\n- `ruby`：用于东亚文字注音；\n- `subgrid`：子网格布局（Chrome 77+）。\n\n### 总结\n- **基础布局**：`block`/`inline`/`inline-block`；\n- **现代布局**：`flex`/`grid`（推荐）；\n- **隐藏元素**：`none`；\n- **表格布局**：`table`/`table-cell`。"
+  },
+  {
+    "id": "css-interview-65",
+    "topic": "如何从 html 元素继承 box-sizing?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 方法：设置 `html` 为 `border-box`，其他元素继承\n\n#### 代码实现\n```css\n/* 1. 设置根元素 html 为 border-box */\nhtml {\n  box-sizing: border-box;\n}\n\n/* 2. 所有元素及伪元素继承 box-sizing */\n*, *::before, *::after {\n  box-sizing: inherit;\n}\n```\n\n#### 原理\n- `box-sizing: inherit` 会让所有元素继承 `html` 的 `box-sizing`；\n- 若需要某个元素改为 `content-box`，可单独覆盖：\n  ```css\n  .special-box {\n    box-sizing: content-box;\n  }\n  ```\n\n#### 优势\n- **统一盒模型**：全局使用 `border-box`，避免 `padding`/`border` 撑大元素；\n- **灵活覆盖**：可单独修改某个元素的盒模型，不影响全局；\n- **兼容性好**：支持 IE8+。\n\n### 总结\n通过 `html { box-sizing: border-box }` + `* { box-sizing: inherit }`，实现全局盒模型继承，是现代前端开发的最佳实践。"
+  },
+  {
+    "id": "css-interview-66",
+    "topic": "如何使用 css 来实现禁止移动端页面的左右划动手势?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 核心方案：阻止页面水平滚动 + 禁用触摸滑动\n\n#### 1. **禁止水平滚动（基础）**\n```css\nhtml, body {\n  overflow-x: hidden; /* 隐藏水平滚动条，禁止水平滚动 */\n  width: 100vw;\n  max-width: 100vw;\n}\n```\n\n#### 2. **禁用触摸滑动（iOS/Safari）**\n```css\nbody {\n  /* 禁止左右滑动，iOS Safari 专用 */\n  touch-action: pan-y; /* 只允许垂直滚动，禁止水平滚动 */\n  -webkit-overflow-scrolling: touch;\n}\n```\n- `touch-action: pan-y`：只允许垂直方向的触摸滚动，禁止水平。\n\n#### 3. **完整方案**\n```css\nhtml, body {\n  margin: 0;\n  padding: 0;\n  overflow-x: hidden;\n  width: 100vw;\n  max-width: 100vw;\n  touch-action: pan-y; /* 禁止水平触摸滑动 */\n}\n```\n\n#### 注意事项\n- `touch-action` 兼容性：Chrome 36+、iOS 13+；\n- 若页面有横向滚动需求，需在容器上单独设置 `overflow-x: auto`；\n- 部分浏览器（如微信内置浏览器）可能需要额外 JS 处理。\n\n### 总结\n通过 `overflow-x: hidden` + `touch-action: pan-y`，可实现禁止移动端左右划动手势，保证页面只垂直滚动。"
+  },
+  {
+    "id": "css-interview-67",
+    "topic": "如何检测浏览器所支持的最小字体大小?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 方法：JS 动态创建元素，测量渲染高度\n\n#### 核心原理\n浏览器对小于一定阈值的字体大小会进行**最小字号限制**（如 Chrome 最小 12px），通过创建不同字号的元素并测量其高度，可检测出最小字号。\n\n#### 代码实现\n```javascript\nfunction detectMinFontSize() {\n  // 创建测试元素\n  const testEl = document.createElement('div');\n  testEl.style.position = 'absolute';\n  testEl.style.visibility = 'hidden';\n  testEl.style.lineHeight = '1';\n  document.body.appendChild(testEl);\n\n  let minSize = 1;\n  let prevHeight = 0;\n\n  // 从 1px 开始递增，直到渲染高度不再变化\n  while (minSize <= 100) {\n    testEl.style.fontSize = `${minSize}px`;\n    const currentHeight = testEl.offsetHeight;\n    if (currentHeight > prevHeight) {\n      prevHeight = currentHeight;\n      minSize++;\n    } else {\n      // 高度不再变化，说明当前字号为最小有效字号\n      break;\n    }\n  }\n\n  document.body.removeChild(testEl);\n  return minSize - 1; // 返回最小有效字号\n}\n\n// 调用示例\nconsole.log('浏览器最小字体大小：', detectMinFontSize(), 'px');\n```\n\n#### 常见结果\n- Chrome：最小 12px（可通过 `transform: scale()` 绕过）；\n- Firefox/Safari：支持更小字号（如 8px）；\n- 移动端浏览器：通常最小 12px。\n\n### 总结\n通过 JS 创建测试元素，测量不同字号下的渲染高度，可准确检测浏览器支持的最小字体大小。"
+  },
+  {
+    "id": "css-interview-68",
+    "topic": "Js 动画与 CSS 动画区别及相应实现",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### JS 动画 vs CSS 动画：核心区别\n\n| 对比维度 | **CSS 动画** (`transition`/`animation`) | **JS 动画** (`requestAnimationFrame`/GSAP) |\n| :--- | :--- | :--- |\n| **性能** | ✅ 高（GPU 加速，合成线程渲染） | ⚠️ 中高（需手动优化，优秀库接近 CSS 性能） |\n| **开发难度** | ✅ 低（声明式，代码少） | ❌ 高（需手动计算时间、进度） |\n| **控制能力** | ❌ 弱（简单触发/暂停） | ✅ 强（精确控制进度、暂停、倒放） |\n| **适用场景** | ✅ 简单交互、循环动画 | ✅ 复杂交互、业务联动 |\n| **兼容性** | ✅ 现代浏览器支持好 | ✅ 兼容性更广，可降级 |\n\n---\n\n### CSS 动画实现示例\n```css\n/* 过渡动画 */\n.box {\n  width: 100px;\n  transition: width 0.3s ease;\n}\n.box:hover {\n  width: 200px;\n}\n\n/* 关键帧动画 */\n@keyframes move {\n  0% { transform: translateX(0); }\n  100% { transform: translateX(200px); }\n}\n.box {\n  animation: move 2s infinite;\n}\n```\n\n### JS 动画实现示例（requestAnimationFrame）\n```javascript\nconst box = document.querySelector('.box');\nlet start = null;\nlet progress = 0;\n\nfunction animate(timestamp) {\n  if (!start) start = timestamp;\n  progress = timestamp - start;\n  const translateX = Math.min(progress / 10, 200); // 200px 为目标位移\n  box.style.transform = `translateX(${translateX}px)`;\n  if (progress < 2000) {\n    requestAnimationFrame(animate);\n  }\n}\n\nrequestAnimationFrame(animate);\n```\n\n### 总结\n- **CSS 动画**：适合简单、展示类动画，性能最优；\n- **JS 动画**：适合复杂、交互类动画，控制能力极强。"
+  },
+  {
+    "id": "css-interview-69",
+    "topic": "IconFont 的原理是什么",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### IconFont（字体图标）原理\nIconFont 是将**图标封装为字体文件**，通过 CSS `@font-face` 引入，使用 `content` 属性显示图标。\n\n#### 核心原理\n1. **图标转字体**：将 SVG 图标转换为字体文件（`.ttf`/`.woff`/`.woff2`），每个图标对应一个**Unicode 字符**；\n2. **字体引入**：通过 `@font-face` 引入字体文件，定义字体名称；\n3. **图标显示**：通过 CSS `content` 属性指定 Unicode 字符，显示对应图标；\n4. **样式控制**：图标本质是文字，可通过 `color`/`font-size`/`text-shadow` 等 CSS 属性控制样式。\n\n#### 代码示例\n```css\n/* 1. 引入字体 */\n@font-face {\n  font-family: 'iconfont';\n  src: url('iconfont.woff2') format('woff2'),\n       url('iconfont.woff') format('woff');\n}\n\n/* 2. 定义图标类 */\n.iconfont {\n  font-family: 'iconfont' !important;\n  font-size: 16px;\n  font-style: normal;\n}\n\n/* 3. 指定图标 Unicode */\n.icon-home::before {\n  content: \"\\e600\"; /* 对应 home 图标的 Unicode */\n}\n```\n```html\n<!-- 4. 使用图标 -->\n<i class=\"iconfont icon-home\"></i>\n```\n\n#### 优势\n- **体积小**：字体文件比多张图片小；\n- **可缩放**：矢量图标，放大不失真；\n- **可修改样式**：直接用 CSS 修改颜色、大小；\n- **兼容性好**：支持所有现代浏览器。\n\n### 总结\nIconFont 本质是**「图标 → 字体 → 文字」**，通过字体技术实现图标展示，兼具图片和文字的优势。"
+  },
+  {
+    "id": "css-interview-70",
+    "topic": "css sprites是什么, 怎么使用?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS Sprites（雪碧图）是什么？\nCSS Sprites 是一种**图片优化技术**，将多个小图标合并为一张大图，通过 `background-position` 定位显示不同图标，减少 HTTP 请求数，提升页面加载速度。\n\n#### 核心原理\n- **合并图片**：将多个小图标拼接成一张大图；\n- **定位显示**：通过 `background-position` 控制显示大图的不同区域，对应不同图标；\n- **减少请求**：多个图标只需要加载一张大图，减少 HTTP 请求。\n\n#### 代码示例\n```css\n/* 1. 定义雪碧图容器 */\n.icon {\n  display: inline-block;\n  width: 24px; /* 图标宽度 */\n  height: 24px; /* 图标高度 */\n  background-image: url('sprites.png'); /* 合并后的大图 */\n  background-repeat: no-repeat;\n}\n\n/* 2. 定位不同图标 */\n.icon-home {\n  background-position: 0 0; /* 左上角 home 图标 */\n}\n.icon-user {\n  background-position: -24px 0; /* 右侧 user 图标 */\n}\n.icon-setting {\n  background-position: 0 -24px; /* 下方 setting 图标 */\n}\n```\n```html\n<!-- 3. 使用图标 -->\n<i class=\"icon icon-home\"></i>\n<i class=\"icon icon-user\"></i>\n```\n\n#### 优势\n- **减少请求**：多个图标合并为一张图，减少 HTTP 请求数；\n- **缓存友好**：大图只需要缓存一次；\n- **加载更快**：避免多次加载小图的延迟。\n\n#### 缺点\n- **维护麻烦**：新增/修改图标需要重新合并大图；\n- **定位复杂**：需要精确计算 `background-position`；\n- **不适合大图标**：大图体积过大可能导致加载慢。\n\n### 总结\nCSS Sprites 是**「合并小图 + 定位显示」**的图片优化方案，适合图标较多的场景，是早期前端性能优化的重要手段。"
+  },
+  {
+    "id": "css-interview-71",
+    "topic": "display:none与visibility:hidden有什么区别?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `display: none` vs `visibility: hidden` 核心区别\n\n| 对比维度 | `display: none` | `visibility: hidden` |\n| :--- | :--- | :--- |\n| **是否占据空间** | ❌ 不占据，元素从文档流中移除 | ✅ 占据空间，只是视觉不可见 |\n| **是否触发重排/重绘** | ✅ 触发重排（Layout）+ 重绘（Paint） | ✅ 只触发重绘（Paint），不触发重排 |\n| **子元素是否继承** | ❌ 子元素也会被隐藏，无法单独显示 | ✅ 子元素可单独设置 `visibility: visible` 显示 |\n| **是否可被 JS 获取** | ❌ 元素不可见，`offsetWidth`/`offsetHeight` 为 0 | ✅ 元素可见，`offsetWidth`/`offsetHeight` 正常 |\n| **是否可被过渡/动画** | ❌ 不支持过渡/动画 | ✅ 支持 `visibility` 过渡/动画 |\n| **是否可被屏幕阅读器读取** | ❌ 不会被读取 | ✅ 会被读取（仅视觉隐藏） |\n\n---\n\n### 代码示例\n```css\n/* display: none：元素消失，不占空间 */\n.box1 {\n  display: none;\n}\n\n/* visibility: hidden：元素不可见，占空间 */\n.box2 {\n  visibility: hidden;\n}\n```\n\n### 总结\n- **`display: none`**：**彻底隐藏**，移除文档流，适合不需要保留位置的场景；\n- **`visibility: hidden`**：**视觉隐藏**，保留布局空间，适合需要占位、可过渡的场景。"
+  },
+  {
+    "id": "css-interview-72",
+    "topic": "你知道哪些css模块化的方案?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 模块化的 5 种核心方案\n\n#### 1. **CSS Module（最常用）**\n- 原理：构建工具将类名编译为**全局唯一哈希值**，实现局部作用域；\n- 示例：\n  ```css\n  /* style.module.css */\n  .title { color: red; }\n  ```\n  ```jsx\n  import styles from './style.module.css'\n  <h1 className={styles.title}>\n  ```\n- 优点：彻底隔离，无命名冲突，兼容性好。\n\n#### 2. **Scoped CSS（Vue 内置）**\n- 原理：给组件内 CSS 选择器添加**唯一属性选择器**（如 `[data-v-7ba5bd90]`）；\n- 示例：\n  ```vue\n  <style scoped>\n  .title { color: red; }\n  </style>\n  ```\n- 优点：开箱即用，无需手动处理，Vue 生态首选。\n\n#### 3. **CSS-in-JS（React 生态）**\n- 原理：在 JS/TS 中编写 CSS，动态生成**唯一类名**；\n- 示例（Styled Components）：\n  ```js\n  const Title = styled.h1`color: red;`\n  ```\n- 优点：动态样式，完全隔离，支持逻辑复用。\n\n#### 4. **BEM 命名规范**\n- 原理：约定类名格式 `Block__Element--Modifier`，避免全局命名冲突；\n- 示例：`.button--primary`/`.card__header`；\n- 优点：无需构建工具，兼容性好，适合无构建场景。\n\n#### 5. **Shadow DOM（Web Components）**\n- 原理：创建独立的 DOM 子树，样式完全隔离，外部样式无法侵入；\n- 示例：\n  ```js\n  const shadow = element.attachShadow({ mode: 'open' });\n  shadow.innerHTML = `<style>.title { color: red; }</style><h1>Hello</h1>`;\n  ```\n- 优点：真正的样式隔离，适合跨框架组件。\n\n---\n\n### 补充：原子化 CSS（Tailwind CSS）\n- 原理：单一职责的原子类，组合实现样式，无命名冲突；\n- 示例：`<div class='text-red-500 p-4'>`；\n- 优点：开发效率高，样式一致性好，是现代趋势。\n\n### 总结\n- **Vue 项目**：Scoped CSS；\n- **React 项目**：CSS Module / CSS-in-JS；\n- **原生组件**：Shadow DOM；\n- **无构建依赖**：BEM 命名规范；\n- **现代趋势**：原子化 CSS（Tailwind）。"
+  },
+  {
+    "id": "css-interview-73",
+    "topic": "html和css中的图片加载与渲染规则是什么样的?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、HTML 图片加载与渲染规则\n#### 1. `<img>` 标签\n- **加载时机**：浏览器解析到 `<img>` 标签时，立即发起图片请求；\n- **渲染时机**：图片加载完成后，浏览器重新计算布局并渲染；\n- **占位**：若未设置 `width`/`height`，图片加载前不占空间，加载后会触发重排；\n- **属性**：`loading='lazy'` 可实现懒加载，进入视口后再请求。\n\n#### 2. `<picture>` 标签\n- 支持响应式图片，根据设备像素比、屏幕尺寸选择不同图片；\n- 加载规则：浏览器选择最合适的图片格式，只加载选中的图片。\n\n---\n\n### 二、CSS 图片加载与渲染规则\n#### 1. `background-image`\n- **加载时机**：当元素被渲染到页面上（即元素有尺寸且可见）时，才发起图片请求；\n- **渲染时机**：图片加载完成后，替换背景，触发重绘（不触发重排）；\n- **占位**：背景图片不影响元素尺寸，不会触发重排。\n\n#### 2. `content: url()`\n- 加载规则与 `background-image` 类似，仅在元素可见时加载。\n\n---\n\n### 三、核心差异\n| 对比维度 | `<img>` | `background-image` |\n| :--- | :--- | :--- |\n| **加载时机** | 解析到标签即加载 | 元素可见时加载 |\n| **布局影响** | 未设宽高会触发重排 | 不影响布局，无重排 |\n| **懒加载** | 原生 `loading='lazy'` | 需 JS 实现 |\n| **SEO** | 友好（`alt` 属性） | 不友好（无 `alt`） |\n\n### 总结\n- **`<img>`**：适合内容图片，加载早，影响布局，SEO 友好；\n- **`background-image`**：适合装饰图片，加载晚，不影响布局，SEO 不友好。"
+  },
+  {
+    "id": "css-interview-74",
+    "topic": "CSS中的 \"flex:1;\" 是什么意思?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `flex: 1` 是 `flex-grow`/`flex-shrink`/`flex-basis` 的简写，等价于：\n```css\nflex: 1 1 0;\n```\n\n#### 三个子属性含义\n1. **`flex-grow: 1`**：\n   - 当容器有剩余空间时，该元素会**自动扩展**，占满剩余空间；\n   - 多个元素时，按 `flex-grow` 比例分配剩余空间。\n2. **`flex-shrink: 1`**：\n   - 当容器空间不足时，该元素会**自动收缩**，适应容器大小；\n   - 多个元素时，按 `flex-shrink` 比例收缩。\n3. **`flex-basis: 0`**：\n   - 元素的**初始大小**为 `0`，即完全由弹性布局决定；\n   - 等价于「不考虑内容大小，完全弹性分配」。\n\n---\n\n### 对比 `flex: auto`\n| 简写 | 等价于 | 行为 |\n| :--- | :--- | :--- |\n| `flex: 1` | `flex: 1 1 0` | 完全弹性，占满剩余空间，初始大小为 0 |\n| `flex: auto` | `flex: 1 1 auto` | 弹性，占满剩余空间，初始大小由内容决定 |\n| `flex: none` | `flex: 0 0 auto` | 固定大小，不扩展不收缩 |\n\n#### 代码示例\n```css\n.parent { display: flex; }\n.child1 { flex: 1; } /* 占满剩余空间 */\n.child2 { width: 200px; flex: none; } /* 固定宽度 */\n```\n\n### 总结\n`flex: 1` 表示：**元素可扩展、可收缩，初始大小为 0，完全弹性分配**，是实现自适应布局的核心简写。"
+  },
+  {
+    "id": "css-interview-75",
+    "topic": "分析比较 opacity: 0、visibility: hidden、display: none 优劣和适用场景",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `opacity: 0` vs `visibility: hidden` vs `display: none` 对比\n\n| 对比维度 | `opacity: 0` | `visibility: hidden` | `display: none` |\n| :--- | :--- | :--- | :--- |\n| **是否占据空间** | ✅ 占据 | ✅ 占据 | ❌ 不占据 |\n| **是否触发重排** | ❌ 仅重绘 | ❌ 仅重绘 | ✅ 重排 + 重绘 |\n| **是否可过渡/动画** | ✅ 支持 | ✅ 支持 | ❌ 不支持 |\n| **子元素是否可显示** | ❌ 子元素也透明 | ✅ 子元素可 `visible` | ❌ 子元素也隐藏 |\n| **是否可被点击/交互** | ✅ 可点击（透明但存在） | ❌ 不可点击 | ❌ 不可点击 |\n| **是否可被屏幕阅读器读取** | ✅ 会被读取 | ✅ 会被读取 | ❌ 不会被读取 |\n\n---\n\n### 优劣与适用场景\n\n#### 1. `opacity: 0`\n- **优点**：支持过渡/动画，可交互，不触发重排；\n- **缺点**：占据空间，可被点击，可能误触；\n- **适用场景**：淡入淡出动画、需要保留交互的隐藏。\n\n#### 2. `visibility: hidden`\n- **优点**：支持过渡/动画，不触发重排，子元素可单独显示；\n- **缺点**：占据空间，不可交互；\n- **适用场景**：需要占位、可过渡的隐藏，如菜单展开/收起。\n\n#### 3. `display: none`\n- **优点**：不占据空间，完全移除，不可交互；\n- **缺点**：触发重排，不支持过渡/动画；\n- **适用场景**：彻底隐藏，不需要保留位置和交互，如弹窗关闭。\n\n### 总结\n- **需要动画/过渡**：优先 `opacity: 0` 或 `visibility: hidden`；\n- **需要占位**：`visibility: hidden`；\n- **彻底隐藏**：`display: none`。"
+  },
+  {
+    "id": "css-interview-76",
+    "topic": "Atom CSS是什么?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### Atom CSS（原子化 CSS）是什么？\nAtom CSS 是一种**CSS 架构理念**，核心是「**单一职责的原子类 + 组合实现样式**」，每个类名只对应一个 CSS 属性，通过组合类名实现复杂样式。\n\n#### 核心思想\n- **原子类**：一个类名只做一件事（如 `.mt-20` 对应 `margin-top: 20px`，`.text-red` 对应 `color: red`）；\n- **组合复用**：复杂样式由多个原子类组合而成，避免重复代码；\n- **无命名冲突**：原子类全局唯一，无需担心命名冲突。\n\n#### 代表工具\n- **Tailwind CSS**：最流行的原子化 CSS 框架；\n- **Windi CSS**：Tailwind 的轻量级替代；\n- **Tachyons**：早期原子化 CSS 框架。\n\n#### 代码示例（Tailwind）\n```html\n<div class=\"mt-20 p-4 bg-blue-500 text-white rounded-lg shadow-md\">\n  原子化 CSS 示例\n</div>\n```\n- 等价于：\n  ```css\n  div {\n    margin-top: 20px;\n    padding: 16px;\n    background-color: #3b82f6;\n    color: white;\n    border-radius: 8px;\n    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\n  }\n  ```\n\n#### 优势\n- **开发效率高**：无需写自定义 CSS，直接组合类名；\n- **样式一致性**：统一设计系统，避免随意写样式；\n- **无命名冲突**：原子类全局唯一，无需担心样式污染；\n- **体积小**：JIT 模式下只编译使用的类名，打包体积小。\n\n#### 缺点\n- **HTML 可读性差**：类名过多，HTML 冗长；\n- **学习成本高**：需要记忆大量原子类；\n- **复杂样式需自定义**：极端复杂样式需自定义工具类。\n\n### 总结\nAtom CSS 是**「单一职责 + 组合复用」**的 CSS 架构，是现代前端开发的趋势，代表框架为 Tailwind CSS。"
+  },
+  {
+    "id": "css-interview-77",
+    "topic": "CSS中的1像素问题是什么? 有哪些解决方案?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 1 像素问题是什么？\n在**高分辨率屏幕（Retina 屏）**上，CSS 中设置的 `1px` 边框会被渲染为 **2 或 3 个物理像素**，导致边框看起来「变粗」，视觉效果不精细。\n\n#### 原因\n- 设备像素比（DPR）：Retina 屏 DPR = 2/3，1 个 CSS 像素对应 2/3 个物理像素；\n- `border: 1px solid #000` 会被渲染为 2/3 个物理像素，看起来更粗。\n\n---\n\n### 解决方案（5 种）\n\n#### 1. **`transform: scale(0.5)`（最常用）**\n```css\n.border {\n  position: relative;\n}\n.border::after {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 200%;\n  height: 200%;\n  border: 1px solid #000;\n  transform: scale(0.5);\n  transform-origin: 0 0;\n}\n```\n- 原理：创建 2 倍大小的伪元素，缩放 0.5，实现 0.5px 边框。\n\n#### 2. **`border-image`**\n```css\n.border {\n  border-image: url('border.png') 2 stretch;\n}\n```\n- 原理：使用 1 像素图片作为边框，在 Retina 屏上显示为 1 物理像素。\n\n#### 3. **`box-shadow` 模拟**\n```css\n.border {\n  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);\n}\n```\n- 原理：用阴影模拟边框，在 Retina 屏上显示更细。\n\n#### 4. **`viewport` + `rem` 适配**\n```html\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=0.5, maximum-scale=0.5\">\n```\n- 原理：将视口缩放 0.5，1 CSS 像素对应 1 物理像素。\n\n#### 5. **`linear-gradient` 渐变**\n```css\n.border {\n  background: linear-gradient(0deg, #000 50%, transparent 50%) no-repeat;\n  background-size: 100% 1px;\n}\n```\n- 原理：用渐变模拟 1 像素边框。\n\n### 总结\n- **最推荐方案**：`transform: scale(0.5)` + 伪元素，兼容性好，效果精细；\n- **本质**：通过缩放/图片/渐变等方式，让 1 CSS 像素对应 1 物理像素。"
+  },
+  {
+    "id": "css-interview-78",
+    "topic": "css加载会造成阻塞吗?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：**CSS 加载会阻塞页面渲染，但不会阻塞 DOM 解析**\n\n#### 核心规则\n1. **不阻塞 DOM 解析**：\n   - 浏览器解析 HTML 时，遇到 `<link rel=\"stylesheet\">` 会**异步加载 CSS**，继续解析 DOM；\n   - DOM 树构建不受 CSS 加载影响。\n\n2. **阻塞页面渲染**：\n   - 渲染树（Render Tree）需要 **DOM + CSSOM** 才能生成；\n   - CSS 加载未完成时，浏览器会**延迟渲染页面**，避免「无样式闪烁」（FOUC）；\n   - 页面会显示空白，直到 CSS 加载完成。\n\n3. **阻塞 JS 执行**：\n   - JS 可能会修改 DOM 和 CSSOM，因此浏览器会**暂停 JS 执行**，等待 CSSOM 构建完成；\n   - `<script>` 标签会阻塞 DOM 解析和 CSSOM 构建。\n\n---\n\n### 代码示例\n```html\n<head>\n  <!-- 加载 CSS，阻塞渲染，不阻塞 DOM 解析 -->\n  <link rel=\"stylesheet\" href=\"style.css\">\n  <!-- JS 会等待 CSS 加载完成后再执行 -->\n  <script src=\"script.js\"></script>\n</head>\n<body>\n  <!-- DOM 解析继续，直到遇到 <script> 才会暂停 -->\n  <div>Hello</div>\n</body>\n```\n\n### 优化建议\n- **CSS 放在 `<head>`**：尽早加载 CSS，加快 CSSOM 构建；\n- **JS 放在 `<body>` 底部**：避免阻塞 DOM 解析；\n- **使用 `media` 属性**：针对不同媒体类型的 CSS 异步加载：\n  ```html\n  <link rel=\"stylesheet\" href=\"print.css\" media=\"print\">\n  <link rel=\"stylesheet\" href=\"mobile.css\" media=\"screen and (max-width: 768px)\">\n  ```\n- **内联关键 CSS**：将关键 CSS 内联到 `<head>`，避免加载阻塞。\n\n### 总结\n- **DOM 解析**：CSS 不阻塞；\n- **页面渲染**：CSS 阻塞；\n- **JS 执行**：CSS 阻塞。"
+  },
+  {
+    "id": "css-interview-79",
+    "topic": "CSS 中有哪几种定位方式?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 定位方式（5 种核心）\n\n#### 1. **`static`（默认定位）**\n- 元素默认定位方式，**遵循文档流**；\n- `top`/`right`/`bottom`/`left`/`z-index` 无效；\n- 示例：\n  ```css\n  .box { position: static; }\n  ```\n\n#### 2. **`relative`（相对定位）**\n- 相对于**自身原位置**定位，**不脱离文档流**；\n- `top`/`right`/`bottom`/`left` 控制偏移，原位置保留；\n- 常作为 `absolute` 定位的父容器；\n- 示例：\n  ```css\n  .box { position: relative; top: 10px; left: 10px; }\n  ```\n\n#### 3. **`absolute`（绝对定位）**\n- 相对于**最近的定位父元素**（非 `static`）定位，**脱离文档流**；\n- 无定位父元素则相对于 `<html>` 根元素；\n- 示例：\n  ```css\n  .parent { position: relative; }\n  .child { position: absolute; top: 0; left: 0; }\n  ```\n\n#### 4. **`fixed`（固定定位）**\n- 相对于**浏览器视口**定位，**脱离文档流**，滚动时位置不变；\n- 特殊情况：父元素有 `transform`/`perspective`/`filter` 时，相对于该父元素定位；\n- 示例：\n  ```css\n  .box { position: fixed; top: 0; left: 0; }\n  ```\n\n#### 5. **`sticky`（粘性定位）**\n- 混合定位：**未滚动时遵循文档流，滚动到阈值时变为 `fixed`**；\n- 必须指定 `top`/`right`/`bottom`/`left` 中至少一个阈值；\n- 示例：\n  ```css\n  .box { position: sticky; top: 0; }\n  ```\n\n---\n\n### 总结\n| 定位方式 | 是否脱离文档流 | 参考系 | 核心用途 |\n| :--- | :--- | :--- | :--- |\n| `static` | ❌ | 文档流 | 默认布局 |\n| `relative` | ❌ | 自身原位置 | 作为 absolute 父容器 |\n| `absolute` | ✅ | 最近定位父元素 | 覆盖层、弹窗 |\n| `fixed` | ✅ | 浏览器视口 | 固定导航、返回顶部 |\n| `sticky` | 临时 | 视口 + 父容器 | 吸顶导航、悬浮栏 |"
+  },
+  {
+    "id": "css-interview-81",
+    "topic": "style标签写在body后与body前有什么区别?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 核心区别：渲染阻塞与样式呈现顺序\n\n#### 1. **写在 `<head>`（body 前）—— 推荐做法**\n- **规则**：浏览器解析 HTML 时，先加载 CSS，构建 CSSOM 后再渲染页面；\n- **优点**：**无样式内容闪烁（FOUC）**，页面逐步渲染，视觉体验好；\n- **渲染流程**：HTML 解析 → CSSOM 构建 → 渲染树构建 → 布局绘制。\n\n#### 2. **写在 `<body>` 底部（body 后）—— 不推荐**\n- **规则**：浏览器先解析 HTML 并渲染页面内容，再加载 CSS；\n- **缺点**：会出现 **「无样式内容闪烁（FOUC）」**，页面先显示无样式的内容，瞬间再渲染为样式内容，视觉体验差；\n- **渲染流程**：HTML 解析 → 部分渲染 → CSSOM 构建 → 重新渲染 → 布局绘制。\n\n#### 补充：若使用 `<link>` 外链\n- 无论写在 `<head>` 还是 `<body>`，CSS 加载都会**阻塞渲染**（浏览器必须等待 CSSOM 完成才能渲染）；\n- 写在 `<head>` 是为了**尽早加载**，减少阻塞时间；写在 `<body>` 底部会导致页面先显示无样式内容。\n\n### 总结\n- **写在 `<head>`**：**防闪烁，渲染流畅**，是最佳实践；\n- **写在 `<body>` 底部**：**触发 FOUC**，页面先闪一下再显示样式，体验差。"
+  },
+  {
+    "id": "css-interview-82",
+    "topic": "两个同级的相邻元素之间，有看不见的空白间隔，是什么原因引起的? 有什么解决办法?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 原因：HTML 换行/空格被解析为空白字符\n相邻 `inline-block`/`inline` 元素之间的**换行符、空格、制表符**会被浏览器解析为**空白字符**，从而产生间隔。\n\n```html\n<!-- 会产生间隔：两个 div 之间有换行 -->\n<div class=\"box\">1</div>\n<div class=\"box\">2</div>\n```\n\n---\n\n### 解决方法（4 种）\n\n#### 1. **移除 HTML 中的换行/空格（最直接）**\n```html\n<!-- 无换行，无间隔 -->\n<div class=\"box\">1</div><div class=\"box\">2</div>\n```\n\n#### 2. **设置父元素 `font-size: 0`（最常用）**\n```css\n.parent {\n  font-size: 0; /* 清除空白字符宽度 */\n}\n.child {\n  display: inline-block;\n  font-size: 16px; /* 恢复子元素字体大小 */\n}\n```\n- 优点：简单高效，适合所有场景。\n\n#### 3. **用 `letter-spacing`/`word-spacing` 负值**\n```css\n.parent {\n  letter-spacing: -4px; /* 负值缩小间距，需根据字体调整 */\n}\n.child {\n  display: inline-block;\n  letter-spacing: 0; /* 恢复子元素字间距 */\n}\n```\n- 注意：不同字体的空白宽度不同，需微调。\n\n#### 4. **用 Flex 布局替代（现代方案）**\n```css\n.parent {\n  display: flex;\n  gap: 0; /* 无间隔 */\n}\n```\n- 优点：彻底避免空白字符问题，代码简洁。\n\n### 总结\n- **原因**：HTML 换行/空格被解析为空白字符；\n- **推荐方案**：**Flex 布局** 或 **父元素 `font-size: 0`**。"
+  },
+  {
+    "id": "css-interview-83",
+    "topic": "如果需要手动写动画，你认为最小时间间隔是多久, 为什么?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：**16ms 左右**（对应 60fps 刷新率）\n\n#### 核心原因\n- 浏览器的标准刷新率为 **60 次/秒 (60fps)**；\n- 单次渲染周期时间 = `1000ms / 60 ≈ 16.7ms`；\n- 动画帧间隔若小于 16ms，浏览器无法在一帧内渲染，会导致**丢帧**，反而卡顿；\n- 若大于 16ms，动画会不流畅。\n\n#### 技术实现依据\n- **`requestAnimationFrame (rAF)`**：现代 JS 动画标准，与浏览器刷新率同步，最佳间隔为 **16.7ms**；\n- **`setTimeout/setInterval`**：早期方案，最小间隔建议 **16ms**，避免精度问题和卡顿。\n\n#### 注意事项\n- 不同设备刷新率不同（如 90fps/120fps），最佳间隔应动态适应；\n- 若动画优化不当，间隔过短会导致 CPU/GPU 过载，反而卡顿。\n\n### 总结\n- **最小/最佳间隔**：**16.7ms**（对应 60fps）；\n- **实现**：优先用 `requestAnimationFrame`，而非 `setTimeout`，保证与浏览器刷新率同步。"
+  },
+  {
+    "id": "css-interview-84",
+    "topic": "::before 和:after中双冒号和单冒号有什么区别? 解释一下这2个伪元素的作用",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 单冒号 vs 双冒号：核心区别与作用\n\n#### 1. **语法规范不同**\n- **单冒号 `:before` / `:after`**：CSS2 语法，兼容所有浏览器（包括 IE6-8）；\n- **双冒号 `::before` / `::after`**：CSS3 语法，用于**严格区分伪类（单冒号）和伪元素（双冒号）**；\n- 本质：伪元素（如 `::before`）是创建**不存在于 DOM 中的虚拟元素**，伪类（如 `:hover`）是匹配**元素状态**。\n\n#### 2. **作用完全相同**\n无论是单冒号还是双冒号，都用于在元素内容**前/后**插入虚拟内容，且都**必须设置 `content` 属性**（否则不显示）。\n\n#### 3. **伪元素核心作用**\n- **`::before`**：在元素**内容前**插入虚拟元素，可设置宽高、样式；\n- **`::after`**：在元素**内容后**插入虚拟元素，可设置宽高、样式；\n- **虚拟元素特性**：\n  - 不在 DOM 中，无法通过 JS 获取；\n  - 可设置 `display: block/inline-block` 等，拥有块级能力；\n  - 继承父元素样式。\n\n#### 代码示例\n```css\n/* 正确：双冒号（CSS3） */\n.box::before {\n  content: \"前置\";\n  color: red;\n  display: block;\n}\n\n/* 兼容：单冒号（CSS2） */\n.box:after {\n  content: \"后置\";\n  color: blue;\n}\n```\n\n### 总结\n- **区别**：语法规范不同（CSS2 vs CSS3），权重相同；\n- **作用**：在元素内容前/后插入虚拟内容，必须配合 `content`；\n- **选型**：现代项目用双冒号 `::`，兼容旧版用单冒号 `:`。"
+  },
+  {
+    "id": "css-interview-85",
+    "topic": "元素竖向的百分比设定是相对于容器的高度吗?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 答案：**是的，默认相对于容器的高度（height）**，但有特殊例外。\n\n#### 核心规则\n- **`height`/`top`/`bottom`/`margin`/`padding` 的百分比**：相对于**父元素的高度（`height`）**；\n- 示例：\n  ```css\n  .parent { height: 200px; }\n  .child { height: 50%; } /* 100px，相对于父元素高度 */\n  ```\n\n#### 特殊例外：`position: absolute` 下的百分比\n- 绝对定位元素的 `top`/`left`/`right`/`bottom`/`height`/`width` 百分比：相对于**包含块（containing block）**，即最近的定位父元素；\n- 若父元素无定位，相对于 `<html>`。\n\n#### 易错点：`line-height` 百分比\n- `line-height: 1.5`（无单位）：相对于**元素自身的字体大小**；\n- `line-height: 150%`（有单位）：相对于**元素自身的字体大小**，与无单位效果相同。\n\n### 总结\n- **常规布局**：竖向百分比（`height`/`margin`/`padding`）**相对于父元素高度**；\n- **绝对定位**：相对于最近定位父元素（或 `<html>`）；\n- **行高**：相对于元素自身字体大小。"
+  },
+  {
+    "id": "css-interview-86",
+    "topic": "CSS优化、提高性能的方法有哪些?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 性能优化的 6 种核心方案\n\n#### 1. **精简 CSS 代码**\n- **移除无用代码**：使用 `PurgeCSS`/`uncss` 清除未使用的 CSS；\n- **压缩代码**：使用 `cssnano`/`Terser` 压缩，移除空格、注释；\n- **合并文件**：减少 HTTP 请求数（CSS Sprites 或合并工具）。\n\n#### 2. **优化 CSS 选择器**\n- **降低选择器权重**：避免过度嵌套（如 `.div1 .div2 .item`），使用类选择器；\n- **避免通配符**：`*` 选择器会遍历所有元素，性能低；\n- **避免 `!important`**：打破优先级规则，难以维护。\n\n#### 3. **使用硬件加速（GPU 加速）**\n- 对动画元素使用 `transform`/`opacity`，触发 **GPU 合成**；\n- 避免使用 `width`/`height`/`top`/`left` 等触发重排的属性；\n- 示例：\n  ```css\n  .box { transform: translateZ(0); }\n  ```\n\n#### 4. **优化渲染流程**\n- **关键 CSS 内联**：将首屏所需 CSS 内联到 `<head>`，避免阻塞渲染；\n- **媒体查询异步**：使用 `media='print'` 或 `media='screen and (min-width: 768px)'` 异步加载非关键 CSS；\n- **预加载**：使用 `<link rel='preload' href='style.css' as='style'>` 提前加载关键 CSS。\n\n#### 5. **使用现代 CSS 特性**\n- **CSS Grid/Flex**：替代传统布局，减少 DOM 节点和重排；\n- **CSS Variables**：动态管理样式，减少冗余代码；\n- **Contain 属性**：`contain: layout paint size`，隔离元素渲染，提升性能。\n\n#### 6. **避免强制同步布局**\n- JS 不要频繁读取布局属性（如 `offsetTop`）后立即修改样式，避免浏览器多次计算；\n- 使用 `requestAnimationFrame` 批量更新 DOM。\n\n### 总结\n- **代码层面**：精简、压缩、Tree-shaking；\n- **选择器层面**：简化、低权重；\n- **渲染层面**：GPU 加速、关键 CSS 内联；\n- **布局层面**：避免重排，使用 Flex/Grid。"
+  },
+  {
+    "id": "css-interview-87",
+    "topic": "margin和padding分别适合什么场景使用?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### margin vs padding：核心区别与适用场景\n\n#### 1. **margin（外边距）—— 控制「外部间距」**\n- **定义**：元素与其他元素之间的距离；\n- **特性**：\n  - 可设置负值，实现元素重叠或反向偏移；\n  - 块级元素可通过 `auto` 实现水平居中；\n  - 垂直 margin 会折叠（相邻块级元素）。\n- **适用场景**：\n  - 控制元素之间的**间距**（如列表项之间的距离）；\n  - 实现**自适应布局**（如 Flex 中的 `flex: 1` 配合 margin）；\n  - 元素的**外部占位调整**。\n\n#### 2. **padding（内边距）—— 控制「内部间距」**\n- **定义**：元素内容与边框之间的距离；\n- **特性**：\n  - 不可设置负值（背景会填充 padding 区域）；\n  - 会影响元素的总尺寸（需结合 `box-sizing: border-box`）；\n  - 无 margin 折叠问题。\n- **适用场景**：\n  - 控制元素**内部内容与边框的距离**（如按钮内文字、卡片内边距）；\n  - 扩大元素**可点击区域**（如给 `a` 标签添加 padding）；\n  - 实现**圆角背景**、图标占位。\n\n---\n\n### 选型建议\n| 需求 | 推荐方案 | 原因 |\n| :--- | :--- | :--- |\n| 调整元素之间的间距 | **margin** | 控制外部距离，负值灵活 |\n| 调整内容与边框的距离 | **padding** | 控制内部距离，背景友好 |\n| 水平居中 | **margin: 0 auto** | 块级元素标准居中方式 |\n| 扩大点击区域 | **padding** | 不影响其他元素布局 |\n| 重叠元素 | **margin 负值** | 实现层叠布局 |\n\n### 总结\n- **margin**：**管布局，管间距**，适合外部关系；\n- **padding**：**管内容，管占位**，适合内部关系。"
+  },
+  {
+    "id": "css-interview-88",
+    "topic": "什么是CSS媒体查询?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 媒体查询（Media Query）是什么？\nCSS 媒体查询是 CSS3 中的一种**响应式布局技术**，本质是让 CSS 根据**设备特性**（如屏幕宽度、高度、方向、分辨率等）动态加载不同样式，实现**多设备适配**。\n\n#### 核心原理\n- 浏览器检测设备特性，满足条件时应用对应样式；\n- 属于「条件判断」，与 JS 逻辑类似，但由浏览器自动解析。\n\n#### 完整语法\n```css\n@media [媒体类型] and [媒体特性] (逻辑符) {\n  /* 样式代码 */\n}\n```\n\n#### 1. 媒体类型\n- `all`：所有设备（默认）；\n- `screen`：电脑屏幕、平板、手机等显示屏；\n- `print`：打印机/打印预览模式；\n- `speech`：语音合成器（如读屏软件）。\n\n#### 2. 常用媒体特性\n- 尺寸类：`width`/`min-width`/`max-width`/`height`/`min-height`/`max-height`；\n- 方向类：`orientation: portrait`（竖屏）/`landscape`（横屏）；\n- 分辨率类：`resolution`（如 `resolution: 2x`）；\n- 交互类：`hover`（是否支持悬停）/`pointer`（输入设备类型）。\n\n#### 3. 常见使用场景\n##### 场景 1：响应式布局（断点适配）\n```css\n/* 屏幕宽度 ≤ 768px 时的样式 */\n@media (max-width: 768px) {\n  .container { width: 100%; }\n}\n\n/* 屏幕宽度 ≥ 1200px 时的样式 */\n@media (min-width: 1200px) {\n  .container { width: 1200px; }\n}\n```\n\n##### 场景 2：移动端横屏适配\n```css\n@media screen and (orientation: landscape) and (max-height: 500px) {\n  .box { height: 100vh; }\n}\n```\n\n##### 场景 3：打印样式优化\n```css\n@media print {\n  body { font-size: 12px; }\n  .no-print { display: none; }\n}\n```\n\n#### 4. 引入方式\n- 内部样式：直接在 CSS 中用 `@media`；\n- 外部样式：通过 `link` 媒体属性引入；\n  ```html\n  <!-- 仅在屏幕宽度 ≥ 768px 时加载 -->\n  <link rel=\"stylesheet\" href=\"mobile.css\" media=\"screen and (min-width: 768px)\">\n  ```\n\n### 总结\nCSS 媒体查询是**响应式布局的基石**，通过「设备特性判断 + 样式加载」，实现一套代码适配多端，是现代前端开发的必备技术。"
+  },
+  {
+    "id": "css-interview-89",
+    "topic": "为什么会出现浮动? 什么时候需要清除浮动? 清除浮动的方式有哪些?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、为什么会出现浮动？\n浮动（`float`）是 CSS2 引入的布局属性，核心目的是**实现文字环绕效果**，让块级元素可以横向排列（如图片左移，文字环绕右侧）。\n\n#### 核心特性\n- 元素脱离文档流，向左/向右浮动；\n- 其他元素会围绕浮动元素排列；\n- 早期用于实现多列布局、图文混排。\n\n### 二、什么时候需要清除浮动？\n当浮动元素导致**父元素高度塌陷**，影响后续布局时，需要清除浮动。\n\n#### 典型触发场景\n1. **父元素无固定高度**：子元素浮动，父元素高度为 0（高度塌陷）；\n2. **后续元素布局错乱**：浮动元素影响下方元素位置，导致布局重叠；\n3. **父元素背景/边框不显示**：因为父元素无高度，无法显示背景。\n\n### 三、清除浮动的 4 种核心方式\n\n#### 1. **额外标签法（空 div 法）—— 最基础**\n在浮动元素末尾添加一个空块级元素，设置 `clear: both`。\n```html\n<div class=\"parent\">\n  <div class=\"float-box\" style=\"float: left;\">浮动元素</div>\n  <!-- 清除浮动的标签 -->\n  <div style=\"clear: both;\"></div>\n</div>\n```\n- 优点：简单易懂；\n- 缺点：添加无意义标签，语义差。\n\n#### 2. **父级添加 overflow 属性（最常用）**\n给父元素设置 `overflow: hidden` 或 `overflow: auto`，触发 BFC 从而清除浮动。\n```css\n.parent {\n  overflow: hidden; /* 清除浮动 */\n  zoom: 1; /* 兼容 IE6/7 */\n}\n.float-box { float: left; }\n```\n- 优点：代码少，无额外标签；\n- 缺点：内容过多时可能被裁剪。\n\n#### 3. **伪元素清除法（现代最佳实践）**\n利用 `::after` 伪元素，给父元素添加清除样式，是最推荐的方式。\n```css\n.clearfix::after {\n  content: \"\";\n  display: block;\n  clear: both;\n}\n/* 兼容 IE6/7 */\n.clearfix {\n  zoom: 1;\n}\n```\n```html\n<div class=\"parent clearfix\">\n  <div class=\"float-box\">浮动元素</div>\n</div>\n```\n- 优点：语义化好，无额外标签，兼容性强。\n\n#### 4. **父级设置 display: flow-root（CSS3 新方案）**\n使用 CSS3 新增的 `display: flow-root` 创建无副作用的 BFC，清除浮动。\n```css\n.parent {\n  display: flow-root;\n}\n.float-box { float: left; }\n```\n- 优点：无需伪元素，代码极简；\n- 缺点：兼容性（IE 不支持）。\n\n### 总结\n- **出现原因**：实现图文环绕、早期多列布局；\n- **清除时机**：父元素高度塌陷，后续布局错乱；\n- **推荐方式**：**伪元素 `.clearfix`** 或 `display: flow-root`。"
+  },
+  {
+    "id": "css-interview-90",
+    "topic": "什么是BFC?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### BFC 是什么？\nBFC（Block Formatting Context，块级格式化上下文）是页面中的一块**独立的渲染区域**，是 CSS 布局的核心概念之一。\n\n#### 核心定义\n- BFC 是一个**隔离的容器**，区域内元素的布局不会影响外部元素，外部元素也不会影响内部；\n- 在 BFC 区域内，**块级盒子**垂直排列，**浮动元素**会参与布局计算。\n\n#### 核心特性\n1. **内部布局独立**：BFC 内部元素的垂直 margin 不会与外部折叠；\n2. **清除浮动**：BFC 会计算浮动子元素的高度，解决父元素高度塌陷；\n3. **避免重叠**：BFC 区域不会与浮动元素重叠，可实现两栏布局；\n4. **隔离元素**：内部元素和外部元素互不干扰。\n\n#### 如何触发 BFC？（面试必背）\n满足以下任一条件，元素就会创建 BFC：\n1. 根元素（`<html>`）；\n2. 浮动元素：`float: left/right`（值不为 `none`）；\n3. 绝对/固定定位：`position: absolute/fixed`；\n4. 行内块：`display: inline-block`；\n5. 弹性容器：`display: flex/inline-flex`；\n6. 网格容器：`display: grid/inline-grid`；\n7. 溢出属性：`overflow: hidden/auto/scroll`（值不为 `visible`）；\n8. 表格单元格：`display: table-cell`；\n9. 表格标题：`display: table-caption`；\n10. CSS3 新增：`display: flow-root`。\n\n#### 常见应用场景（面试必问）\n1. **清除内部浮动**（解决高度塌陷）：\n   ```css\n   .parent { overflow: hidden; /* 触发 BFC，清除浮动 */ }\n   .child { float: left; }\n   ```\n\n2. **避免 margin 折叠**：\n   相邻块级元素的垂直 margin 会合并，给其中一个元素套入 BFC 容器，即可避免折叠。\n   ```css\n   .wrapper { overflow: hidden; }\n   .box { margin: 20px 0; }\n   ```\n\n3. **两栏/多栏自适应布局**：\n   左侧浮动，右侧 BFC 元素，避免与浮动元素重叠。\n   ```css\n   .left { float: left; width: 200px; }\n   .right { overflow: hidden; /* 触发 BFC，自适应 */ }\n   ```\n\n### 总结\nBFC 是**「独立的布局容器」**，核心作用是**隔离布局、清除浮动、避免重排**。是 CSS 布局中解决高度塌陷、布局冲突的核心手段，也是前端面试的高频考点。"
+  },
+  {
+    "id": "css-interview-91",
+    "topic": "CSS3新增伪类有那些?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS3 新增伪类（按功能分类）\n\n#### 1. 结构伪类（基于 DOM 结构匹配）\n- `:first-child`：匹配第一个子元素；\n- `:last-child`：匹配最后一个子元素；\n- `:nth-child(n)`：匹配第 n 个子元素（支持 even/odd/公式）；\n- `:nth-last-child(n)`：从后往前匹配第 n 个子元素；\n- `:only-child`：匹配唯一子元素；\n- `:first-of-type`：匹配同类型第一个子元素；\n- `:last-of-type`：匹配同类型最后一个子元素；\n- `:nth-of-type(n)`：匹配同类型第 n 个子元素；\n- `:nth-last-of-type(n)`：从后往前匹配同类型第 n 个子元素；\n- `:only-of-type`：匹配同类型唯一子元素。\n\n#### 2. 状态伪类（基于元素状态匹配）\n- `:enabled`：匹配可用表单元素；\n- `:disabled`：匹配禁用表单元素；\n- `:checked`：匹配选中的单选/复选框；\n- `:indeterminate`：匹配不确定状态的表单元素；\n- `:default`：匹配默认选中的表单元素；\n- `:valid`：匹配验证通过的表单元素；\n- `:invalid`：匹配验证失败的表单元素；\n- `:required`：匹配必填表单元素；\n- `:optional`：匹配选填表单元素；\n- `:in-range`：匹配值在范围内的输入框；\n- `:out-of-range`：匹配值超出范围的输入框；\n- `:read-only`：匹配只读元素；\n- `:read-write`：匹配可读写元素。\n\n#### 3. 其他新增伪类\n- `:not(selector)`：否定伪类，匹配不满足 selector 的元素；\n- `:target`：匹配当前 URL 锚点指向的元素；\n- `:empty`：匹配没有子元素（包括文本节点）的元素；\n- `:root`：匹配文档根元素（即 `<html>`）；\n- `:lang(language)`：匹配指定语言的元素；\n- `:focus-within`：匹配包含焦点元素的父元素；\n- `:placeholder-shown`：匹配显示占位符的输入框；\n- `:is(selector)`：匹配满足任意选择器的元素（简化选择器）；\n- `:where(selector)`：与 `:is` 类似，但权重为 0。\n\n### 总结\nCSS3 新增伪类极大增强了选择器的表达能力，可基于**结构、状态、逻辑**精准匹配元素，减少冗余 JS 代码，是现代 CSS 开发的核心工具。"
+  },
+  {
+    "id": "css-interview-92",
+    "topic": "CSS中, box-sizing属性值有什么用?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `box-sizing` 定义元素的盒模型计算方式，核心是控制 `width`/`height` 是否包含 `padding`/`border`。\n\n#### 1. `content-box`（默认值）\n- **计算规则**：`width`/`height` 仅包含**内容区域**，`padding`/`border` 会额外增加元素总尺寸；\n- 示例：\n  ```css\n  .box {\n    width: 200px;\n    padding: 20px;\n    border: 1px solid #000;\n    /* 总宽度 = 200 + 20*2 + 1*2 = 242px */\n  }\n  ```\n- **特点**：容易导致布局溢出，不符合直觉。\n\n#### 2. `border-box`（推荐）\n- **计算规则**：`width`/`height` 包含**内容区域 + padding + border**，元素总尺寸固定；\n- 示例：\n  ```css\n  .box {\n    box-sizing: border-box;\n    width: 200px;\n    padding: 20px;\n    border: 1px solid #000;\n    /* 总宽度 = 200px，内容区域 = 200 - 20*2 - 1*2 = 158px */\n  }\n  ```\n- **特点**：布局稳定，符合「设置多少就是多少」的直觉，是现代前端最佳实践。\n\n#### 3. `inherit`\n- 继承父元素的 `box-sizing` 值，常用于全局统一盒模型：\n  ```css\n  html { box-sizing: border-box; }\n  *, *::before, *::after { box-sizing: inherit; }\n  ```\n\n### 总结\n- `content-box`：默认，尺寸会被 `padding`/`border` 撑大；\n- `border-box`：推荐，`width`/`height` 包含 `padding`/`border`，布局稳定；\n- `inherit`：继承父元素，便于全局统一。"
+  },
+  {
+    "id": "css-interview-93",
+    "topic": "前端项目中为什么要初始化CSS样式?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 核心原因：**消除浏览器默认样式差异，保证跨浏览器一致性**。\n\n#### 1. 浏览器默认样式不一致\n不同浏览器对 HTML 元素的默认样式（如 `margin`/`padding`/`font-size`/`line-height`）实现不同：\n- 例如：`<body>` 默认有 `margin: 8px`，`<ul>` 默认有 `padding-left`，`<h1>` 默认字体大小不同；\n- 若不初始化，同一页面在不同浏览器中会出现布局差异（如间距、字体、对齐）。\n\n#### 2. 统一基础样式，便于开发\n- 重置默认样式后，可从零开始构建布局，避免默认样式干扰；\n- 统一 `box-sizing`、`font-size`、`line-height` 等基础属性，提升开发效率；\n- 为后续组件化开发提供一致的基础。\n\n#### 3. 提升可维护性与扩展性\n- 初始化样式是「基础层」，后续业务样式基于此构建，减少冲突；\n- 便于统一管理全局样式（如颜色、字体、间距）。\n\n#### 常见初始化方案\n- **Normalize.css**：温和重置，保留有用默认样式，修复浏览器 bug；\n- **Reset.css**：暴力重置，清除所有默认样式，从零开始；\n- **自定义初始化**：结合项目需求，重置关键属性（如 `margin`/`padding`/`box-sizing`）。\n\n### 总结\n初始化 CSS 是为了**抹平浏览器差异、统一基础样式、提升布局稳定性**，是现代前端项目的标准步骤。"
+  },
+  {
+    "id": "css-interview-94",
+    "topic": "页面导入样式时, 使用link和@import有什么区别?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### `link` vs `@import` 核心区别\n\n| 对比维度 | `link`（HTML 标签） | `@import`（CSS 规则） |\n| :--- | :--- | :--- |\n| **加载时机** | 浏览器解析 HTML 时**并行加载**，不阻塞 DOM 解析 | 需等待 CSSOM 构建完成后再加载，可能阻塞渲染 |\n| **兼容性** | 兼容所有浏览器（包括 IE6+） | CSS2 语法，IE5+ 支持 |\n| **权重** | 与页面内 CSS 权重相同 | 与引入页面 CSS 权重相同 |\n| **JS 操作** | 可通过 JS 动态创建/修改 `link` 标签 | 无法通过 JS 直接操作 |\n| **资源类型** | 可引入 CSS、图标、预加载资源等 | 仅能引入 CSS |\n| **渲染阻塞** | 会阻塞页面渲染（CSSOM 未完成） | 会阻塞页面渲染，且加载更晚 |\n\n#### 代码示例\n```html\n<!-- link 方式 -->\n<link rel=\"stylesheet\" href=\"style.css\">\n\n<!-- @import 方式 -->\n<style>\n  @import url('style.css');\n</style>\n```\n\n### 总结\n- **推荐使用 `link`**：加载更早、兼容性更好、支持 JS 操作、功能更丰富；\n- **`@import` 仅适合 CSS 内部引入**，不适合页面级样式引入，会导致加载延迟和渲染阻塞。"
+  },
+  {
+    "id": "css-interview-95",
+    "topic": "CSS匹配规则顺序是怎么样的?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 匹配规则：**从右向左解析**（关键）\n\n#### 1. 解析顺序\n浏览器解析 CSS 选择器时，**从最右侧的选择器开始**，逐步向左匹配父元素，直到找到根元素。\n\n示例：`div .item span`\n- 解析顺序：先找所有 `span` → 再找父元素是 `.item` → 再找祖父元素是 `div`；\n- 而非从左到右先找 `div` 再找 `.item` 再找 `span`。\n\n#### 2. 匹配效率\n- **高效选择器**：类选择器（`.item`）、ID 选择器（`#id`）、标签选择器（`span`）；\n- **低效选择器**：后代选择器（`div span`）、通配符（`*`）、属性选择器（`[attr]`）；\n- 优化建议：避免过度嵌套（如 `.div1 .div2 .item`），使用类选择器直接匹配。\n\n#### 3. 优先级规则（权重）\n匹配成功后，样式优先级由**选择器权重**决定：\n1. `!important`（最高）；\n2. 行内样式（`style=\"...\"`）；\n3. ID 选择器（`#id`）；\n4. 类选择器/伪类/属性选择器（`.class`/`:hover`/`[attr]`）；\n5. 元素选择器/伪元素（`div`/`::before`）；\n6. 通配符（`*`）（最低）。\n\n#### 4. 覆盖规则\n- 权重相同：**后定义的样式覆盖先定义的**（「后来者居上」）；\n- 权重不同：**权重高的样式生效**。\n\n### 总结\n- **解析顺序**：从右向左，先找子元素再找父元素；\n- **优先级**：按权重计算，权重相同则后定义生效；\n- **优化**：简化选择器嵌套，使用类选择器提升匹配效率。"
+  },
+  {
+    "id": "css-interview-96",
+    "topic": "canvas在标签上设置宽高, 与在style中设置宽高有什么区别?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 核心区别：**标签上设置的是「画布分辨率」，style 中设置的是「显示尺寸」**。\n\n#### 1. 标签属性 `width`/`height`（画布分辨率）\n- 定义 canvas 元素的**像素尺寸**（即画布的实际分辨率）；\n- 是 canvas 绘图上下文的基准尺寸，决定了绘制内容的清晰度；\n- 示例：\n  ```html\n  <canvas width=\"400\" height=\"300\"></canvas>\n  ```\n- 若不设置，默认 `width=300px`、`height=150px`。\n\n#### 2. CSS `width`/`height`（显示尺寸）\n- 定义 canvas 元素在页面上的**显示大小**（即缩放后的尺寸）；\n- 会对画布进行拉伸/压缩，影响显示效果；\n- 示例：\n  ```css\n  canvas {\n    width: 800px;\n    height: 600px;\n  }\n  ```\n\n#### 3. 差异与影响\n- **标签设置**：直接决定画布像素数，绘制内容清晰；\n- **style 设置**：仅改变显示大小，若与画布分辨率不一致，会导致**拉伸模糊**；\n- 示例：\n  - 画布分辨率 `400×300`，显示尺寸 `800×600` → 内容被拉伸 2 倍，模糊；\n  - 画布分辨率 `800×600`，显示尺寸 `400×300` → 内容被压缩 2 倍，清晰但显示区域小。\n\n#### 4. 最佳实践\n- 标签上设置 `width`/`height` 为**实际需要的分辨率**；\n- style 中设置 `width`/`height` 为**显示尺寸**，保持与画布分辨率比例一致，避免拉伸。\n\n### 总结\n- **标签属性**：控制「画布分辨率」，影响绘制清晰度；\n- **CSS 样式**：控制「显示尺寸」，影响页面布局；\n- 两者需保持比例一致，否则会出现拉伸模糊。"
+  },
+  {
+    "id": "css-interview-97",
+    "topic": "grid网格布局是什么?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### Grid 网格布局是 CSS3 新增的**二维布局系统**，核心是将页面划分为「行 + 列」的网格，实现复杂布局。\n\n#### 核心概念\n- **容器（Grid Container）**：设置 `display: grid` 的元素，是网格的父容器；\n- **项目（Grid Item）**：容器的直接子元素，是网格的子项；\n- **行（Row）**：水平方向的网格线；\n- **列（Column）**：垂直方向的网格线；\n- **单元格（Cell）**：行与列交叉形成的区域；\n- **网格线（Grid Line）**：划分行/列的分隔线；\n- **网格区域（Grid Area）**：由多个单元格组成的区域。\n\n#### 核心属性\n##### 容器属性\n- `display: grid`：创建网格容器；\n- `grid-template-columns`：定义列宽（如 `grid-template-columns: 1fr 2fr 1fr`）；\n- `grid-template-rows`：定义行高；\n- `grid-gap`：定义行/列间距；\n- `justify-items`：水平对齐项目；\n- `align-items`：垂直对齐项目；\n- `grid-auto-flow`：自动排列项目顺序。\n\n##### 项目属性\n- `grid-column`：指定项目占据的列（如 `grid-column: 1 / 3`）；\n- `grid-row`：指定项目占据的行；\n- `justify-self`：单个项目水平对齐；\n- `align-self`：单个项目垂直对齐。\n\n#### 代码示例\n```css\n.container {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr); /* 3 列，等宽 */\n  grid-template-rows: 100px 200px; /* 2 行，高度分别为 100px、200px */\n  gap: 20px; /* 行/列间距 */\n}\n.item {\n  grid-column: 1 / 3; /* 占据第 1-2 列 */\n  grid-row: 1 / 2; /* 占据第 1 行 */\n}\n```\n\n#### 优势\n- **二维布局**：同时控制行和列，比 Flex（一维）更强大；\n- **灵活响应**：`fr` 单位实现自适应，`repeat()` 简化代码；\n- **精准控制**：可精确指定项目占据的行/列；\n- **复杂布局**：轻松实现九宫格、圣杯布局、响应式布局。\n\n### 总结\nGrid 是**最强大的 CSS 布局系统**，适合复杂二维布局，是现代前端布局的首选方案。"
+  },
+  {
+    "id": "css-interview-98",
+    "topic": "CSS3新增了哪些特性?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS3 新增核心特性（按功能分类）\n\n#### 1. 选择器增强\n- 结构伪类：`:nth-child()`/`:first-of-type()`/`:not()` 等；\n- 属性选择器：`[attr^='value']`/`[attr$='value']`/`[attr*='value']`；\n- 伪元素：`::before`/`::after`（双冒号规范）、`::selection`。\n\n#### 2. 盒模型与布局\n- `box-sizing`：控制盒模型计算方式（`border-box`）；\n- Flex 布局：`display: flex`，一维弹性布局；\n- Grid 布局：`display: grid`，二维网格布局；\n- `calc()`：动态计算属性值（如 `width: calc(100% - 20px)`）；\n- `min-width`/`max-width`/`min-height`/`max-height`：限制尺寸范围。\n\n#### 3. 背景与边框\n- `background-size`：控制背景图片尺寸；\n- `background-origin`/`background-clip`：控制背景图片位置/裁剪；\n- 多背景：`background: url(a.png), url(b.png)`；\n- `border-radius`：圆角边框；\n- `box-shadow`：盒子阴影；\n- `border-image`：边框图片。\n\n#### 4. 文字与字体\n- `text-shadow`：文字阴影；\n- `word-wrap`/`word-break`：控制文本换行；\n- `@font-face`：自定义字体；\n- `text-overflow`：文本溢出处理；\n- `line-height` 优化：支持无单位值。\n\n#### 5. 渐变与变换\n- 渐变：`linear-gradient()`/`radial-gradient()`/`conic-gradient()`；\n- 变换：`transform: translate()/rotate()/scale()/skew()`；\n- 3D 变换：`perspective`/`transform-style: preserve-3d`。\n\n#### 6. 过渡与动画\n- `transition`：过渡动画；\n- `@keyframes` + `animation`：关键帧动画；\n- `will-change`：提前优化动画性能。\n\n#### 7. 媒体查询与响应式\n- `@media`：媒体查询，实现响应式布局；\n- `viewport` 相关：控制移动端视口。\n\n#### 8. 其他\n- `opacity`：透明度；\n- `filter`：滤镜（模糊、灰度等）；\n- `pointer-events`：控制元素交互；\n- `user-select`：控制文本选择。\n\n### 总结\nCSS3 极大增强了 CSS 的表达能力，实现了**复杂布局、动画、渐变、响应式**等功能，是现代前端开发的基础。"
+  },
+  {
+    "id": "css-interview-99",
+    "topic": "怎么使用CSS3实现动画?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS3 实现动画的两种核心方式：`transition`（过渡）和 `animation`（关键帧）。\n\n#### 1. `transition`：过渡动画（状态切换）\n- 定义：元素从一个状态到另一个状态的平滑过渡；\n- 触发条件：`hover`/`focus`/`active`/JS 修改属性；\n- 核心属性：\n  - `transition-property`：要过渡的属性（如 `transform`/`opacity`）；\n  - `transition-duration`：过渡持续时间；\n  - `transition-timing-function`：缓动函数（如 `ease`/`linear`）；\n  - `transition-delay`：延迟时间；\n- 示例：\n  ```css\n  .box {\n    width: 100px;\n    transition: width 0.3s ease 0.1s;\n  }\n  .box:hover {\n    width: 200px;\n  }\n  ```\n\n#### 2. `animation`：关键帧动画（主动播放）\n- 定义：通过 `@keyframes` 定义多阶段动画，自动播放；\n- 核心属性：\n  - `animation-name`：关键帧名称；\n  - `animation-duration`：动画持续时间；\n  - `animation-timing-function`：缓动函数；\n  - `animation-delay`：延迟时间；\n  - `animation-iteration-count`：循环次数（`infinite` 无限循环）；\n  - `animation-direction`：播放方向（`alternate` 往返）；\n  - `animation-fill-mode`：动画前后状态；\n- 示例：\n  ```css\n  @keyframes move {\n    0% { transform: translateX(0); }\n    100% { transform: translateX(200px); }\n  }\n  .box {\n    animation: move 2s infinite alternate;\n  }\n  ```\n\n#### 3. 性能优化建议\n- 优先使用 `transform`/`opacity` 动画，触发 GPU 硬件加速；\n- 避免使用 `width`/`height`/`top`/`left` 等触发重排的属性；\n- 使用 `will-change: transform` 提前优化动画性能；\n- 控制动画帧率，避免过度动画。\n\n### 总结\n- **`transition`**：适合简单状态切换动画（如 hover 效果）；\n- **`animation`**：适合复杂循环/多阶段动画（如加载动画）；\n- 两者结合 `transform` 可实现高性能 CSS 动画。"
+  },
+  {
+    "id": "css-interview-100",
+    "topic": "怎么理解回流跟重绘? 什么场景下会触发?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 回流（Reflow）与重绘（Repaint）是浏览器渲染流程的核心环节，直接影响页面性能。\n\n#### 1. 回流（Reflow）—— 布局计算\n- **定义**：浏览器重新计算元素的**几何属性**（位置、尺寸），更新布局树；\n- **本质**：「重新布局」，是性能开销最大的操作；\n- **触发场景**：\n  - 添加/删除 DOM 元素；\n  - 修改元素尺寸（`width`/`height`/`margin`/`padding`/`border`）；\n  - 修改元素位置（`top`/`left`/`position`）；\n  - 修改页面结构（`display: none`/`block`）；\n  - 窗口大小变化（`resize`）；\n  - 读取布局属性（`offsetTop`/`clientWidth`）。\n\n#### 2. 重绘（Repaint）—— 像素绘制\n- **定义**：浏览器重新绘制元素的**视觉样式**（颜色、背景、阴影等），不影响布局；\n- **本质**：「重新上色」，开销比回流小；\n- **触发场景**：\n  - 修改元素颜色（`color`/`background-color`）；\n  - 修改元素阴影（`box-shadow`/`text-shadow`）；\n  - 修改元素透明度（`opacity`）；\n  - 修改背景图片（`background-image`）。\n\n#### 3. 核心关系\n- **回流必然触发重绘**，但重绘不一定触发回流；\n- 回流开销远大于重绘，应尽量减少回流次数。\n\n#### 4. 性能优化建议\n- **批量修改 DOM**：使用文档片段（`DocumentFragment`）或隐藏元素后修改；\n- **避免频繁读取布局属性**：读取后立即修改会导致强制同步布局；\n- **使用 CSS 动画**：`transform`/`opacity` 动画触发重绘，不触发回流；\n- **使用 `will-change`**：提前告知浏览器元素即将变化，优化渲染；\n- **避免嵌套过深**：减少回流影响范围。\n\n### 总结\n- **回流**：计算布局，开销大，触发场景多；\n- **重绘**：绘制样式，开销小，仅影响视觉；\n- 优化核心：**减少回流次数，避免强制同步布局**，优先使用 `transform`/`opacity` 动画。"
+  },
+  {
+    "id": "css-interview-101",
+    "topic": "什么是响应式设计? 响应式设计的基本原理是什么? 如何进行实现?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、什么是响应式设计？\n响应式设计（Responsive Web Design）是指**一套代码在不同设备（PC/平板/手机）上自动适配布局、内容和交互**，保证良好的用户体验。\n\n### 二、基本原理\n核心是「**流式布局 + 媒体查询 + 弹性图片**」：\n1. **流式布局**：使用百分比、`rem`/`vw` 等相对单位，让元素随视口大小变化；\n2. **媒体查询**：根据设备特性（屏幕宽度、方向）加载不同 CSS 样式；\n3. **弹性图片**：图片最大宽度不超过容器，避免溢出。\n\n### 三、实现方式\n#### 1. 视口设置（基础）\n```html\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n```\n- `width=device-width`：视口宽度等于设备宽度；\n- `initial-scale=1.0`：初始缩放比例为 1。\n\n#### 2. 流式布局\n- 使用 `%`/`rem`/`vw`/`flex`/`grid` 等相对单位，避免固定 `px`；\n- 示例：\n  ```css\n  .container { width: 90%; max-width: 1200px; margin: 0 auto; }\n  ```\n\n#### 3. 媒体查询（核心）\n根据屏幕宽度设置不同样式：\n```css\n/* 手机端 */\n@media (max-width: 768px) {\n  .nav { display: none; }\n}\n/* 平板端 */\n@media (min-width: 769px) and (max-width: 1024px) {\n  .container { width: 80%; }\n}\n/* PC 端 */\n@media (min-width: 1025px) {\n  .container { width: 1200px; }\n}\n```\n\n#### 4. 弹性图片/媒体\n```css\nimg, video { max-width: 100%; height: auto; }\n```\n\n### 总结\n响应式设计的核心是「**适配而非分离**」，通过流式布局、媒体查询和弹性资源，实现一套代码多端运行，是现代前端开发的标准。"
+  },
+  {
+    "id": "css-interview-102",
+    "topic": "如果使用CSS提高页面性能?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 性能优化的 6 个核心方向\n\n#### 1. **精简代码，减小体积**\n- **压缩代码**：使用 `cssnano`/`Terser` 移除空格、注释、冗余代码；\n- **Tree-shaking**：用 `PurgeCSS`/`uncss` 清除未使用的 CSS；\n- **合并文件**：减少 HTTP 请求数（如将多个 CSS 文件合并为一个）；\n- **内联关键 CSS**：将首屏必需 CSS 内联到 `<head>`，避免加载阻塞。\n\n#### 2. **优化选择器，提升匹配效率**\n- **简化嵌套**：避免 `.div1 .div2 .item` 这种深层嵌套，使用类选择器；\n- **避免通配符**：`*` 选择器会遍历所有元素，性能极低；\n- **避免 `!important`**：打破优先级规则，增加浏览器计算成本。\n\n#### 3. **减少重排/重绘，提升渲染性能**\n- **使用 GPU 加速**：动画优先用 `transform`/`opacity`，触发合成线程，不触发重排；\n- **避免高频修改**：批量修改样式，避免频繁读取布局属性；\n- **使用 `contain` 属性**：隔离元素渲染，`contain: layout paint size` 限制重排范围。\n\n#### 4. **优化加载，减少阻塞**\n- **CSS 放 `<head>`**：尽早加载，构建 CSSOM，避免 FOUC；\n- **异步加载非关键 CSS**：用 `media='print'` 或 `link rel=\"preload\"` 异步加载；\n- **预加载关键资源**：`<link rel=\"preload\" href=\"style.css\" as=\"style\">`。\n\n#### 5. **使用现代布局，简化渲染**\n- **Flex/Grid 布局**：替代传统浮动/定位，减少 DOM 节点和重排；\n- **CSS Variables**：动态管理样式，减少冗余代码；\n- **避免 `table` 布局**：table 布局会触发多次重排，性能差。\n\n#### 6. **资源优化，提升加载速度**\n- **CSS Sprites**：合并小图标，减少 HTTP 请求；\n- **字体优化**：使用 `font-display: swap`，避免 FOIT（无样式文本闪烁）；\n- **图片优化**：使用 WebP 格式，配合 `srcset` 实现响应式图片。\n\n### 总结\nCSS 性能优化的核心是：**减小体积、提升匹配效率、减少重排/重绘、优化加载流程**，最终提升页面加载速度和渲染流畅度。"
+  },
+  {
+    "id": "css-interview-103",
+    "topic": "如何实现单行 / 多行文本溢出的省略样式?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、单行文本溢出省略（面试必背）\n核心是 `overflow: hidden` + `white-space: nowrap` + `text-overflow: ellipsis`。\n```css\n.single-line {\n  width: 200px; /* 必须设置固定宽度 */\n  white-space: nowrap; /* 强制不换行 */\n  overflow: hidden; /* 超出隐藏 */\n  text-overflow: ellipsis; /* 显示省略号 */\n}\n```\n- **必备条件**：固定宽度、`white-space: nowrap`、`overflow: hidden`。\n\n### 二、多行文本溢出省略（WebKit 环境）\n使用 `-webkit-line-clamp` 限制行数，仅支持 WebKit 内核（Chrome/Safari/小程序）。\n```css\n.multi-line {\n  width: 200px; /* 固定宽度 */\n  display: -webkit-box; /* 转为弹性盒子 */\n  -webkit-line-clamp: 2; /* 限制显示 2 行 */\n  -webkit-box-orient: vertical; /* 垂直排列 */\n  overflow: hidden; /* 超出隐藏 */\n  text-overflow: ellipsis; /* 显示省略号 */\n}\n```\n- **注意**：`-webkit-box-orient: vertical` 可能被压缩工具移除，需保留。\n\n### 三、通用兼容方案（全浏览器）\n通过 JS 计算字符数或使用伪元素模拟，或使用 `clamp()` 结合 `max-height`。\n```css\n/* 简易兼容方案（部分浏览器支持） */\n.multi-line {\n  max-height: 40px; /* 2 行高度 */\n  line-height: 20px;\n  overflow: hidden;\n  position: relative;\n}\n.multi-line::after {\n  content: \"...\";\n  position: absolute;\n  bottom: 0;\n  right: 0;\n  background: white;\n}\n```\n\n### 总结\n- **单行**：`white-space: nowrap` + `overflow: hidden` + `text-overflow: ellipsis`；\n- **多行**：WebKit 环境用 `-webkit-line-clamp`，兼容环境用 JS/伪元素模拟。"
+  },
+  {
+    "id": "css-interview-104",
+    "topic": "如何使用css完成视差滚动效果?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 视差滚动（Parallax Scrolling）核心原理：**不同元素滚动速度不同，营造层次感**。\n\n#### 实现方式 1：`background-attachment: fixed`（最简单）\n- 原理：背景图片固定，内容滚动时背景不动，产生视差；\n- 示例：\n  ```css\n  .parallax {\n    height: 100vh;\n    background-image: url('bg.jpg');\n    background-attachment: fixed; /* 背景固定 */\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n  }\n  .content {\n    height: 500px;\n    background: white;\n  }\n  ```\n- **缺点**：移动端兼容性差，可能卡顿。\n\n#### 实现方式 2：`transform: translate3d()` + `perspective`（高性能）\n- 原理：不同元素设置不同 `transform` 速度，滚动时通过 JS 控制 `translateY`；\n- 示例：\n  ```css\n  .parallax-container {\n    perspective: 1px;\n    height: 100vh;\n    overflow-x: hidden;\n    overflow-y: auto;\n  }\n  .parallax-layer {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n  .layer-1 { transform: translateZ(0); } /* 速度正常 */\n  .layer-2 { transform: translateZ(-1px) scale(2); } /* 速度慢 */\n  ```\n- **优点**：性能好，支持 3D 视差；\n- **缺点**：需配合 JS 控制滚动。\n\n#### 实现方式 3：`scroll-timeline`（CSS 滚动驱动动画，现代方案）\n- 原理：CSS 动画与滚动进度绑定，不同元素设置不同动画速度；\n- 示例：\n  ```css\n  @keyframes parallax {\n    from { transform: translateY(0); }\n    to { transform: translateY(-50%); }\n  }\n  .parallax-layer {\n    animation: parallax linear;\n    animation-timeline: scroll(root); /* 绑定滚动进度 */\n  }\n  ```\n- **优点**：纯 CSS，性能最优；\n- **缺点**：兼容性（Chrome 115+）。\n\n### 总结\n- **简单场景**：`background-attachment: fixed`；\n- **高性能场景**：`transform: translate3d()` + JS；\n- **现代场景**：`scroll-timeline` 纯 CSS 实现。"
+  },
+  {
+    "id": "css-interview-105",
+    "topic": "怎么使用 CSS 如何画一个三角形",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 画三角形的核心原理：**利用边框的透明特性**。\n\n#### 基础实现（向上三角形）\n```css\n.triangle {\n  width: 0;\n  height: 0;\n  border-left: 50px solid transparent; /* 左边透明 */\n  border-right: 50px solid transparent; /* 右边透明 */\n  border-bottom: 100px solid red; /* 底部为红色，形成三角形 */\n}\n```\n- **原理**：元素宽高为 0，边框由四个方向组成，相邻方向透明，一个方向显示颜色，形成三角形。\n\n#### 不同方向三角形\n- **向下三角形**：\n  ```css\n  .triangle-down {\n    width: 0;\n    height: 0;\n    border-left: 50px solid transparent;\n    border-right: 50px solid transparent;\n    border-top: 100px solid red;\n  }\n  ```\n- **向左三角形**：\n  ```css\n  .triangle-left {\n    width: 0;\n    height: 0;\n    border-top: 50px solid transparent;\n    border-bottom: 50px solid transparent;\n    border-right: 100px solid red;\n  }\n  ```\n- **向右三角形**：\n  ```css\n  .triangle-right {\n    width: 0;\n    height: 0;\n    border-top: 50px solid transparent;\n    border-bottom: 50px solid transparent;\n    border-left: 100px solid red;\n  }\n  ```\n\n#### 进阶：带边框的三角形\n使用伪元素叠加实现：\n```css\n.triangle-border {\n  position: relative;\n  width: 0;\n  height: 0;\n  border-left: 50px solid transparent;\n  border-right: 50px solid transparent;\n  border-bottom: 100px solid red;\n}\n.triangle-border::after {\n  content: '';\n  position: absolute;\n  bottom: -98px;\n  left: -48px;\n  border-left: 48px solid transparent;\n  border-right: 48px solid transparent;\n  border-bottom: 98px solid white;\n}\n```\n\n### 总结\nCSS 画三角形的核心是：**宽高为 0 + 边框透明 + 单方向边框着色**，是前端面试高频考点。"
+  },
+  {
+    "id": "css-interview-106",
+    "topic": "怎么让Chrome支持小于12px的文字?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### Chrome 浏览器默认最小字体为 12px，小于 12px 的文字会被强制渲染为 12px，需通过以下方式绕过：\n\n#### 方法 1：`transform: scale()`（最常用）\n- 原理：将文字放大后再缩小，视觉上小于 12px；\n- 示例：\n  ```css\n  .text-10px {\n    font-size: 12px; /* 先设为 12px */\n    transform: scale(0.83); /* 12 * 0.83 ≈ 10px */\n    transform-origin: left center; /* 缩放原点，避免偏移 */\n  }\n  ```\n- **优点**：兼容性好，视觉效果清晰；\n- **缺点**：会影响元素位置，需调整布局。\n\n#### 方法 2：`-webkit-text-size-adjust: none`（旧版方案）\n- 原理：禁用 Chrome 自动调整字体大小；\n- 示例：\n  ```css\n  html {\n    -webkit-text-size-adjust: none; /* 禁用字体大小调整 */\n  }\n  .text-10px {\n    font-size: 10px;\n  }\n  ```\n- **缺点**：新版 Chrome 已废弃，仅支持旧版浏览器。\n\n#### 方法 3：使用 SVG 文字（最稳定）\n- 原理：用 SVG 绘制文字，不受浏览器最小字体限制；\n- 示例：\n  ```html\n  <svg width=\"100\" height=\"20\">\n    <text x=\"0\" y=\"15\" font-size=\"10px\">10px 文字</text>\n  </svg>\n  ```\n- **优点**：稳定可靠，不受浏览器限制；\n- **缺点**：无法选中，不适合大量文本。\n\n#### 方法 4：`image-set()` 图片（备选）\n- 原理：将文字转为图片，显示小于 12px 的文字；\n- **缺点**：无法选中，加载慢，不推荐。\n\n### 总结\n- **推荐方案**：`transform: scale()`，兼容性好，适合大多数场景；\n- **稳定方案**：SVG 文字，适合少量特殊文字；\n- **注意**：小于 12px 的文字可读性差，应尽量避免使用。"
+  },
+  {
+    "id": "css-interview-107",
+    "topic": "说说对 CSS 预编译语言的理解, 以及它们之间的区别",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、什么是 CSS 预编译语言？\nCSS 预编译语言是在 CSS 基础上扩展了**变量、嵌套、混合器、函数、继承**等特性的语言，需编译为原生 CSS 才能在浏览器中运行，核心是**提升 CSS 可维护性和复用性**。\n\n### 二、主流预编译语言：Sass/Less/Stylus\n\n| 对比维度 | **Sass (SCSS)** | **Less** | **Stylus** |\n| :--- | :--- | :--- | :--- |\n| 语法 | `.scss`（大括号，类似 CSS）/`.sass`（缩进） | `.less`（大括号，类似 CSS） | `.styl`（缩进/大括号可选） |\n| 变量 | `$var: red;` | `@var: red;` | `var = red` |\n| 混合器 | `@mixin`/`@include` | `.mixin()`/`.mixin()` | `mixin()`/`mixin()` |\n| 继承 | `@extend` | `&:extend` | `@extend` |\n| 函数 | 内置函数 + 自定义函数 | 内置函数 + 自定义函数 | 内置函数 + 自定义函数 |\n| 条件/循环 | `@if`/`@for`/`@each` | `& when`/`each` | `if`/`for`/`each` |\n| 编译工具 | Dart Sass/SassC | Less.js（Node/浏览器） | Stylus（Node） |\n| 生态 | 最丰富（Bootstrap/Foundation 基于 Sass） | 较丰富（Ant Design 早期基于 Less） | 较小 |\n| 学习成本 | 中 | 低 | 高（灵活度极高） |\n\n### 三、核心区别\n1. **语法风格**：\n   - Sass/SCSS/Less：接近原生 CSS，学习成本低；\n   - Stylus：缩进语法，灵活度极高，代码更简洁。\n2. **功能强弱**：\n   - Sass：功能最强大，支持完整的编程特性（条件/循环/函数）；\n   - Less：功能适中，适合中小型项目；\n   - Stylus：功能最灵活，支持编程式写法。\n3. **生态与工具**：\n   - Sass：生态最完善，是行业标准；\n   - Less：与 JS 结合紧密，适合前端项目；\n   - Stylus：适合 Node 生态，小众但高效。\n\n### 四、为什么使用预编译语言？\n- **变量复用**：统一管理颜色、字体、间距；\n- **嵌套结构**：模拟 HTML 层级，代码更直观；\n- **混合器/函数**：抽离公共样式，实现代码复用；\n- **逻辑运算**：支持条件/循环，动态计算样式；\n- **模块化**：拆分文件，便于维护。\n\n### 总结\nCSS 预编译语言是**CSS 的增强版**，核心是提升可维护性和复用性；Sass 是行业标准，Less 适合入门，Stylus 适合追求灵活度的开发者。"
+  },
+  {
+    "id": "css-interview-108",
+    "topic": "flexbox (弹性盒布局模型) 是什么, 适用什么场景?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### Flexbox（弹性盒布局）是 CSS3 新增的**一维布局模型**，核心是让容器内的元素「弹性」分配空间，实现高效的布局。\n\n#### 核心概念\n- **容器（Flex Container）**：设置 `display: flex` 的元素，是布局的父容器；\n- **项目（Flex Item）**：容器的直接子元素，是布局的子项；\n- **主轴（Main Axis）**：元素排列的方向（默认水平）；\n- **交叉轴（Cross Axis）**：与主轴垂直的方向（默认垂直）。\n\n#### 核心属性\n##### 容器属性\n- `flex-direction`：主轴方向（`row`/`row-reverse`/`column`/`column-reverse`）；\n- `flex-wrap`：是否换行（`nowrap`/`wrap`/`wrap-reverse`）；\n- `justify-content`：主轴对齐方式（`flex-start`/`flex-end`/`center`/`space-between`/`space-around`）；\n- `align-items`：交叉轴对齐方式（`flex-start`/`flex-end`/`center`/`baseline`/`stretch`）；\n- `align-content`：多行交叉轴对齐方式。\n\n##### 项目属性\n- `flex-grow`：剩余空间分配比例（默认 0，不分配）；\n- `flex-shrink`：空间不足时收缩比例（默认 1，可收缩）；\n- `flex-basis`：元素初始大小（默认 `auto`）；\n- `flex`：`flex-grow`/`flex-shrink`/`flex-basis` 简写（`flex: 1` 占满剩余空间）；\n- `align-self`：单个项目交叉轴对齐方式。\n\n#### 适用场景\n- **水平/垂直居中**：最简洁的居中方案（`display: flex; align-items: center; justify-content: center`）；\n- **两栏/三栏自适应布局**：左侧固定，右侧自适应（`flex: 1`）；\n- **导航栏/工具栏**：均匀分布、两端对齐；\n- **流式布局**：自动换行、响应式布局；\n- **列表/卡片布局**：均匀分配空间。\n\n#### 优势\n- **简洁高效**：代码少，布局直观；\n- **弹性自适应**：自动适应容器大小，无需计算百分比；\n- **兼容性好**：支持 IE10+，现代浏览器完美支持；\n- **一维布局**：适合横向/纵向排列，比 Grid 更轻量。\n\n### 总结\nFlexbox 是**一维布局的最佳方案**，适合居中、自适应、流式布局等场景，是现代前端开发的首选布局方式。"
+  },
+  {
+    "id": "css-interview-109",
+    "topic": "如何实现两栏布局, 右侧自适应? 三栏布局中间自适应呢?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、两栏布局：左侧固定，右侧自适应\n#### 方案 1：Flex 布局（最推荐）\n```css\n.container {\n  display: flex;\n}\n.left {\n  width: 200px; /* 固定宽度 */\n}\n.right {\n  flex: 1; /* 占满剩余空间 */\n}\n```\n\n#### 方案 2：Float + BFC\n```css\n.left {\n  float: left;\n  width: 200px;\n}\n.right {\n  overflow: hidden; /* 触发 BFC，不与浮动元素重叠 */\n}\n```\n\n#### 方案 3：绝对定位\n```css\n.container {\n  position: relative;\n}\n.left {\n  position: absolute;\n  left: 0;\n  width: 200px;\n}\n.right {\n  margin-left: 200px; /* 避开左侧固定宽度 */\n}\n```\n\n---\n\n### 二、三栏布局：左右固定，中间自适应\n#### 方案 1：Flex 布局（最推荐）\n```css\n.container {\n  display: flex;\n}\n.left {\n  width: 200px; /* 固定宽度 */\n}\n.center {\n  flex: 1; /* 占满剩余空间 */\n}\n.right {\n  width: 200px; /* 固定宽度 */\n}\n```\n\n#### 方案 2：圣杯布局（Float + 负 margin）\n```css\n.container {\n  padding: 0 200px; /* 为左右栏预留空间 */\n}\n.left, .center, .right {\n  float: left;\n}\n.left {\n  width: 200px;\n  margin-left: -100%; /* 移到最左侧 */\n  position: relative;\n  left: -200px;\n}\n.center {\n  width: 100%;\n}\n.right {\n  width: 200px;\n  margin-left: -200px; /* 移到最右侧 */\n  position: relative;\n  right: -200px;\n}\n```\n\n#### 方案 3：双飞翼布局（Float + 负 margin）\n```css\n.left, .center, .right {\n  float: left;\n}\n.left {\n  width: 200px;\n  margin-left: -100%;\n}\n.center-wrap {\n  width: 100%;\n}\n.center {\n  margin: 0 200px; /* 为左右栏预留空间 */\n}\n.right {\n  width: 200px;\n  margin-left: -200px;\n}\n```\n\n#### 方案 4：Grid 布局（现代方案）\n```css\n.container {\n  display: grid;\n  grid-template-columns: 200px 1fr 200px; /* 左右固定，中间自适应 */\n}\n```\n\n### 总结\n- **两栏布局**：优先用 **Flex** 或 **Float + BFC**；\n- **三栏布局**：优先用 **Flex** 或 **Grid**，传统方案用圣杯/双飞翼。"
+  },
+  {
+    "id": "css-interview-110",
+    "topic": "CSS中, 有哪些方式可以隐藏页面元素? 有什么区别?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 隐藏元素的 5 种方式及核心区别\n\n| 方式 | 是否占据空间 | 是否触发重排 | 是否可交互 | 是否可被屏幕阅读器读取 | 适用场景 |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| `display: none` | ❌ 不占据 | ✅ 重排 + 重绘 | ❌ 不可 | ❌ 不可 | 彻底隐藏，无需占位 |\n| `visibility: hidden` | ✅ 占据 | ❌ 仅重绘 | ❌ 不可 | ✅ 可 | 视觉隐藏，保留布局 |\n| `opacity: 0` | ✅ 占据 | ❌ 仅重绘 | ✅ 可 | ✅ 可 | 淡入淡出动画，保留交互 |\n| `transform: scale(0)` | ✅ 占据（视觉隐藏） | ❌ 仅重绘 | ❌ 不可 | ✅ 可 | 缩放隐藏，配合动画 |\n| `position: absolute; left: -9999px` | ❌ 不占据 | ✅ 重排 | ❌ 不可 | ✅ 可 | 隐藏元素，保留 DOM 结构 |\n\n#### 详细解析\n1. **`display: none`**：\n   - 元素从文档流中移除，不占据空间，彻底隐藏；\n   - 会触发重排和重绘，性能开销大；\n   - 不可交互，不可被屏幕阅读器读取。\n\n2. **`visibility: hidden`**：\n   - 元素视觉隐藏，仍占据空间，保留布局；\n   - 仅触发重绘，不触发重排，性能开销小；\n   - 不可交互，可被屏幕阅读器读取。\n\n3. **`opacity: 0`**：\n   - 元素透明，仍占据空间，保留布局；\n   - 仅触发重绘，不触发重排，支持过渡/动画；\n   - **可交互**（点击、输入），可被屏幕阅读器读取。\n\n4. **`transform: scale(0)`**：\n   - 元素缩放为 0，视觉隐藏，仍占据空间；\n   - 触发 GPU 加速，仅重绘，性能好；\n   - 不可交互，可被屏幕阅读器读取。\n\n5. **`position: absolute; left: -9999px`**：\n   - 元素移出视口，不占据空间；\n   - 触发重排，性能开销大；\n   - 不可交互，可被屏幕阅读器读取。\n\n### 总结\n- **彻底隐藏**：`display: none`；\n- **视觉隐藏**：`visibility: hidden`；\n- **动画隐藏**：`opacity: 0`；\n- **性能优化**：`transform: scale(0)`；\n- **移出视口**：`position: absolute; left: -9999px`。"
+  },
+  {
+    "id": "css-interview-111",
+    "topic": "设备像素、css像素、设备独立像素、dpr、ppi 之间有什么区别?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、核心概念定义\n\n#### 1. 设备像素（Device Pixel）\n- 物理像素，屏幕的最小显示单元；\n- 由硬件决定，不可改变；\n- 例：iPhone 13 分辨率 2532×1170，即有 2532×1170 个设备像素。\n\n#### 2. CSS 像素（CSS Pixel）\n- 前端开发使用的抽象像素单位（`px`）；\n- 浏览器将 CSS 像素转换为设备像素渲染；\n- 例：`width: 100px` 是 CSS 像素，实际渲染为 100×DPR 个设备像素。\n\n#### 3. 设备独立像素（Device Independent Pixel, DIP）\n- 也叫「逻辑像素」，是设备的抽象显示单位；\n- 与物理像素无关，保证不同设备显示一致；\n- 例：iPhone 13 逻辑分辨率 390×844，即 390×844 个 DIP。\n\n#### 4. 设备像素比（Device Pixel Ratio, DPR）\n- 公式：`DPR = 设备像素 / 设备独立像素`；\n- 表示 1 个 DIP 对应多少个设备像素；\n- 例：iPhone 13 DPR = 3，即 1 DIP = 3 设备像素。\n\n#### 5. 像素密度（Pixels Per Inch, PPI）\n- 每英寸像素数，衡量屏幕清晰度；\n- 公式：`PPI = √(横向像素² + 纵向像素²) / 屏幕尺寸`；\n- PPI 越高，屏幕越清晰。\n\n### 二、关系与区别\n- **CSS 像素 = 设备独立像素**：前端开发中，`1px` 对应 1 个 DIP；\n- **DPR 是转换桥梁**：`CSS 像素 × DPR = 设备像素`；\n- **PPI 与 DPR 相关**：PPI 越高，DPR 通常越大（如 Retina 屏 DPR=2/3）；\n- **设备像素是物理基础**，DIP/CSS 像素是抽象层，DPR 是转换比例，PPI 是清晰度指标。\n\n### 三、示例\n- iPhone 13：\n  - 设备像素：2532×1170；\n  - 设备独立像素：390×844；\n  - DPR = 2532 / 844 ≈ 3；\n  - CSS 像素 `100px` → 渲染为 `100×3 = 300` 个设备像素。\n\n### 总结\n- **设备像素**：物理最小单元；\n- **DIP/CSS 像素**：抽象显示单位；\n- **DPR**：DIP 到设备像素的转换比例；\n- **PPI**：屏幕清晰度指标。"
+  },
+  {
+    "id": "css-interview-112",
+    "topic": "em/px/rem/vh/vw 这些单位有什么区别?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 单位 `em`/`px`/`rem`/`vh`/`vw` 核心区别\n\n| 单位 | 定义 | 相对对象 | 适用场景 |\n| :--- | :--- | :--- | :--- |\n| `px` | 绝对像素单位 | 设备像素（受 DPR 影响） | 固定尺寸、边框、图标 |\n| `em` | 相对字体大小单位 | 父元素 `font-size` | 组件内相对尺寸、继承关系 |\n| `rem` | 根元素字体单位 | 根元素 `<html>` `font-size` | 响应式布局、全局适配 |\n| `vw` | 视口宽度单位 | 视口宽度的 1% | 响应式布局、全屏元素 |\n| `vh` | 视口高度单位 | 视口高度的 1% | 响应式布局、全屏元素 |\n\n#### 详细解析\n1. **`px`（像素）**：\n   - 绝对单位，视觉上最稳定；\n   - 受设备 DPR 影响，1 CSS 像素 = DPR 个设备像素；\n   - 适合固定尺寸，不适合响应式。\n\n2. **`em`**：\n   - 相对父元素 `font-size`，`1em = 父元素 font-size`；\n   - 嵌套会累积（如父 `16px`，子 `2em = 32px`，孙 `2em = 64px`）；\n   - 适合组件内相对尺寸，继承关系复杂。\n\n3. **`rem`（root em）**：\n   - 相对根元素 `<html>` `font-size`，`1rem = html font-size`；\n   - 无嵌套累积，全局统一；\n   - 适合响应式布局，配合 JS 动态设置 `html font-size` 实现适配。\n\n4. **`vw`/`vh`**：\n   - `vw`：视口宽度的 1%，`100vw = 视口宽度`；\n   - `vh`：视口高度的 1%，`100vh = 视口高度`；\n   - 天然响应式，无需 JS，适合全屏元素、响应式布局。\n\n#### 最佳实践\n- **固定尺寸**：`px`；\n- **组件内相对尺寸**：`em`；\n- **全局响应式**：`rem` 或 `vw/vh`；\n- **全屏元素**：`vw/vh`。\n\n### 总结\n- `px`：绝对稳定，适合固定布局；\n- `em`：相对父元素，继承累积；\n- `rem`：相对根元素，全局统一；\n- `vw/vh`：相对视口，天然响应式。"
+  },
+  {
+    "id": "css-interview-113",
+    "topic": "css选择器有哪些? 优先级分别是什么? 哪些属性可以继承?",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### 一、CSS 选择器分类\n#### 1. 基础选择器\n- 通配符：`*`；\n- 元素选择器：`div`/`p`/`h1`；\n- 类选择器：`.class`；\n- ID 选择器：`#id`；\n- 属性选择器：`[attr]`/`[attr=value]`/`[attr^=value]`。\n\n#### 2. 组合选择器\n- 后代选择器：`div p`；\n- 子选择器：`div > p`；\n- 相邻兄弟选择器：`div + p`；\n- 通用兄弟选择器：`div ~ p`。\n\n#### 3. 伪类/伪元素\n- 伪类：`:hover`/`:active`/`:focus`/`:nth-child()`/`:not()`；\n- 伪元素：`::before`/`::after`/`::first-line`/`::first-letter`。\n\n### 二、CSS 优先级（权重）\n优先级从高到低：\n1. `!important`（最高，打破所有规则）；\n2. 行内样式（`style=\"...\"`）；\n3. ID 选择器（`#id`）；\n4. 类选择器/伪类/属性选择器（`.class`/`:hover`/`[attr]`）；\n5. 元素选择器/伪元素（`div`/`::before`）；\n6. 通配符（`*`）（最低）。\n\n#### 权重计算\n- 行内样式：1000；\n- ID 选择器：100；\n- 类/伪类/属性选择器：10；\n- 元素/伪元素：1；\n- 通配符：0；\n- 示例：`#id .class div` → 100 + 10 + 1 = 111。\n\n#### 覆盖规则\n- 权重相同：**后定义的样式覆盖先定义的**；\n- 权重不同：**权重高的样式生效**。\n\n### 三、可继承属性\n#### 1. 文本相关（可继承）\n- `color`/`font-size`/`font-family`/`font-weight`/`line-height`/`text-align`/`text-indent`/`letter-spacing`/`word-spacing`。\n\n#### 2. 列表相关（可继承）\n- `list-style`/`list-style-type`/`list-style-position`/`list-style-image`。\n\n#### 3. 其他可继承属性\n- `cursor`/`visibility`/`white-space`。\n\n#### 4. 不可继承属性\n- 盒模型：`width`/`height`/`margin`/`padding`/`border`/`box-sizing`；\n- 布局：`display`/`position`/`float`/`clear`/`flex`/`grid`；\n- 背景：`background`/`background-color`/`background-image`；\n- 定位：`top`/`right`/`bottom`/`left`；\n- 装饰：`box-shadow`/`text-shadow`/`opacity`。\n\n### 总结\n- **选择器**：基础/组合/伪类/伪元素；\n- **优先级**：`!important` > 行内 > ID > 类/伪类/属性 > 元素/伪元素 > 通配符；\n- **可继承属性**：文本/列表/部分交互属性，盒模型/布局/背景等不可继承。"
+  },
+  {
+    "id": "css-interview-114",
+    "topic": "说说你对盒子模型的理解",
+    "notes": "",
+    "renderType": "markdown",
+    "isShowAnswer": false,
+    "classifyIds": ["classify3"],
+    "tagList": ["CSS相关"],
+    "answerContent": "### CSS 盒子模型（Box Model）是 CSS 布局的核心概念，定义了元素的尺寸计算方式。\n\n#### 核心组成\n每个元素由 4 部分组成，从内到外：\n1. **内容区域（Content）**：元素的实际内容（文本、图片等）；\n2. **内边距（Padding）**：内容与边框之间的距离；\n3. **边框（Border）**：元素的边框；\n4. **外边距（Margin）**：元素与其他元素之间的距离。\n\n#### 两种盒模型\n##### 1. 标准盒模型（`content-box`，默认）\n- **总尺寸 = content + padding + border + margin**；\n- `width`/`height` 仅包含 content；\n- 示例：`width: 200px; padding: 20px; border: 1px solid #000` → 总宽度 = 200 + 20×2 + 1×2 = 242px。\n\n##### 2. IE 盒模型（`border-box`，推荐）\n- **总尺寸 = width/height + margin**；\n- `width`/`height` 包含 content + padding + border；\n- 示例：`width: 200px; padding: 20px; border: 1px solid #000` → 总宽度 = 200px，content = 200 - 20×2 - 1×2 = 158px。\n\n#### 控制盒模型的属性\n```css\nbox-sizing: content-box; /* 标准盒模型（默认） */\nbox-sizing: border-box; /* IE 盒模型（推荐） */\nbox-sizing: inherit; /* 继承父元素 */\n```\n\n#### 最佳实践\n```css\n/* 全局统一使用 border-box */\nhtml {\n  box-sizing: border-box;\n}\n*, *::before, *::after {\n  box-sizing: inherit;\n}\n```\n\n#### 核心意义\n- 盒模型决定了元素的尺寸计算方式，是布局的基础；\n- `border-box` 更符合直觉，避免 `padding`/`border` 撑大元素，是现代前端最佳实践。\n\n### 总结\nCSS 盒子模型是元素尺寸计算的核心，分为 `content-box`（标准）和 `border-box`（推荐），`border-box` 让 `width`/`height` 包含 `padding`/`border`，布局更稳定。"
+  }
+]
