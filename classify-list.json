@@ -23,5 +23,10 @@
         "id": "classify2",
         "name": "Vue相关",
         "icon": "https://picturbed.netlify.app/icon-vue.png"
+    },
+    {
+        "id": "classify6",
+        "name": "React相关",
+        "icon": "https://picturbed.netlify.app/icon-react.png"
     }
 ]

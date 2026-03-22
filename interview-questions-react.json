@@ -1,0 +1,2060 @@
+[
+    {
+        "id": "react-interview-001",
+        "topic": "说说 Hooks 的依赖数组原理",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Hooks 依赖数组原理\n- **定义**：`useEffect`/`useCallback`/`useMemo` 等 Hooks 的第二个参数，是一个**数组**，用于指定「依赖项」；\n- **核心原理**：\n  1. React 会在**每次渲染前**，将「当前依赖数组」与「上一次渲染的依赖数组」进行**浅比较（Object.is）**；\n  2. 若依赖项发生变化（即任意一项与上次不相等），则执行 Hook 回调（如 `useEffect` 的副作用函数）；\n  3. 若依赖项未变化，则跳过执行，复用上次结果。\n\n#### 浅比较规则\n- 基本类型：比较值是否相等；\n- 引用类型：比较引用地址是否相同（不会深比较对象/数组内部）。\n\n#### 示例\n```jsx\nuseEffect(() => {\n  console.log('依赖变化');\n}, [count]); // 仅当 count 变化时执行\n```\n\n#### 注意事项\n- 依赖数组必须包含**所有在回调中使用的外部变量/函数**；\n- 若遗漏依赖，会导致闭包陷阱（使用旧值）；\n- 若包含引用类型，需使用 `useCallback`/`useMemo` 稳定引用，避免无限循环。\n\n### 总结\n- 依赖数组：**控制 Hook 执行时机的「触发器」**；\n- 原理：**浅比较依赖项，变化则执行**；\n- 关键：**完整声明依赖 + 稳定引用类型**。"
+    },
+    {
+        "id": "react-interview-002",
+        "topic": "React 的虚拟 DOM 解决了什么问题?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 虚拟 DOM（Virtual DOM）\n- **定义**：用 JS 对象模拟真实 DOM 结构，是真实 DOM 的「轻量级映射」；\n- 核心作用：**提升渲染性能 + 跨平台能力**。\n\n#### 解决的问题\n1. **频繁操作真实 DOM 性能差**：\n   - 直接操作 DOM 会触发重排/重绘，开销大；\n   - 虚拟 DOM 先在内存中计算差异（Diff），再批量更新真实 DOM，减少重排次数。\n2. **跨平台渲染**：\n   - 虚拟 DOM 不依赖浏览器环境，可渲染为移动端（React Native）、桌面端（Electron）等；\n   - 实现「一次编写，多端运行」。\n3. **声明式编程**：\n   - 开发者只需描述「目标 UI 状态」，React 自动计算差异并更新；\n   - 无需手动操作 DOM，代码更简洁、可维护。\n4. **组件化抽象**：\n   - 虚拟 DOM 是组件化的基础，将 UI 拆分为可复用组件；\n   - 每个组件维护自己的虚拟 DOM，便于拆分与复用。\n\n#### Diff 算法核心\n- **同层比较**：只比较同一层级的节点，时间复杂度 O(n)；\n- **类型不同则替换**：若节点类型变化，直接销毁重建；\n- **key 优化**：通过 key 识别列表项，避免不必要的重建。\n\n### 总结\n- 虚拟 DOM：**JS 对象模拟 DOM，实现高效更新 + 跨平台**；\n- 核心价值：**性能优化、跨平台、声明式编程、组件化**。"
+    },
+    {
+        "id": "react-interview-003",
+        "topic": "Next.js 中的 AppRouter 和 PageRouter 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### App Router vs Page Router\n\n| 特性 | App Router（App 目录，Next.js 13+） | Page Router（Pages 目录，传统） |\n| :--- | :--- | :--- |\n| **文件结构** | `app/[route]/page.js` | `pages/[route].js` |\n| **渲染模型** | 服务端组件（Server Components）为默认，支持客户端组件 | 全为客户端组件，需手动配置 SSR/SSG/ISR |\n| **数据获取** | 直接在组件中 `async/await` 获取数据 | 需用 `getServerSideProps`/`getStaticProps` |\n| **嵌套布局** | 天然支持嵌套布局（`layout.js`） | 需手动实现布局组件 |\n| **路由组** | 支持 `(group)` 路由组，不影响 URL | 不支持 |\n| **加载/错误** | 内置 `loading.js`/`error.js` 处理加载/错误状态 | 需手动实现 |\n| **兼容性** | 新特性，逐步完善 | 成熟稳定，生态完善 |\n\n#### 核心差异\n- **渲染模型**：App Router 以服务端组件为核心，减少客户端 JS 体积；Page Router 全为客户端组件。\n- **数据获取**：App Router 简化数据获取，直接在组件中异步获取；Page Router 依赖专用数据获取函数。\n- **文件约定**：App Router 用 `page.js`/`layout.js`/`loading.js` 等约定文件；Page Router 用 `[route].js` 对应路由。\n\n#### 适用场景\n- **App Router**：新项目、追求性能、需要服务端渲染/静态生成；\n- **Page Router**：老项目、需要成熟生态、复杂客户端交互。\n\n### 总结\n- App Router：**现代、服务端优先、简化数据获取**；\n- Page Router：**传统、客户端优先、成熟稳定**。"
+    },
+    {
+        "id": "react-interview-004",
+        "topic": "在 React 中, useEffect 钩子的作用是什么? 它的参数有哪些? 如何使用 useEffect 实现组件的副作用处理?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useEffect 钩子\n- **作用**：处理组件的**副作用**（如数据请求、DOM 操作、订阅/取消订阅等）；\n- 本质：替代类组件的 `componentDidMount`/`componentDidUpdate`/`componentWillUnmount` 生命周期。\n\n#### 参数\n1. **第一个参数**：**副作用函数**，执行副作用逻辑；\n   - 可返回一个「清理函数」，用于清除副作用（如取消订阅、清除定时器）。\n2. **第二个参数**：**依赖数组**（可选），控制副作用执行时机；\n   - 不传：每次渲染后执行；\n   - 空数组 `[]`：仅在组件挂载和卸载时执行；\n   - 包含依赖项：仅当依赖项变化时执行。\n\n#### 示例：副作用处理\n```jsx\nimport { useEffect, useState } from 'react';\n\nfunction User({ userId }) {\n  const [user, setUser] = useState(null);\n\n  // 数据请求副作用\n  useEffect(() => {\n    let isMounted = true;\n    // 异步请求\n    fetch(`/api/user/${userId}`)\n      .then(res => res.json())\n      .then(data => {\n        if (isMounted) setUser(data);\n      });\n\n    // 清理函数：组件卸载时取消请求\n    return () => {\n      isMounted = false;\n    };\n  }, [userId]); // 依赖 userId，变化则重新请求\n\n  return <div>{user?.name}</div>;\n}\n```\n\n#### 核心场景\n- **数据获取**：组件挂载/依赖变化时请求数据；\n- **DOM 操作**：操作真实 DOM（如第三方库初始化）；\n- **订阅管理**：订阅事件/WebSocket，卸载时取消订阅；\n- **定时器**：设置定时器，卸载时清除。\n\n### 总结\n- `useEffect`：**处理组件副作用的核心 Hook**；\n- 参数：`(副作用函数, 依赖数组)`；\n- 关键：**依赖数组控制执行时机 + 清理函数避免内存泄漏**。"
+    },
+    {
+        "id": "react-interview-005",
+        "topic": "如何实现一个可以监听任何事件的 React Hooks?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 实现通用事件监听 Hook\n- 核心思路：封装 `useEffect`，在组件挂载时绑定事件，卸载时移除事件。\n\n#### 完整实现\n```jsx\nimport { useEffect, useRef } from 'react';\n\nfunction useEventListener(eventName, handler, element = window) {\n  // 保存最新的 handler，避免闭包陷阱\n  const handlerRef = useRef(handler);\n\n  useEffect(() => {\n    handlerRef.current = handler;\n  }, [handler]);\n\n  useEffect(() => {\n    // 事件处理函数\n    const eventListener = (event) => handlerRef.current(event);\n\n    // 绑定事件\n    element.addEventListener(eventName, eventListener);\n\n    // 清理函数：卸载时移除事件\n    return () => {\n      element.removeEventListener(eventName, eventListener);\n    };\n  }, [eventName, element]); // 依赖事件名和目标元素\n}\n\n// 使用示例\nfunction App() {\n  const handleClick = () => console.log('点击了窗口');\n  useEventListener('click', handleClick);\n\n  return <div>点击窗口试试</div>;\n}\n```\n\n#### 关键细节\n1. **`useRef` 保存 handler**：避免因 handler 变化导致频繁绑定/解绑事件；\n2. **清理函数**：组件卸载时自动移除事件，防止内存泄漏；\n3. **可配置目标元素**：默认监听 `window`，也可监听 DOM 元素（如 `document`/`div`）；\n4. **依赖数组**：仅当 `eventName`/`element` 变化时重新绑定事件。\n\n#### 扩展\n- 支持 passive/once 等事件选项；\n- 支持 React 合成事件（如 `onClick`）与原生事件的兼容。\n\n### 总结\n- 核心：`useEffect` + `useRef` + 事件绑定/解绑；\n- 价值：**复用事件监听逻辑，避免重复代码，防止内存泄漏**。"
+    },
+    {
+        "id": "react-interview-006",
+        "topic": "在 React 项目中, 一般怎么处理错误?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 错误处理方案\n\n#### 1. 错误边界（Error Boundary）\n- **作用**：捕获子组件渲染/生命周期中的错误，防止整个应用崩溃；\n- 实现：类组件实现 `static getDerivedStateFromError()` 和 `componentDidCatch()`；\n```jsx\nclass ErrorBoundary extends React.Component {\n  state = { hasError: false };\n\n  static getDerivedStateFromError() {\n    return { hasError: true };\n  }\n\n  componentDidCatch(error, info) {\n    // 上报错误到监控系统\n    console.error(error, info);\n  }\n\n  render() {\n    if (this.state.hasError) {\n      return <h1>出错了，请刷新重试</h1>;\n    }\n    return this.props.children;\n  }\n}\n\n// 使用\n<ErrorBoundary>\n  <MyComponent />\n</ErrorBoundary>\n```\n\n#### 2. 异步错误处理\n- **Promise/async-await**：使用 `try/catch` 捕获异步错误；\n```jsx\nasync function fetchData() {\n  try {\n    const res = await fetch('/api/data');\n    const data = await res.json();\n  } catch (err) {\n    console.error('请求失败', err);\n    // 显示错误提示\n  }\n}\n```\n- **React Query/SWR**：内置错误状态，自动处理请求错误。\n\n#### 3. 表单/输入错误\n- 表单库（Formik/React Hook Form）内置错误验证；\n- 手动校验：在提交前校验输入，显示错误提示。\n\n#### 4. 全局错误监控\n- 接入 Sentry/Bugsnag 等工具，上报错误到服务端；\n- 监控未捕获的 Promise  rejection、全局错误。\n\n#### 5. 客户端路由错误\n- React Router 中使用 `ErrorBoundary` 包裹路由组件；\n- 处理 404/500 等页面错误。\n\n### 总结\n- 核心：**错误边界（组件渲染错误） + try/catch（异步错误） + 全局监控**；\n- 目标：**防止应用崩溃，提升用户体验，便于排查问题**。"
+    },
+    {
+        "id": "react-interview-007",
+        "topic": "在 React 中如何实现代码分割? 有哪些常见方式?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 代码分割（Code Splitting）\n- **作用**：将代码拆分为多个 chunk，按需加载，减少初始包体积，提升首屏速度；\n- 核心：**延迟加载非首屏代码**。\n\n#### 常见方式\n1. **React.lazy + Suspense（推荐）**：\n   - 动态导入组件，配合 `Suspense` 显示加载状态；\n```jsx\nimport { lazy, Suspense } from 'react';\nconst About = lazy(() => import('./About'));\n\nfunction App() {\n  return (\n    <Suspense fallback={<div>加载中...</div>}>\n      <About />\n    </Suspense>\n  );\n}\n```\n\n2. **React Router 路由级分割**：\n   - 按路由拆分，访问时才加载对应页面代码；\n```jsx\nimport { BrowserRouter as Router, Routes, Route } from 'react-router-dom';\nconst Home = lazy(() => import('./Home'));\nconst About = lazy(() => import('./About'));\n\nfunction App() {\n  return (\n    <Router>\n      <Suspense fallback={<div>加载中...</div>}>\n        <Routes>\n          <Route path=\"/\" element={<Home />} />\n          <Route path=\"/about\" element={<About />} />\n        </Routes>\n      </Suspense>\n    </Router>\n  );\n}\n```\n\n3. **动态 import() 手动分割**：\n   - 手动拆分工具函数/组件，按需加载；\n```jsx\nfunction handleClick() {\n  // 点击时才加载模块\n  import('./utils').then(module => {\n    module.formatDate();\n  });\n}\n```\n\n4. **第三方库分割**：\n   - 使用 webpack `splitChunks` 拆分第三方库（如 `react`/`lodash`）；\n   - 避免将大库打包进初始 chunk。\n\n#### 工具支持\n- Webpack/Rollup/Vite 等构建工具原生支持动态 import；\n- Next.js 内置 `dynamic` 函数实现代码分割。\n\n### 总结\n- 核心：**动态 import() + 懒加载**；\n- 常见方式：`React.lazy`/路由分割/手动分割；\n- 目标：**减小初始包体积，提升首屏加载速度**。"
+    },
+    {
+        "id": "react-interview-008",
+        "topic": "如何通过 React.memo 优化条件渲染?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React.memo 优化条件渲染\n- **`React.memo`**：高阶组件（HOC），用于**记忆函数组件**，避免不必要的重渲染；\n- 原理：浅比较 props，若 props 未变化，则复用上次渲染结果。\n\n#### 场景：条件渲染优化\n当父组件渲染时，若子组件 props 未变化，可通过 `React.memo` 阻止子组件重渲染。\n\n#### 示例\n```jsx\nimport { memo, useState } from 'react';\n\n// 子组件：用 React.memo 包裹\nconst Child = memo(({ count }) => {\n  console.log('Child 渲染');\n  return <div>Count: {count}</div>;\n});\n\nfunction Parent() {\n  const [count, setCount] = useState(0);\n  const [text, setText] = useState('');\n\n  return (\n    <div>\n      <input value={text} onChange={(e) => setText(e.target.value)} />\n      <button onClick={() => setCount(count + 1)}>加 1</button>\n      {/* 仅当 count 变化时，Child 才重渲染 */}\n      <Child count={count} />\n    </div>\n  );\n}\n```\n\n#### 关键细节\n1. **浅比较 props**：`React.memo` 默认浅比较 props，若 props 包含引用类型（对象/数组/函数），需稳定引用；\n   - 函数：用 `useCallback` 包裹；\n   - 对象/数组：用 `useMemo` 包裹。\n2. **自定义比较函数**：可传入第二个参数，自定义 props 比较逻辑；\n```jsx\nconst Child = memo(({ count }) => {}, (prevProps, nextProps) => {\n  // 自定义比较：仅当 count 变化时重渲染\n  return prevProps.count === nextProps.count;\n});\n```\n\n#### 适用场景\n- 子组件频繁重渲染，且 props 变化少；\n- 列表项组件、纯展示组件；\n- 条件渲染中，部分子组件无需重渲染。\n\n### 总结\n- `React.memo`：**记忆函数组件，避免不必要重渲染**；\n- 优化条件渲染：**配合 `useCallback`/`useMemo` 稳定 props 引用**，精准控制子组件渲染时机。"
+    },
+    {
+        "id": "react-interview-009",
+        "topic": "redux-thunk 和 redux 是什么关系?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### redux-thunk 与 redux 的关系\n- **redux**：状态管理库，核心是「单向数据流」，通过 `action` → `reducer` → `store` 管理状态；\n- **redux-thunk**：redux 的**中间件（Middleware）**，用于**处理异步 action**。\n\n#### 核心关系\n1. **redux 本身只处理同步 action**：\n   - 默认 `action` 必须是 plain object（普通对象）；\n   - 无法直接处理异步逻辑（如请求数据）。\n2. **redux-thunk 扩展 redux 能力**：\n   - 允许 `action` 是**函数**（而非普通对象）；\n   - 在函数中执行异步逻辑，完成后再 dispatch 同步 action。\n\n#### 示例：异步 action\n```jsx\n// 安装：npm install redux-thunk\nimport { createStore, applyMiddleware } from 'redux';\nimport thunk from 'redux-thunk';\n\nconst store = createStore(reducer, applyMiddleware(thunk));\n\n// 异步 action（函数）\nconst fetchUser = (userId) => {\n  return async (dispatch) => {\n    dispatch({ type: 'FETCH_USER_REQUEST' });\n    try {\n      const res = await fetch(`/api/user/${userId}`);\n      const data = await res.json();\n      dispatch({ type: 'FETCH_USER_SUCCESS', payload: data });\n    } catch (err) {\n      dispatch({ type: 'FETCH_USER_FAILURE', payload: err });\n    }\n  };\n};\n\n// 调用\nstore.dispatch(fetchUser(1));\n```\n\n#### 中间件作用\n- 中间件是 redux 的「插件系统」，在 `action` 到达 `reducer` 前拦截处理；\n- `redux-thunk` 是最基础的异步中间件，后续有 `redux-saga`/`redux-observable` 等更强大的异步方案。\n\n### 总结\n- redux：**状态管理核心库**；\n- redux-thunk：**redux 中间件，用于处理异步 action**；\n- 关系：**redux-thunk 扩展 redux，使其支持异步逻辑**。"
+    },
+    {
+        "id": "react-interview-010",
+        "topic": "React Router 中, HashRouter 和 BrowserRouter 的区别和原理?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### HashRouter vs BrowserRouter\n\n| 特性 | HashRouter | BrowserRouter |\n| :--- | :--- | :--- |\n| **URL 形式** | `http://xxx.com/#/about` | `http://xxx.com/about` |\n| **底层原理** | 监听 `hashchange` 事件 | 监听 `popstate` 事件，利用 HTML5 History API |\n| **服务器配置** | 无需配置，直接部署 | 需配置服务器，将所有请求指向 `index.html` |\n| **SEO** | 不友好（hash 部分不会发送到服务器） | 友好（正常 URL） |\n| **兼容性** | 兼容 IE9+ | 兼容 IE10+ |\n| **锚点功能** | 天然支持（hash 即锚点） | 需手动实现 |\n\n#### 原理详解\n1. **HashRouter**：\n   - URL 中 `#` 后面的部分为路由，不会发送到服务器；\n   - 路由变化触发 `hashchange` 事件，React Router 监听并渲染对应组件；\n   - 优点：部署简单，无需服务器配置；\n   - 缺点：URL 不美观，SEO 不友好。\n\n2. **BrowserRouter**：\n   - 使用 HTML5 `history.pushState()`/`replaceState()` 改变 URL，不刷新页面；\n   - 监听 `popstate` 事件处理前进/后退；\n   - 优点：URL 美观，SEO 友好；\n   - 缺点：需服务器配置（否则刷新页面会 404）。\n\n#### 服务器配置示例（Nginx）\n```nginx\nlocation / {\n  try_files $uri $uri/ /index.html;\n}\n```\n\n#### 适用场景\n- **HashRouter**：静态站点、不需要 SEO、快速部署；\n- **BrowserRouter**：需要 SEO、正式项目、现代浏览器。\n\n### 总结\n- HashRouter：**基于 URL hash，部署简单，SEO 差**；\n- BrowserRouter：**基于 History API，URL 美观，SEO 好，需服务器配置**。"
+    },
+    {
+        "id": "react-interview-011",
+        "topic": "React中, useRef、ref、forwardsRef的区别是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 三者核心区别\n\n| 概念 | 作用 | 适用场景 |\n| :--- | :--- | :--- |\n| **`useRef`** | Hook，创建一个**可变的 ref 对象**，`current` 属性保存值；不会随组件重渲染而重置 | 保存 DOM 节点、定时器 ID、跨渲染周期的变量 |\n| **`ref`** | 引用的统称，包括字符串 ref、对象 ref、函数 ref；用于获取组件/ DOM 实例 | 类组件/函数组件中获取子组件或 DOM 节点 |\n| **`forwardRef`** | 高阶组件，**将父组件的 ref 转发给子组件** | 函数组件向父组件暴露内部 DOM/子组件实例 |\n\n#### 1. `useRef`\n```jsx\nconst inputRef = useRef(null);\n// 访问 DOM\n<input ref={inputRef} />;\ninputRef.current.focus();\n```\n- `current` 可变，修改不会触发重渲染；\n- 初始值 `useRef(initialValue)`。\n\n#### 2. `ref`\n- **对象 ref**：`const ref = createRef()`（类组件常用）；\n- **函数 ref**：`ref={(el) => this.input = el}`；\n- **字符串 ref**：`ref=\"input\"`（已废弃）。\n\n#### 3. `forwardRef`\n```jsx\nconst Input = forwardRef((props, ref) => (\n  <input ref={ref} {...props} />\n));\n\n// 父组件使用\nconst inputRef = useRef(null);\n<Input ref={inputRef} />;\ninputRef.current.focus();\n```\n- 第二个参数 `ref` 是父组件传递的引用；\n- 让函数组件也能接收 ref，暴露内部节点。\n\n### 总结\n- `useRef`：**创建 ref 对象**，用于存储数据/ DOM；\n- `ref`：**引用的抽象**，多种形式获取实例；\n- `forwardRef`：**转发 ref**，让父组件拿到子组件内部引用。"
+    },
+    {
+        "id": "react-interview-012",
+        "topic": "useEffect的第二个参数, 是如何判断实现依赖是否发生变化的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useEffect 依赖数组变化判断原理\n\n#### 1. 浅比较（`Object.is`）\n- React 会**保存上一次渲染的依赖数组**；\n- 每次渲染前，对「新依赖数组」和「旧依赖数组」进行**逐项浅比较**；\n- 比较规则：使用 `Object.is(a, b)` 判断两个值是否相等；\n  - 基本类型：值相等则认为未变化；\n  - 引用类型：**引用地址相同**才认为未变化（不会深比较）。\n\n#### 2. 比较逻辑\n- 若任意一项 `Object.is(prev, next)` 为 `false`，则判定依赖变化，执行副作用；\n- 若所有项都相等，则跳过副作用，复用上次结果。\n\n#### 3. 特殊情况\n- **空数组 `[]`**：仅挂载/卸载时执行（依赖永远不变）；\n- **不传依赖数组**：每次渲染后都执行（无依赖限制）；\n- **包含函数/对象**：若每次渲染都创建新引用，会被判定为变化，导致重复执行。\n\n#### 示例\n```jsx\nconst [count, setCount] = useState(0);\nconst obj = { count }; // 每次渲染都创建新对象\n\n// 错误：obj 引用变化，每次渲染都执行\nuseEffect(() => {\n  console.log(count);\n}, [obj]);\n\n// 正确：用 useMemo 稳定 obj 引用\nconst stableObj = useMemo(() => ({ count }), [count]);\nuseEffect(() => {\n  console.log(count);\n}, [stableObj]);\n```\n\n### 总结\n- 核心：**`Object.is` 逐项浅比较**；\n- 关键：**引用类型需稳定引用**，避免误判为变化。"
+    },
+    {
+        "id": "react-interview-013",
+        "topic": "useState 是如何实现的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useState 实现原理\n\n#### 1. 核心结构\n- 每个函数组件对应一个 **Fiber 节点**，维护一个 **hooks 链表**；\n- `useState` 会在链表中创建一个 hook 对象，保存：\n  - `memoizedState`：当前状态值；\n  - `queue`：更新队列（存放待执行的更新）。\n\n#### 2. 初始化流程\n- 首次渲染：\n  1. 调用 `useState(initialValue)`，创建 hook 对象；\n  2. `memoizedState` 初始化为 `initialValue`；\n  3. 返回 `[initialValue, dispatch]`（`dispatch` 是更新函数）。\n\n#### 3. 更新流程\n- 调用 `setState(newState)`：\n  1. 将更新（`newState` 或函数 `(prev) => newState`）加入 `queue`；\n  2. 触发组件重新渲染；\n  3. 渲染时，遍历 `queue`，计算新的 `memoizedState`；\n  4. 返回 `[newState, dispatch]`。\n\n#### 4. 批量更新\n- React 18 之前：同步/异步批量更新（受 `ReactDOM.unstable_batchedUpdates` 控制）；\n- React 18 之后：**自动批量更新**，所有更新都会合并，减少重渲染次数。\n\n#### 5. 关键特性\n- **状态不可变性**：必须通过 `setState` 更新，直接修改 `state` 不会触发重渲染；\n- **函数式更新**：`setState(prev => prev + 1)` 可获取最新状态；\n- **惰性初始化**：`useState(() => initialValue)` 仅首次执行。\n\n### 总结\n- `useState` 基于 **Fiber hooks 链表**，维护状态与更新队列；\n- 核心：**状态存储 + 更新队列 + 批量更新**。"
+    },
+    {
+        "id": "react-interview-014",
+        "topic": "forwardRef 作用是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### forwardRef 作用\n- **定义**：`forwardRef` 是一个高阶组件（HOC），**将父组件传递的 ref 转发给子组件内部的 DOM/子组件实例**；\n- 解决问题：函数组件默认无法接收 ref，`forwardRef` 让函数组件也能暴露内部节点给父组件。\n\n#### 核心场景\n1. **父组件获取子组件内部 DOM 节点**：\n   - 如自定义输入框组件，父组件需要调用 `focus()`；\n2. **封装第三方库/UI 组件**：\n   - 暴露内部节点给上层，保持 API 兼容性；\n3. **高阶组件传递 ref**：\n   - 避免 ref 被 HOC 拦截，无法传递到目标组件。\n\n#### 示例代码\n```jsx\nimport { forwardRef, useRef } from 'react';\n\n// 子组件：接收 ref 并转发给内部 input\nconst CustomInput = forwardRef((props, ref) => (\n  <input ref={ref} placeholder=\"自定义输入框\" {...props} />\n));\n\n// 父组件：传递 ref 给子组件\nfunction Parent() {\n  const inputRef = useRef(null);\n\n  const focusInput = () => {\n    inputRef.current.focus(); // 调用子组件内部 input 的 focus\n  };\n\n  return (\n    <div>\n      <CustomInput ref={inputRef} />\n      <button onClick={focusInput}>聚焦输入框</button>\n    </div>\n  );\n}\n```\n\n#### 注意事项\n- 第二个参数 `ref` 只能是 `ref` 对象或 `null`，不能是其他值；\n- 类组件可直接接收 `ref`，无需 `forwardRef`；\n- 配合 `useImperativeHandle` 可自定义暴露给父组件的实例方法。\n\n### 总结\n- `forwardRef`：**转发 ref，让父组件访问子组件内部节点/实例**；\n- 价值：**打破组件封装，实现跨层级 DOM/实例访问**。"
+    },
+    {
+        "id": "react-interview-015",
+        "topic": "怎么获取函数组件的实例?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 获取函数组件实例的方法\n\n#### 1. 函数组件无实例（核心前提）\n- 函数组件本身**没有实例**，不像类组件有 `this` 实例；\n- 只能通过 `ref` + `forwardRef` + `useImperativeHandle` 暴露**自定义实例方法/属性**。\n\n#### 2. 方案：`forwardRef + useImperativeHandle`\n- 步骤：\n  1. 用 `forwardRef` 让函数组件接收 `ref`；\n  2. 用 `useImperativeHandle` 自定义暴露给父组件的实例值。\n\n#### 示例代码\n```jsx\nimport { forwardRef, useImperativeHandle, useRef } from 'react';\n\nconst Child = forwardRef((props, ref) => {\n  const inputRef = useRef(null);\n\n  // 自定义暴露给父组件的方法\n  useImperativeHandle(ref, () => ({\n    focus: () => inputRef.current.focus(),\n    clear: () => inputRef.current.value = '',\n    getValue: () => inputRef.current.value\n  }));\n\n  return <input ref={inputRef} />;\n});\n\n// 父组件使用\nfunction Parent() {\n  const childRef = useRef(null);\n\n  const handleClick = () => {\n    // 调用子组件暴露的方法\n    childRef.current.focus();\n    console.log(childRef.current.getValue());\n  };\n\n  return (\n    <div>\n      <Child ref={childRef} />\n      <button onClick={handleClick}>操作子组件</button>\n    </div>\n  );\n}\n```\n\n#### 3. 注意事项\n- 不要滥用，尽量通过 props/状态管理通信；\n- 仅在必须操作 DOM/子组件内部逻辑时使用；\n- 类组件可直接通过 `ref={componentRef}` 获取实例。\n\n### 总结\n- 函数组件无实例，需通过 `forwardRef + useImperativeHandle` **自定义暴露方法**；\n- 本质：**模拟实例接口**，而非真正获取组件实例。"
+    },
+    {
+        "id": "react-interview-016",
+        "topic": "React Reconciler 为何要采用 fiber 架构?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Fiber 架构的核心动机\n\n#### 1. 解决旧架构（Stack Reconciler）的问题\n- **同步阻塞**：旧版 Diff 是**同步递归**，一旦开始无法中断，会阻塞主线程（JS 引擎/渲染引擎）；\n- **掉帧卡顿**：当组件树庞大时，Diff 耗时超过 16ms（60fps 单帧时间），导致页面卡顿、交互延迟。\n\n#### 2. Fiber 架构的目标\n- **可中断/可恢复**：将 Diff 拆分为小任务（Fiber 单元），可随时暂停/继续，不阻塞主线程；\n- **优先级调度**：根据任务优先级（如用户交互 > 动画 > 数据更新）安排执行顺序，保证高优先级任务先完成；\n- **并发渲染**：支持多任务并发，提升响应速度和用户体验。\n\n#### 3. 核心价值\n- **时间切片（Time Slicing）**：利用浏览器空闲时间执行 Diff，避免阻塞渲染/交互；\n- **优先级调度**：高优先级任务（如点击输入）可插队执行；\n- **更好的用户体验**：减少卡顿，提升交互流畅度。\n\n### 总结\n- 旧架构：**同步递归，阻塞主线程**；\n- Fiber 架构：**可中断、优先级调度、时间切片**，解决大型应用卡顿问题；\n- 本质：**将同步 Diff 改为异步可中断的增量更新**，提升 React 性能与响应性。"
+    },
+    {
+        "id": "react-interview-017",
+        "topic": "fiber 架构的工作原理?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Fiber 架构工作原理\n\n#### 1. 核心概念\n- **Fiber 节点**：最小工作单元，对应一个组件/ DOM 节点；\n- **Fiber 树**：虚拟 DOM 的链表结构，每个 Fiber 节点通过 `child`/`sibling`/`return` 链接；\n- **双缓冲树**：\n  - `current`：当前渲染到屏幕的 Fiber 树；\n  - `workInProgress`：正在构建的新 Fiber 树（更新后替换 `current`）。\n\n#### 2. 工作流程（Render + Commit）\n1. **Render 阶段（可中断）**：\n   - 遍历 `workInProgress` 树，执行 Diff；\n   - 标记需要更新的 Fiber 节点（增/删/改）；\n   - 可随时暂停，让出主线程，处理高优先级任务；\n2. **Commit 阶段（不可中断）**：\n   - 将 Diff 结果一次性更新到真实 DOM；\n   - 执行生命周期/副作用（`componentDidMount`/`useEffect`）；\n   - 替换 `current` 树为 `workInProgress` 树。\n\n#### 3. 优先级调度\n- 每个更新都有优先级（如 `Immediate`/`High`/`Normal`/`Low`）；\n- Scheduler 调度器根据优先级安排任务，高优先级任务可插队；\n- 利用 `requestIdleCallback`/`MessageChannel` 实现时间切片。\n\n#### 4. 链表结构优势\n- 可中断遍历：通过指针（`child`/`sibling`/`return`）记录遍历位置，恢复时继续；\n- 避免递归栈溢出：链表遍历替代递归，支持大型组件树。\n\n### 总结\n- 核心：**Fiber 节点 + 双缓冲树 + 可中断 Render + 优先级调度**；\n- 流程：**Render（增量 Diff）→ Commit（DOM 更新）**；\n- 价值：**异步可中断更新，提升性能与响应性**。"
+    },
+    {
+        "id": "react-interview-018",
+        "topic": "说说Fiber的含义与数据结构",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Fiber 含义与数据结构\n\n#### 1. Fiber 含义\n- **字面含义**：「纤维」，代表**最小执行单元**；\n- **技术含义**：\n  - 一个 Fiber 节点对应一个组件/ DOM 节点；\n  - 是 React 增量更新的**工作单元**；\n  - 保存组件状态、props、DOM 引用、更新优先级等信息。\n\n#### 2. 核心数据结构（关键属性）\n```js\nconst fiber = {\n  // 1. 树结构指针\n  child: null,        // 子节点\n  sibling: null,      // 兄弟节点\n  return: null,       // 父节点\n\n  // 2. 类型信息\n  tag: 0,              // 节点类型（函数组件/类组件/DOM 等）\n  type: null,          // 组件类型（如 div/MyComponent）\n  key: null,           // 列表 key\n\n  // 3. 状态与 props\n  pendingProps: null,  // 待处理的 props\n  memoizedProps: null, // 已处理的 props\n  memoizedState: null, // 组件状态\n  updateQueue: null,   // 更新队列\n\n  // 4. DOM 相关\n  stateNode: null,     // 真实 DOM 节点/组件实例\n\n  // 5. 调度与标记\n  priority: 0,         // 更新优先级\n  effectTag: 0,        // 副作用标记（增/删/改）\n  nextEffect: null,    // 下一个副作用节点\n};\n```\n\n#### 3. 树结构特点\n- **链表结构**：通过 `child`/`sibling`/`return` 遍历，替代递归；\n- **双缓冲**：`current` 与 `workInProgress` 两棵树，避免渲染冲突；\n- **副作用链表**：收集所有需要更新的节点，Commit 阶段批量处理。\n\n### 总结\n- Fiber：**最小工作单元 + 状态/ DOM 容器 + 调度信息载体**；\n- 数据结构：**链表树 + 状态/调度属性 + 副作用标记**；\n- 价值：**支持可中断遍历与增量更新**，是 Fiber 架构的基础。"
+    },
+    {
+        "id": "react-interview-019",
+        "topic": "说说 React render 阶段的执行过程",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Render 阶段执行过程\n\n#### 1. 阶段定义\n- **Render 阶段**：从根节点开始，遍历 Fiber 树，**计算更新**，标记需要修改的节点；\n- 特点：**可中断、可恢复**，不操作 DOM，纯内存计算。\n\n#### 2. 核心流程\n1. **初始化**：\n   - 基于 `current` 树创建 `workInProgress` 树；\n   - 从根 Fiber 节点开始遍历。\n2. **遍历（beginWork）**：\n   - 处理当前 Fiber 节点：\n     - 函数组件：执行组件函数，生成新 JSX；\n     - 类组件：执行 `render` 方法，生成新 JSX；\n     - DOM 节点：对比 props；\n   - 生成子 Fiber 节点，构建 `workInProgress` 子树；\n   - 标记副作用（`effectTag`）：如 `Placement`/`Update`/`Deletion`。\n3. **回溯（completeWork）**：\n   - 自底向上回溯，处理兄弟节点/父节点；\n   - 收集所有副作用节点，形成**副作用链表**。\n4. **结束**：\n   - 生成完整的 `workInProgress` 树；\n   - 收集所有需要更新的副作用，等待 Commit 阶段处理。\n\n#### 3. 可中断特性\n- 每处理完一个 Fiber 节点，检查是否剩余空闲时间；\n- 若时间不足，暂停遍历，让出主线程；\n- 下次空闲时，从上次暂停位置继续遍历。\n\n### 总结\n- Render 阶段：**遍历 Fiber 树 → 计算更新 → 标记副作用**；\n- 核心：**纯内存 Diff，可中断，不操作 DOM**；\n- 输出：`workInProgress` 树 + 副作用链表。"
+    },
+    {
+        "id": "react-interview-020",
+        "topic": "说说 React commit 阶段的执行过程",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Commit 阶段执行过程\n\n#### 1. 阶段定义\n- **Commit 阶段**：将 Render 阶段的**副作用链表**应用到真实 DOM，更新界面；\n- 特点：**不可中断**，必须一次性完成，保证 DOM 一致性。\n\n#### 2. 核心流程（3 个子阶段）\n1. **Before Mutation（DOM 更新前）**：\n   - 执行 `beforeActive` 生命周期（类组件）；\n   - 保存 DOM 节点的当前状态（如滚动位置）。\n2. **Mutation（DOM 更新）**：\n   - 遍历副作用链表，批量操作 DOM：\n     - `Placement`：插入新节点；\n     - `Update`：更新节点属性/内容；\n     - `Deletion`：删除旧节点；\n   - 替换 `current` 树为 `workInProgress` 树。\n3. **Layout（DOM 更新后）**：\n   - 执行 `componentDidMount`/`componentDidUpdate`（类组件）；\n   - 执行 `useLayoutEffect` 回调；\n   - 更新 ref 引用（指向新 DOM/实例）。\n\n#### 3. 关键特性\n- **不可中断**：一旦开始必须完成，避免 DOM 中间状态；\n- **批量更新**：所有 DOM 操作一次性完成，减少重排/重绘；\n- **同步执行**：阻塞主线程，直到所有更新完成。\n\n### 总结\n- Commit 阶段：**将 Render 阶段的更新应用到真实 DOM**；\n- 流程：**Before Mutation → Mutation → Layout**；\n- 核心：**批量 DOM 更新 + 生命周期/副作用执行**。"
+    },
+    {
+        "id": "react-interview-021",
+        "topic": "React中, fiber是如何实现时间切片的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 时间切片（Time Slicing）实现原理\n- **核心目标**：将**长任务拆分为多个小任务**，在浏览器空闲时间执行，避免阻塞主线程，实现流畅交互。\n\n#### 实现技术栈\n1. **Scheduler（调度器）**：\n   - 负责**优先级调度**和**时间切片**；\n   - 基于浏览器 API 实现：`requestIdleCallback`（降级）、`MessageChannel`（现代）；\n   - 为每个更新任务分配优先级（如 `Immediate`/`High`/`Normal`/`Low`/`Offscreen`）。\n\n2. **Fiber 节点与遍历**：\n   - 每个 Fiber 节点是一个**最小工作单元**；\n   - 每次处理一个 Fiber 单元，然后检查是否剩余时间；\n   - 若时间不足，**暂停工作，让出主线程**，等下次空闲继续。\n\n#### 工作流程\n1. **开始切片**：\n   - 触发更新后，Scheduler 安排任务，在空闲时间调用 `performUnitOfWork`。\n2. **处理单元（beginWork）**：\n   - 处理当前 Fiber 节点，生成子 Fiber；\n   - 标记副作用（`effectTag`）。\n3. **中断与恢复**：\n   - 处理完一个节点，检查是否超时；\n   - 若超时，暂停并记录位置，下次从该位置继续（通过指针 `child`/`sibling`/`return`）。\n4. **提交阶段（Commit）**：\n   - 切片完成后，一次性批量更新 DOM（不可中断）。\n\n#### 关键机制\n- **shouldYield**：判断是否需要让出主线程；\n- **双缓冲树**：`workInProgress` 与 `current` 树，保证更新安全；\n- **优先级插队**：高优先级任务（如用户输入）可打断低优先级任务，优先渲染。\n\n### 总结\n- 时间切片基于 **Scheduler + Fiber 单元 + 空闲调度**；\n- 价值：**将同步长 Diff 改为异步增量更新，提升大型应用的响应性**。"
+    },
+    {
+        "id": "react-interview-022",
+        "topic": "说说你对 createPortal 的了解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### createPortal 详解\n- **定义**：React 提供的 API，用于**将子组件渲染到当前组件 DOM 树之外的指定 DOM 节点**；\n- 语法：`createPortal(children, domNode)`。\n\n#### 核心特点\n1. **DOM 结构分离，逻辑仍在组件内**：\n   - 子组件在 DOM 树中位于别处，但在 React 组件树中仍属于父组件；\n   - 事件冒泡遵循 React 组件树，而非 DOM 树。\n2. **不受父组件样式影响**：\n   - 渲染到父组件之外，可避免父组件 `overflow: hidden`/`z-index`/`position` 等样式限制。\n3. **生命周期与状态保持**：\n   - 子组件的挂载、卸载、状态管理与普通组件一致。\n\n#### 示例代码\n```jsx\nimport { createPortal } from 'react-dom';\n\nfunction Modal({ children }) {\n  // 获取 body 下的目标节点\n  const modalRoot = document.getElementById('modal-root');\n  \n  // 若不存在目标节点，创建并添加到 body\n  if (!modalRoot) {\n    const newModalRoot = document.createElement('div');\n    newModalRoot.id = 'modal-root';\n    document.body.appendChild(newModalRoot);\n    return createPortal(children, newModalRoot);\n  }\n\n  return createPortal(children, modalRoot);\n}\n\n// 使用\nfunction App() {\n  return (\n    <div>\n      <h1>主页面</h1>\n      <Modal>\n        <div className=\"modal\">这是一个弹窗</div>\n      </Modal>\n    </div>\n  );\n}\n```\n\n#### 适用场景\n- **Modal/弹窗**：解决父组件溢出隐藏、层级问题；\n- **Tooltip/下拉菜单**：脱离父组件容器，避免被遮挡；\n- **全局通知/加载中**：渲染到 body 下。\n\n#### 注意事项\n- 需手动管理目标 DOM 节点的创建与销毁；\n- 注意事件冒泡，防止事件误触发。\n\n### 总结\n- createPortal：**渲染到父组件 DOM 外，解决样式/层级限制**；\n- 核心：**DOM 分离，React 逻辑保留**，是实现弹窗、全局组件的关键技术。"
+    },
+    {
+        "id": "react-interview-023",
+        "topic": "React 中的 createContext 和 useContext 分别有什么用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### createContext 与 useContext\n\n#### 1. createContext（创建上下文）\n- **作用**：创建一个**上下文对象**，用于在组件树中**全局共享数据**，避免逐层透传（props drilling）；\n- 包含：`Provider`（提供数据）和 `Consumer`（消费数据，类组件/旧版）。\n\n#### 2. useContext（Hook 消费上下文）\n- **作用**：在**函数组件**中**订阅 Context 数据**，获取最新值；\n- 当 Context 的 Provider  value 变化时，使用该 Context 的组件会**重新渲染**。\n\n#### 核心流程\n1. **创建 Context**：\n```jsx\nimport { createContext, useContext, useState } from 'react';\n\n// 创建 Context，默认值可选\nconst ThemeContext = createContext('light');\n```\n\n2. **提供数据（Provider）**：\n```jsx\nfunction App() {\n  const [theme, setTheme] = useState('light');\n\n  return (\n    // Provider 包裹子组件，传递 value\n    <ThemeContext.Provider value={theme}>\n      <Toolbar />\n      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>切换主题</button>\n    </ThemeContext.Provider>\n  );\n}\n```\n\n3. **消费数据（useContext）**：\n```jsx\nfunction Toolbar() {\n  // 订阅 Context，获取最新值\n  const theme = useContext(ThemeContext);\n\n  return <div className={`toolbar ${theme}`}>工具栏</div>;\n}\n```\n\n#### 关键特性\n- **避免 props 透传**：跨多层组件直接获取数据；\n- **响应式更新**：Provider value 变化，触发消费组件重渲染；\n- **配合 useReducer**：实现全局状态管理（替代 Redux 简单场景）。\n\n#### 与类组件 Consumer 的区别\n- useContext：**函数组件专用，语法简洁，订阅精准**；\n- Consumer：类组件/函数组件均可，语法较繁琐。\n\n### 总结\n- createContext：**创建数据共享通道**；\n- useContext：**函数组件订阅 Context，获取数据**；\n- 价值：**简化组件通信，消除 props drilling**。"
+    },
+    {
+        "id": "react-interview-024",
+        "topic": "使用 react-router 跳转时, 如何将参数传递给下一个页面?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Router 传参方式\n\nReact Router 传参主要分为 **URL 参数**、**查询参数**、**状态参数** 三种方式。\n\n#### 1. URL 参数（动态路由，推荐）\n- 适合**必传参数**、SEO 友好；\n- 定义路由时用 `:param`，跳转时拼接路径。\n\n**配置路由**：\n```jsx\nimport { Routes, Route } from 'react-router-dom';\n\n<Routes>\n  <Route path=\"/user/:id\" element={<User />} />\n</Routes>\n```\n\n**跳转与获取**：\n```jsx\n// 跳转\nimport { useNavigate } from 'react-router-dom';\n\nfunction Home() {\n  const navigate = useNavigate();\n  return <button onClick={() => navigate('/user/123')}>去用户页</button>;\n}\n\n// 目标页面获取\nfunction User() {\n  const { id } = useParams();\n  return <div>用户 ID: {id}</div>;\n}\n```\n\n#### 2. 查询参数（Search Params，适合可选参数）\n- 适合**过滤、分页、排序**等场景；\n- 使用 `URLSearchParams` 或 `useSearchParams` Hook。\n\n**跳转与获取**：\n```jsx\n// 跳转\nnavigate('/user?name=张三&age=18');\n\n// 目标页面获取\nfunction User() {\n  const [searchParams] = useSearchParams();\n  const name = searchParams.get('name'); // '张三'\n  const age = searchParams.get('age'); // '18'\n  return <div>姓名: {name}</div>;\n}\n```\n\n#### 3. 状态参数（State，适合敏感/大参数，不暴露在 URL）\n- 仅在当前会话有效，刷新页面会丢失；\n- 使用 `navigate` 的 `state` 参数。\n\n**跳转与获取**：\n```jsx\n// 跳转\nnavigate('/result', { state: { data: '这是状态数据' } });\n\n// 目标页面获取\nfunction Result() {\n  const location = useLocation();\n  return <div>状态数据: {location.state?.data}</div>;\n}\n```\n\n#### 4. 编程式导航与历史记录\n- `useNavigate` 替代 `useHistory`（React Router 6+）；\n- 支持 `replace` 替换当前历史记录：`navigate('/home', { replace: true })`。\n\n### 总结\n- **URL 参数**：`:id`，适合必传、SEO；\n- **查询参数**：`?key=val`，适合可选、过滤；\n- **状态参数**：`state`，适合敏感、临时数据。"
+    },
+    {
+        "id": "react-interview-025",
+        "topic": "react中, 数组用useState做状态管理的时候, 使用push, pop等直接更改数组对象, 会引起页面渲染吗?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 不会引起页面渲染\n\n#### 核心原因\n- React 依赖**状态引用地址的变化**来判断是否需要重渲染；\n- `push`/`pop`/`splice` 等方法是**直接修改原数组**，**引用地址未变**；\n- React 认为状态未变化，因此**不会触发重渲染**。\n\n#### 错误示例\n```jsx\nimport { useState } from 'react';\n\nfunction App() {\n  const [list, setList] = useState([1, 2, 3]);\n\n  const handleAdd = () => {\n    // ❌ 错误：直接修改原数组，引用不变\n    list.push(4); \n    console.log(list); // [1,2,3,4]\n    // ❌ 未调用 setList，不会触发重渲染\n  };\n\n  return (\n    <div>\n      <button onClick={handleAdd}>添加</button>\n      {list.map(item => <div key={item}>{item}</div>)}\n    </div>\n  );\n}\n```\n\n#### 正确做法（必须更新引用）\n需要通过**创建新数组**来更新状态，保持不可变性（Immutable）：\n\n1. **展开运算符（推荐）**：\n```jsx\nconst handleAdd = () => {\n  // ✅ 创建新数组，引用变化\n  setList([...list, 4]);\n};\n```\n\n2. **数组方法返回新数组**：\n```jsx\n// pop\nsetList(list.slice(0, -1));\n\n// splice\nsetList(list.filter((_, i) => i !== 2));\n```\n\n3. **函数式更新**：\n```jsx\nsetList(prevList => [...prevList, 4]);\n```\n\n#### 关键总结\n- **直接修改原数据（push/pop/splice）**：引用不变 → **不触发渲染**；\n- **创建新数据（展开/filter/map）**：引用变化 → **触发渲染**；\n- React 推荐**不可变数据**，避免直接修改状态。"
+    },
+    {
+        "id": "react-interview-026",
+        "topic": "react中, 在什么场景下需要使用useContext?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 使用 useContext 的核心场景\n\nuseContext 主要用于**解决组件间深层传参（props drilling）**的问题，适用于**跨组件层级共享状态**的场景。\n\n#### 1. 跨多层组件的公共状态\n当数据需要在**父组件 → 子组件 → 孙组件** 多层传递，而中间组件不需要使用该数据时：\n- 避免逐层透传 props；\n- 简化代码，降低维护成本。\n\n**示例**：主题切换、语言设置、用户信息等全局通用数据。\n\n#### 2. 小型应用的全局状态管理（替代 Redux）\n对于中小型应用，无需引入复杂的 Redux 时：\n- 使用 `createContext` + `useReducer` + `useContext` 实现全局状态管理；\n- 代码简洁，上手成本低。\n\n```jsx\n// 全局 store\nconst StoreContext = createContext();\n\n// 根组件提供\nfunction App() {\n  const [state, dispatch] = useReducer(reducer, initialState);\n  return (\n    <StoreContext.Provider value={{ state, dispatch }}>\n      <MainPage />\n    </StoreContext.Provider>\n  );\n}\n\n// 任意子组件消费\nfunction Child() {\n  const { state } = useContext(StoreContext);\n  return <div>{state.user.name}</div>;\n}\n```\n\n#### 3. 避免组件 props 透传的性能与可读性问题\n当组件层级较深（如 3 层以上），且中间组件只负责透传 props 时：\n- useContext 可以直接跳过中间组件，获取数据；\n- 提高代码可读性，减少 props 定义。\n\n#### 4. 第三方库/组件库的主题/配置定制\n如 Ant Design、Material UI 等组件库的主题配置：\n- 利用 useContext 全局注入主题样式/配置；\n- 实现组件库的全局定制。\n\n#### 注意事项（避免滥用）\n- useContext 会**订阅整个 Context 变化**，若 Context 包含大量数据，任意数据变化都会导致所有消费组件重渲染；\n- 建议**拆分多个小 Context**，或配合 `memo`/`useMemo` 优化；\n- 适用于**低频变化**的全局状态；\n- 高频变化的状态，建议使用局部状态或专门的状态管理库（Redux/Zustand）。\n\n### 总结\n- 核心场景：**跨多层组件共享数据、替代 Redux 小型全局状态、避免 props drilling**；\n- 价值：**简化代码，提升可维护性**；\n- 注意：**避免用于高频变化的大数据，防止性能问题**。"
+    },
+    {
+        "id": "react-interview-027",
+        "topic": "React 中的 hooks 和 memorizedState 是什么关系?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Hooks 与 `memorizedState` 的关系\n\n#### 1. 核心定义\n- **`memorizedState`**：是每个 Hook 对象上的核心属性，用于**保存 Hook 的状态值**（如 `useState` 的当前状态、`useEffect` 的依赖数组等）；\n- **Hooks**：是 React 提供的函数式 API（如 `useState`/`useEffect`/`useRef`），它们的状态都存储在 `memorizedState` 中。\n\n#### 2. 存储关系\n- 每个函数组件对应一个 Fiber 节点，Fiber 节点维护一个 **Hooks 链表**；\n- 每个 Hook 对象都包含：\n  - `memorizedState`：保存当前状态；\n  - `queue`：保存待处理的更新队列（如 `useState` 的 `setState` 调用）；\n  - `next`：指向下一个 Hook，形成链表。\n\n#### 3. 不同 Hook 的 `memorizedState` 含义\n| Hook | `memorizedState` 存储内容 |\n| :--- | :--- |\n| `useState` | 当前状态值 |\n| `useEffect` | 依赖数组 + 清理函数 |\n| `useRef` | `current` 属性的值 |\n| `useMemo` | 缓存的计算结果 |\n| `useCallback` | 缓存的函数引用 |\n\n#### 4. 状态更新流程\n- 调用 `setState` 时，将更新加入 `queue`；\n- 组件重渲染时，遍历 `queue`，计算新的 `memorizedState`；\n- 新的 `memorizedState` 会替换旧值，作为下一次渲染的初始状态。\n\n#### 5. 关键特性\n- **状态持久化**：`memorizedState` 会在组件多次渲染间保留状态；\n- **不可变性**：通过 `queue` 生成新状态，而非直接修改 `memorizedState`；\n- **链表顺序**：Hooks 的调用顺序决定了链表顺序，必须保证 Hooks 调用顺序稳定。\n\n### 总结\n- `memorizedState` 是 **Hooks 状态的存储容器**；\n- Hooks 是 **操作 `memorizedState` 的 API**；\n- 关系：**Hooks 依赖 `memorizedState` 实现状态持久化与更新**。"
+    },
+    {
+        "id": "react-interview-028",
+        "topic": "React 中, 怎么给 children 添加额外的属性?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 给 children 添加额外属性的方法\n\n#### 1. `React.cloneElement`（推荐，最常用）\n- **作用**：克隆一个 React 元素，并**合并新的 props**；\n- 语法：`React.cloneElement(child, newProps, ...newChildren)`。\n\n**示例代码**：\n```jsx\nimport { cloneElement } from 'react';\n\nfunction Parent({ children }) {\n  // 给每个子元素添加额外属性\n  const enhancedChildren = React.Children.map(children, child => {\n    // 仅处理 React 元素，避免文本/数字等\n    if (React.isValidElement(child)) {\n      return cloneElement(child, {\n        ...child.props, // 保留原有 props\n        extraProp: '额外属性',\n        onClick: () => console.log('点击了子元素')\n      });\n    }\n    return child;\n  });\n\n  return <div>{enhancedChildren}</div>;\n}\n\n// 使用\nfunction App() {\n  return (\n    <Parent>\n      <div>子元素1</div>\n      <button>子元素2</button>\n    </Parent>\n  );\n}\n```\n\n#### 2. `React.Children.map` 遍历子元素\n- 配合 `cloneElement`，遍历 `children` 并逐个增强；\n- 处理多个子元素，保证兼容性。\n\n#### 3. 渲染 Props（Render Props）\n- 将子元素改为函数，通过参数传递额外属性；\n- 更灵活，适合复杂场景。\n\n**示例**：\n```jsx\nfunction Parent({ children }) {\n  return children({ extraProp: '额外属性' });\n}\n\n// 使用\n<Parent>\n  {({ extraProp }) => <div>{extraProp}</div>}\n</Parent>\n```\n\n#### 4. Context 传递（适合深层子元素）\n- 若子元素层级深，可通过 Context 传递额外属性；\n- 避免逐层透传。\n\n#### 注意事项\n- 不要直接修改 `children.props`，React 元素是**不可变的**；\n- 必须使用 `cloneElement` 或 Render Props 等方式；\n- 注意保留原有 props，避免覆盖。\n\n### 总结\n- 推荐：**`React.Children.map + React.cloneElement`**；\n- 核心：**克隆元素，合并新 props**；\n- 场景：**父组件向子组件注入额外逻辑/数据**。"
+    },
+    {
+        "id": "react-interview-029",
+        "topic": "React 中, 构建组件的方式有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 组件构建方式\n\n#### 1. 函数组件（推荐，现代主流）\n- **定义**：使用函数声明，接收 `props`，返回 JSX；\n- 特点：简洁、轻量，配合 Hooks 实现状态与副作用；\n- 示例：\n```jsx\nfunction Button({ onClick, children }) {\n  return <button onClick={onClick}>{children}</button>;\n}\n```\n\n#### 2. 类组件（传统方式，逐步淘汰）\n- **定义**：使用 `class` 继承 `React.Component`，实现 `render` 方法；\n- 特点：完整的生命周期，适合复杂逻辑；\n- 示例：\n```jsx\nclass Button extends React.Component {\n  render() {\n    const { onClick, children } = this.props;\n    return <button onClick={onClick}>{children}</button>;\n  }\n}\n```\n\n#### 3. 高阶组件（HOC，Higher-Order Component）\n- **定义**：接收一个组件，返回一个增强后的新组件；\n- 本质：**组件的装饰器模式**，用于复用逻辑；\n- 示例：\n```jsx\nfunction withLoading(Component) {\n  return function WrappedComponent({ isLoading, ...props }) {\n    if (isLoading) return <div>加载中...</div>;\n    return <Component {...props} />;\n  };\n}\n\n// 使用\nconst ButtonWithLoading = withLoading(Button);\n```\n\n#### 4. Render Props\n- **定义**：组件接收一个函数作为 `children`，该函数返回 JSX；\n- 本质：**逻辑复用，将状态/方法传递给子组件**；\n- 示例：\n```jsx\nclass Mouse extends React.Component {\n  state = { x: 0, y: 0 };\n  render() {\n    return this.props.children(this.state);\n  }\n}\n\n// 使用\n<Mouse>\n  {({ x, y }) => <div>鼠标位置: {x}, {y}</div>}\n</Mouse>\n```\n\n#### 5. Hooks 组件（函数组件 + Hooks）\n- **定义**：函数组件配合 `useState`/`useEffect` 等 Hooks 实现状态与副作用；\n- 特点：**逻辑复用、代码简洁、无类组件冗余**；\n- 示例：\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  return (\n    <div>\n      <p>计数: {count}</p>\n      <button onClick={() => setCount(count + 1)}>加 1</button>\n    </div>\n  );\n}\n```\n\n#### 6. 函数式组件 + Context/Reducer\n- 结合 `createContext`/`useReducer` 实现全局状态管理；\n- 适合中小型应用。\n\n### 总结\n| 方式 | 特点 | 适用场景 |\n| :--- | :--- | :--- |\n| 函数组件 | 简洁、轻量，配合 Hooks | 现代开发，推荐 |\n| 类组件 | 完整生命周期 | 旧项目、复杂逻辑 |\n| HOC | 装饰器模式，复用逻辑 | 横切关注点（日志、权限） |\n| Render Props | 函数传递，灵活复用 | 状态共享、动态渲染 |\n| Hooks 组件 | 函数 + Hooks，现代最佳实践 | 所有场景 |\n\n- 推荐：**函数组件 + Hooks**，是 React 16.8+ 后的主流构建方式。"
+    },
+    {
+        "id": "react-interview-030",
+        "topic": "React 是怎么渲染出页面的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 渲染页面的完整流程\n\n#### 1. 初始化渲染（Mount）\n1. **JSX 编译**：\n   - JSX 被 Babel 编译为 `React.createElement()` 调用；\n   - 生成虚拟 DOM（Virtual DOM）对象。\n2. **创建 Fiber 树**：\n   - 虚拟 DOM 转换为 Fiber 节点，构建 `workInProgress` 树；\n   - 每个 Fiber 节点对应一个组件/DOM 元素。\n3. **Render 阶段（可中断）**：\n   - 遍历 `workInProgress` 树，执行组件函数/`render` 方法；\n   - 生成新的虚拟 DOM，标记副作用（增/删/改）；\n   - 可中断，让出主线程，保证交互流畅。\n4. **Commit 阶段（不可中断）**：\n   - 将副作用批量应用到真实 DOM：\n     - 插入新节点；\n     - 更新节点属性；\n     - 删除旧节点；\n   - 执行生命周期/副作用（`componentDidMount`/`useEffect`）；\n   - 替换 `current` 树为 `workInProgress` 树。\n5. **浏览器绘制**：\n   - DOM 更新后，浏览器重排/重绘，渲染到屏幕。\n\n#### 2. 更新渲染（Update）\n1. **触发更新**：\n   - 调用 `setState`/`useState`/`forceUpdate`；\n   - 或父组件重渲染。\n2. **调度更新**：\n   - Scheduler 分配优先级，安排更新任务。\n3. **Render 阶段**：\n   - 基于 `current` 树构建 `workInProgress` 树；\n   - Diff 算法对比新旧虚拟 DOM，标记差异；\n   - 可中断，时间切片优化。\n4. **Commit 阶段**：\n   - 批量更新 DOM，执行 `componentDidUpdate`/`useEffect`；\n   - 更新 `current` 树。\n5. **浏览器绘制**：\n   - 重排/重绘，更新界面。\n\n#### 3. 核心概念\n- **虚拟 DOM**：JS 对象模拟 DOM，轻量、高效；\n- **Fiber 架构**：可中断遍历，实现时间切片；\n- **Diff 算法**：同层比较，key 优化，最小化 DOM 操作；\n- **双缓冲树**：`current` 与 `workInProgress` 树，保证渲染一致性。\n\n#### 4. 关键特性\n- **声明式编程**：开发者描述目标 UI，React 自动更新；\n- **组件化**：UI 拆分为可复用组件；\n- **高效更新**：Diff + 批量 DOM 操作，减少重排/重绘；\n- **并发渲染**：可中断更新，提升响应性。\n\n### 总结\n- 流程：**JSX → 虚拟 DOM → Fiber 树 → Render → Commit → DOM → 绘制**；\n- 核心：**虚拟 DOM + Fiber 架构 + Diff 算法**，实现高效、可中断的页面渲染；\n- 价值：**声明式开发，高效更新，良好的用户体验**。"
+    },
+    {
+        "id": "react-interview-031",
+        "topic": "React 中, 如何实现类似于 Vue-router 提供的路由守卫?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 路由守卫实现方案\nReact Router 没有内置路由守卫，需通过**高阶组件（HOC）**、**自定义 Hook** 或**路由拦截组件**实现类似功能。\n\n#### 1. 高阶组件（HOC）实现守卫\n```jsx\nimport { Navigate } from 'react-router-dom';\n\n// 鉴权守卫 HOC\nconst withAuth = (Component) => {\n  return (props) => {\n    const isLogin = localStorage.getItem('token');\n    if (!isLogin) {\n      // 未登录，重定向到登录页\n      return <Navigate to=\"/login\" replace />;\n    }\n    // 已登录，渲染目标组件\n    return <Component {...props} />;\n  };\n};\n\n// 使用\nconst ProtectedPage = withAuth(MyPage);\n```\n\n#### 2. 自定义 Hook 实现守卫\n```jsx\nimport { useNavigate } from 'react-router-dom';\n\nfunction useAuth() {\n  const navigate = useNavigate();\n  const isLogin = localStorage.getItem('token');\n\n  const checkAuth = () => {\n    if (!isLogin) {\n      navigate('/login', { replace: true });\n    }\n  };\n\n  return { isLogin, checkAuth };\n}\n\n// 组件内使用\nfunction MyPage() {\n  const { checkAuth } = useAuth();\n  useEffect(() => {\n    checkAuth();\n  }, [checkAuth]);\n  return <div>受保护页面</div>;\n}\n```\n\n#### 3. 路由拦截组件（React Router 6+ 推荐）\n```jsx\nimport { Navigate, Outlet } from 'react-router-dom';\n\n// 布局级守卫组件\nconst ProtectedLayout = () => {\n  const isLogin = localStorage.getItem('token');\n  if (!isLogin) {\n    return <Navigate to=\"/login\" replace />;\n  }\n  // 渲染子路由\n  return <Outlet />;\n};\n\n// 路由配置\nconst router = createBrowserRouter([\n  { path: '/', element: <Home /> },\n  { path: '/login', element: <Login /> },\n  {\n    path: '/dashboard',\n    element: <ProtectedLayout />,\n    children: [\n      { path: '', element: <Dashboard /> },\n      { path: 'profile', element: <Profile /> }\n    ]\n  }\n]);\n```\n\n#### 4. 全局守卫（监听路由变化）\n```jsx\nimport { useLocation, useNavigate } from 'react-router-dom';\n\nfunction GlobalGuard() {\n  const location = useLocation();\n  const navigate = useNavigate();\n\n  useEffect(() => {\n    const isLogin = localStorage.getItem('token');\n    const publicPaths = ['/login', '/register'];\n    if (!isLogin && !publicPaths.includes(location.pathname)) {\n      navigate('/login', { replace: true });\n    }\n  }, [location, navigate]);\n\n  return null;\n}\n\n// 根组件包裹\nfunction App() {\n  return (\n    <RouterProvider router={router}>\n      <GlobalGuard />\n      <Outlet />\n    </RouterProvider>\n  );\n}\n```\n\n### 总结\n- **HOC/布局守卫**：适合页面级鉴权；\n- **自定义 Hook**：适合组件级逻辑复用；\n- **全局守卫**：适合统一拦截所有路由；\n- 核心：**在路由渲染前/变化时，检查权限并决定跳转/渲染**。"
+    },
+    {
+        "id": "react-interview-032",
+        "topic": "为什么 react 组件中, 都需要声明 'import React from 'react';'",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 历史原因与版本变化\n\n#### 1. React 17 之前（必须导入）\n- JSX 会被 Babel 编译为 `React.createElement()` 调用；\n- 若不导入 `React`，运行时会报错 `React is not defined`；\n- 示例：\n```jsx\n// JSX\n<div>Hello</div>\n\n// 编译后\nReact.createElement('div', null, 'Hello');\n```\n\n#### 2. React 17 及之后（可选导入）\n- 引入了 **新的 JSX 转换**（Automatic Runtime）；\n- Babel 会自动导入 `react/jsx-runtime`，无需手动导入 `React`；\n- 仅在使用 Hooks/类组件时才需要导入 `React`；\n- 示例：\n```jsx\n// React 17+ 可省略 import React\nfunction App() {\n  return <div>Hello</div>;\n}\n\n// 使用 Hooks 时仍需导入\nimport { useState } from 'react';\nfunction App() {\n  const [count, setCount] = useState(0);\n  return <div>{count}</div>;\n}\n```\n\n#### 3. 特殊场景仍需导入\n- 类组件：`class App extends React.Component`；\n- 使用 `React` 上的 API：`React.memo`/`React.forwardRef`/`React.useContext` 等；\n- 旧版本工具链：未升级到新 JSX 转换时。\n\n### 总结\n- **React 17 之前**：必须导入，因为 JSX 依赖 `React.createElement`；\n- **React 17 及之后**：可选导入，新 JSX 转换自动处理；\n- 本质：**JSX 编译依赖 React 运行时**，版本不同决定是否需要手动导入。"
+    },
+    {
+        "id": "react-interview-033",
+        "topic": "在 React 项目中, 是否可以不用 react-router, 使用浏览器原生 history 路由来组织页面路由?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 可以，但不推荐\n\n#### 1. 可行性\n- 浏览器原生提供 `history.pushState()`/`replaceState()` 和 `popstate` 事件；\n- 可手动监听 URL 变化，渲染对应组件；\n- 示例：\n```jsx\nimport { useState, useEffect } from 'react';\n\nfunction App() {\n  const [path, setPath] = useState(window.location.pathname);\n\n  useEffect(() => {\n    // 监听 popstate 事件\n    const handlePop = () => setPath(window.location.pathname);\n    window.addEventListener('popstate', handlePop);\n    return () => window.removeEventListener('popstate', handlePop);\n  }, []);\n\n  // 手动跳转\n  const navigate = (to) => {\n    window.history.pushState({}, '', to);\n    setPath(to);\n  };\n\n  // 渲染对应页面\n  switch (path) {\n    case '/':\n      return <Home navigate={navigate} />;\n    case '/about':\n      return <About navigate={navigate} />;\n    default:\n      return <NotFound />;\n  }\n}\n```\n\n#### 2. 问题与挑战\n- **重复造轮子**：需手动实现路由匹配、嵌套路由、路由守卫等；\n- **状态管理复杂**：URL 与组件状态同步需手动维护；\n- **兼容性问题**：不同浏览器对 `history` API 支持差异；\n- **开发效率低**：无内置 API，代码冗余，易出错；\n- **生态缺失**：无法复用 react-router 生态（如 `useParams`/`useNavigate`）。\n\n#### 3. 推荐方案\n- 小型项目：可手动实现简单路由；\n- 中大型项目：**强烈推荐使用 react-router**，成熟稳定，生态完善，开发效率高。\n\n### 总结\n- 可以用原生 history 实现路由，但**开发成本高、维护复杂**；\n- 实际项目中，**react-router 是更优选择**。"
+    },
+    {
+        "id": "react-interview-034",
+        "topic": "react-router 和原生路由有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### react-router 与原生路由的核心区别\n\n| 特性 | react-router | 原生路由（history API） |\n| :--- | :--- | :--- |\n| **API 封装** | 封装了 `history` API，提供易用的 Hooks/组件 | 原生 API，需手动监听/操作 |\n| **路由匹配** | 内置路由匹配（支持动态路由、嵌套路由、通配符） | 需手动解析 URL 匹配 |\n| **嵌套路由** | 天然支持，通过 `Outlet` 实现 | 需手动实现层级渲染 |\n| **路由守卫** | 需自定义实现（HOC/Hook） | 需手动监听 URL 变化 |\n| **状态管理** | 内置路由状态（`useLocation`/`useParams`） | 需手动同步 URL 与组件状态 |\n| **导航方式** | `useNavigate`/`Link` 组件，支持编程式导航 | `pushState`/`replaceState`，需手动更新状态 |\n| **生态** | 丰富生态（路由守卫、懒加载、权限管理） | 无生态，需从零实现 |\n| **开发效率** | 高，开箱即用 | 低，重复造轮子 |\n\n#### 1. react-router 优势\n- **声明式路由**：通过组件配置路由，直观易懂；\n- **嵌套路由**：轻松实现布局嵌套，代码结构清晰；\n- **Hooks API**：`useParams`/`useLocation`/`useNavigate` 等，便捷获取路由信息；\n- **代码分割**：配合 `lazy`/`Suspense` 实现路由级懒加载；\n- **兼容性**：自动处理浏览器差异，支持 HashRouter/BrowserRouter。\n\n#### 2. 原生路由劣势\n- 需手动实现所有功能，代码冗余；\n- 无内置状态管理，易出现 URL 与组件不同步；\n- 无嵌套路由支持，层级复杂时难以维护；\n- 开发效率低，易出错。\n\n### 总结\n- react-router：**封装原生 API，提供完整路由解决方案，开发效率高**；\n- 原生路由：**底层 API，灵活但需手动实现所有功能**；\n- 实际项目：**优先选择 react-router**。"
+    },
+    {
+        "id": "react-interview-035",
+        "topic": "React 为什么要自己实现调度器, 而不是直接使用 requestIdleCallback ?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 不直接使用 `requestIdleCallback` 的原因\n\n#### 1. `requestIdleCallback` 局限性\n- **浏览器兼容性差**：Safari/IE 不支持，移动端兼容性不佳；\n- **触发时机不稳定**：仅在浏览器空闲时执行，可能长时间不触发；\n- **优先级不可控**：无法自定义任务优先级，高优先级任务无法插队；\n- **时间片不可控**：浏览器自动分配剩余时间，无法精确控制；\n- **不可靠**：页面隐藏时可能停止执行。\n\n#### 2. React 自定义调度器（Scheduler）优势\n- **跨平台兼容**：基于 `MessageChannel`/`setTimeout` 实现，兼容性更好；\n- **优先级调度**：支持多优先级（`Immediate`/`High`/`Normal`/`Low`），高优先级任务可插队；\n- **精确时间切片**：手动控制任务执行时间，保证 60fps 流畅度；\n- **可中断/可恢复**：任务可暂停，下次继续执行；\n- **稳定可靠**：不受页面隐藏影响，保证任务执行。\n\n#### 3. 核心设计目标\n- **响应优先**：保证用户交互（点击/输入）优先执行，避免卡顿；\n- **增量更新**：将长任务拆分为小任务，在空闲时间执行；\n- **性能优化**：最小化主线程阻塞，提升页面响应性。\n\n### 总结\n- `requestIdleCallback` 兼容性差、优先级不可控，无法满足 React 需求；\n- React 自定义调度器：**跨平台、优先级可控、精确时间切片**，实现高效并发渲染。"
+    },
+    {
+        "id": "react-interview-036",
+        "topic": "React 中的 forwardsRef, 作用是什么, 有哪些使用场景?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### `forwardRef` 作用与使用场景\n\n#### 1. 核心作用\n- **定义**：`forwardRef` 是高阶组件，**将父组件传递的 ref 转发给子组件内部的 DOM/子组件实例**；\n- 解决问题：函数组件默认无法接收 ref，`forwardRef` 让函数组件也能暴露内部节点给父组件。\n\n#### 2. 语法\n```jsx\nimport { forwardRef } from 'react';\n\nconst Child = forwardRef((props, ref) => {\n  return <input ref={ref} {...props} />;\n});\n\n// 父组件使用\nconst inputRef = useRef(null);\n<Child ref={inputRef} />;\ninputRef.current.focus();\n```\n\n#### 3. 典型使用场景\n- **封装 UI 组件**：自定义输入框/按钮，暴露内部 DOM 给父组件调用方法（如 `focus()`/`blur()`）；\n- **高阶组件传递 ref**：避免 HOC 拦截 ref，无法传递到目标组件；\n- **跨层级获取 DOM**：父组件需要直接操作子组件内部 DOM；\n- **第三方库适配**：将内部节点暴露给上层，保持 API 兼容性。\n\n#### 4. 配合 `useImperativeHandle` 自定义实例\n```jsx\nconst Input = forwardRef((props, ref) => {\n  const inputRef = useRef(null);\n\n  useImperativeHandle(ref, () => ({\n    focus: () => inputRef.current.focus(),\n    clear: () => inputRef.current.value = '',\n    getValue: () => inputRef.current.value\n  }));\n\n  return <input ref={inputRef} {...props} />;\n});\n```\n\n#### 5. 注意事项\n- 类组件可直接接收 ref，无需 `forwardRef`；\n- 不要滥用，尽量通过 props/状态管理通信；\n- 仅在必须操作 DOM/子组件内部逻辑时使用。\n\n### 总结\n- `forwardRef`：**转发 ref，让父组件访问子组件内部节点/实例**；\n- 场景：**封装组件、HOC 传递 ref、跨层级 DOM 操作**。"
+    },
+    {
+        "id": "react-interview-037",
+        "topic": "React 19 有哪些新特性?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 19 核心新特性\n\n#### 1. **React Compiler（自动优化）**\n- 替代 `memo`/`useMemo`/`useCallback`，自动优化组件重渲染；\n- 编译时分析代码，自动记忆化组件和值，减少手动优化；\n- 提升开发效率，避免性能问题。\n\n#### 2. **Server Components（稳定版）**\n- 服务端组件正式稳定，默认支持；\n- 零客户端 JS，提升首屏加载速度；\n- 直接在组件中 `async/await` 获取数据，无需数据获取函数。\n\n#### 3. **Actions（表单/异步操作）**\n- 内置 `useActionState`/`useFormStatus`，简化表单处理；\n- 支持服务端 Actions，直接在组件中定义服务端函数；\n- 自动处理加载/错误状态，提升表单开发效率。\n\n#### 4. **Asset Loading（资源加载）**\n- 内置 `usePreload`/`preloadImage` 等 API，优化资源加载；\n- 自动预加载图片/字体/脚本，提升页面加载速度；\n- 配合 Suspense 实现优雅的加载状态。\n\n#### 5. **Suspense 改进**\n- 支持更多场景：数据获取、代码分割、资源加载；\n- 简化错误边界，内置 `useEffect` 清理逻辑；\n- 更好的并发渲染体验。\n\n#### 6. **Hooks 改进**\n- `useOptimistic`：乐观更新，提升交互体验；\n- `useFormStatus`：获取表单提交状态；\n- `useActionState`：管理 Actions 状态。\n\n#### 7. **文档与工具升级**\n- 全新官网文档，更清晰的指南；\n- React DevTools 升级，支持 React 19 新特性调试。\n\n### 总结\n- React 19 核心方向：**自动优化、服务端优先、简化开发**；\n- 关键价值：**减少手动优化、提升性能、简化表单/数据处理**。"
+    },
+    {
+        "id": "react-interview-038",
+        "topic": "React 中, 如何避免使用 context 时, 引起整个挂载节点树的重新渲染",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 避免 Context 导致全量重渲染的方案\n\n#### 1. **拆分 Context（推荐）**\n- 将大 Context 拆分为多个小 Context，每个 Context 只包含相关数据；\n- 示例：\n```jsx\n// 拆分前\nconst AppContext = createContext({ user: {}, theme: 'light' });\n\n// 拆分后\nconst UserContext = createContext({});\nconst ThemeContext = createContext('light');\n```\n- 只有订阅的 Context 变化时，组件才会重渲染，避免无关数据变化触发重渲染。\n\n#### 2. **使用 `useMemo` 缓存 Provider value**\n- 避免每次渲染都创建新的 `value` 对象，稳定引用；\n```jsx\nfunction AppProvider({ children }) {\n  const [user, setUser] = useState({});\n  const [theme, setTheme] = useState('light');\n\n  // 缓存 value，仅当 user/theme 变化时更新\n  const value = useMemo(() => ({ user, theme }), [user, theme]);\n\n  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;\n}\n```\n\n#### 3. **使用 `React.memo` 包装消费组件**\n- 记忆化消费组件，仅当 props/订阅的 Context 变化时重渲染；\n```jsx\nconst UserComponent = React.memo(() => {\n  const { user } = useContext(UserContext);\n  return <div>{user.name}</div>;\n});\n```\n\n#### 4. **使用 Context 选择器（第三方库）**\n- 使用 `use-context-selector` 或 `zustand`/`jotai` 等状态库，实现**精确订阅**；\n- 仅订阅需要的部分数据，避免整个 Context 变化触发重渲染；\n```jsx\nimport { createContext, useContextSelector } from 'use-context-selector';\n\nconst UserContext = createContext({});\n\nfunction UserComponent() {\n  // 仅订阅 user.name，user 其他属性变化不触发重渲染\n  const userName = useContextSelector(UserContext, (state) => state.user.name);\n  return <div>{userName}</div>;\n}\n```\n\n#### 5. **将状态提升到局部组件**\n- 若状态仅在局部使用，避免提升到全局 Context；\n- 减少 Context 订阅范围。\n\n### 总结\n- 核心思路：**拆分 Context + 稳定 value 引用 + 精确订阅**；\n- 推荐方案：**拆分 Context + useMemo 缓存 value**，简单高效；\n- 复杂场景：使用 `use-context-selector` 或专业状态库。"
+    },
+    {
+        "id": "react-interview-039",
+        "topic": "React 的循环渲染中, 为什么不推荐使用 index 作为元素的 key?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 不推荐用 index 作为 key 的原因\n\n#### 1. **Diff 算法失效，导致性能问题**\n- React Diff 算法依赖 key 识别列表项；\n- 若用 index 作为 key，列表项顺序变化时，key 会重新分配；\n- React 会误认为是不同项，导致**不必要的销毁重建**，性能下降。\n\n#### 2. **状态错乱，导致 UI 异常**\n- 若列表项包含状态（如输入框、复选框），index 变化会导致状态绑定到错误的项；\n- 示例：删除第一项，第二项的 index 变为 0，状态会继承原第一项的状态；\n```jsx\n// 错误示例\n{list.map((item, index) => (\n  <Item key={index} value={item.value} />\n))}\n```\n- 结果：删除第一项后，第二项的输入框内容会变成原第一项的内容。\n\n#### 3. **正确做法**\n- 使用**唯一标识符**作为 key（如 `id`/`uuid`）；\n```jsx\n{list.map((item) => (\n  <Item key={item.id} value={item.value} />\n))}\n```\n- 保证 key 稳定、唯一，与列表项一一对应。\n\n#### 4. 例外场景\n- 列表**永远不会重排序、删除、插入**，仅展示静态数据；\n- 此时用 index 作为 key 无问题，但仍不推荐，避免后续修改导致问题。\n\n### 总结\n- 用 index 作为 key 会导致 **Diff 算法失效、状态错乱、性能下降**；\n- 推荐：**使用唯一、稳定的标识符作为 key**。"
+    },
+    {
+        "id": "react-interview-040",
+        "topic": "说说你对 React 生态的了解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 生态全景\n\n#### 1. **核心库**\n- **React**：核心库，负责组件渲染、状态管理；\n- **React DOM**：渲染到浏览器 DOM；\n- **React Native**：渲染到移动端原生应用；\n- **React Server Components**：服务端组件，零客户端 JS。\n\n#### 2. **路由管理**\n- **React Router**：最流行的路由库，支持 Browser/Hash/Memory 路由；\n- **Next.js App Router**：基于 React Server Components 的路由；\n- **TanStack Router**：类型安全的现代路由库。\n\n#### 3. **状态管理**\n- **Redux/Redux Toolkit**：经典全局状态管理，工具完善；\n- **Context API + useReducer**：轻量级全局状态；\n- **Zustand/Jotai/Recoil**：现代轻量级状态库，简单易用；\n- **MobX**：响应式状态管理，适合复杂场景。\n\n#### 4. **数据获取**\n- **React Query/TanStack Query**：服务端状态管理，缓存/重试/分页；\n- **SWR**：Vercel 出品， stale-while-revalidate 策略；\n- **Apollo Client**：GraphQL 数据获取；\n- **RTK Query**：Redux Toolkit 内置数据获取。\n\n#### 5. **UI 组件库**\n- **Ant Design**：企业级 UI 库，功能全面；\n- **Material UI**：遵循 Material Design 规范；\n- **Chakra UI**：可访问性优先，主题定制；\n- **Mantine**：现代、轻量、可定制。\n\n#### 6. **构建工具**\n- **Vite**：极速开发构建，支持 React 热更新；\n- **Next.js**：全栈框架，SSR/SSG/ISR；\n- **Create React App**：官方脚手架（逐步淘汰）；\n- **Remix**：全栈框架，基于 React Router。\n\n#### 7. **测试工具**\n- **React Testing Library**：组件测试，关注用户行为；\n- **Jest**：测试运行器，断言库；\n- **Cypress**：E2E 测试；\n- **Storybook**：组件文档与交互测试。\n\n#### 8. **其他工具**\n- **Formik/React Hook Form**：表单处理；\n- **React Hook Form**：性能优秀，轻量级；\n- **Framer Motion**：动画库；\n- **React DnD**：拖拽库；\n- **React Query**：数据获取。\n\n### 总结\n- React 生态：**丰富、成熟、多元化**，覆盖前端开发全流程；\n- 核心优势：**组件化、声明式、跨平台**，生态完善，适合各种场景。"
+    },
+    {
+        "id": "react-interview-041",
+        "topic": "说说 React 中, scheduler 的调度机制原理",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Scheduler 调度机制原理\n\n#### 1. 核心目标\n- **优先级调度**：根据任务优先级安排执行顺序，保证高优先级任务（如用户交互）先完成；\n- **时间切片**：将长任务拆分为小任务，在浏览器空闲时间执行，避免阻塞主线程，实现流畅交互。\n\n#### 2. 优先级模型\n- 定义 5 种优先级：\n  - `Immediate`：立即执行（最高优先级）；\n  - `UserBlocking`：用户交互（如点击/输入）；\n  - `Normal`：常规更新；\n  - `Low`：低优先级（如日志）；\n  - `Idle`：空闲时执行（最低优先级）。\n\n#### 3. 任务队列\n- 维护两个队列：\n  - `taskQueue`：待执行的任务队列；\n  - `timerQueue`：延迟执行的任务队列（如 `setTimeout`）。\n- 任务按优先级排序，高优先级任务先执行。\n\n#### 4. 时间切片实现\n- 基于 `MessageChannel` 实现（兼容性优于 `requestIdleCallback`）；\n- 每次执行一个任务单元，检查是否剩余时间；\n- 若时间不足，暂停任务，让出主线程，下次空闲时继续；\n- 保证单帧执行时间不超过 5ms（60fps 要求）。\n\n#### 5. 任务调度流程\n1. **创建任务**：触发更新时，创建任务并加入队列；\n2. **优先级排序**：按优先级排序任务队列；\n3. **执行任务**：在空闲时间执行任务，直到时间耗尽或队列清空；\n4. **中断与恢复**：高优先级任务可打断低优先级任务，优先执行；\n5. **完成任务**：任务执行完成后，从队列中移除。\n\n#### 6. 与 Fiber 架构配合\n- Scheduler 负责调度，Fiber 负责执行任务单元；\n- 实现可中断/可恢复的增量更新，提升 React 性能与响应性。\n\n### 总结\n- Scheduler：**优先级调度 + 时间切片**，实现高效并发渲染；\n- 核心：**任务队列 + 优先级排序 + 空闲调度**，保证用户体验与性能平衡。"
+    },
+    {
+        "id": "react-interview-042",
+        "topic": "React 中的 useRef 是如何实现的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useRef 实现原理\n\n#### 1. 核心定义\n- `useRef` 是一个 Hook，返回一个**可变的 ref 对象**，`current` 属性保存值；\n- 特点：\n  - 不会随组件重渲染而重置；\n  - 修改 `current` 不会触发组件重渲染；\n  - 可保存 DOM 节点、定时器 ID、跨渲染周期的变量。\n\n#### 2. 实现机制\n- 每个函数组件对应一个 Fiber 节点，维护一个 **Hooks 链表**；\n- `useRef` 创建一个 Hook 对象，`memorizedState` 存储 `{ current: initialValue }`；\n- 组件多次渲染时，复用同一个 Hook 对象，因此 `current` 值会保留。\n\n#### 3. 源码简化版\n```js\nfunction useRef(initialValue) {\n  // 从 Fiber 节点的 Hooks 链表中获取当前 Hook\n  const hook = resolveCurrentHook();\n  // 首次渲染：初始化 current\n  if (!hook.memorizedState) {\n    hook.memorizedState = { current: initialValue };\n  }\n  // 返回 ref 对象\n  return hook.memorizedState;\n}\n```\n\n#### 4. 关键特性\n- **跨渲染周期持久化**：`current` 值在组件多次渲染间保留；\n- **无响应性**：修改 `current` 不会触发重渲染，与 `useState` 不同；\n- **DOM 引用**：可通过 `ref={refObj}` 绑定 DOM 节点，`current` 指向真实 DOM。\n\n#### 5. 典型场景\n- 保存 DOM 节点：`const inputRef = useRef(null); <input ref={inputRef} />`；\n- 保存定时器 ID：`const timerRef = useRef(null); timerRef.current = setInterval(...)`；\n- 保存上一次状态：`const prevCountRef = useRef(count);`。\n\n### 总结\n- `useRef`：**基于 Hooks 链表，持久化存储可变对象**；\n- 核心：`memorizedState` 存储 `{ current: value }`，实现跨渲染周期持久化。"
+    },
+    {
+        "id": "react-interview-043",
+        "topic": "下面代码中, 点击 \"+3\" 按钮后, age 的值是什么?",
+        "notes": "（假设代码如下）\n```jsx\nimport { useState } from 'react';\n\nfunction App() {\n  const [age, setAge] = useState(0);\n\n  const handleClick = () => {\n    setAge(age + 1);\n    setAge(age + 1);\n    setAge(age + 1);\n  };\n\n  return (\n    <div>\n      <p>Age: {age}</p>\n      <button onClick={handleClick}>+3</button>\n    </div>\n  );\n}\n```",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 答案：点击后 age 的值是 **1**\n\n#### 原因分析\n1. **批量更新**：\n   - React 18 之前：同步/异步批量更新，`setAge` 会被合并；\n   - React 18 之后：**自动批量更新**，所有 `setAge` 调用会被合并为一次更新。\n\n2. **状态更新是异步的**：\n   - `setAge(age + 1)` 不会立即更新 `age`，而是将更新加入队列；\n   - 三次 `setAge` 都使用**初始值 `age = 0`**，计算结果都是 `0 + 1 = 1`；\n   - 合并后，最终 `age` 被设置为 `1`。\n\n#### 正确实现 +3\n- 使用**函数式更新**，获取最新状态：\n```jsx\nconst handleClick = () => {\n  setAge(prev => prev + 1);\n  setAge(prev => prev + 1);\n  setAge(prev => prev + 1);\n};\n// 结果：age = 3\n```\n- 函数式更新会依次基于上一次结果计算：`0 → 1 → 2 → 3`。\n\n### 总结\n- 原代码：三次 `setAge(age + 1)` 合并后结果为 **1**；\n- 函数式更新：三次 `setAge(prev => prev + 1)` 结果为 **3**；\n- 核心：**状态更新是异步的，批量更新会合并相同状态更新**。"
+    },
+    {
+        "id": "react-interview-044",
+        "topic": "子组件是一个 Portal, 发生点击事件能冒泡到父组件吗?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 答案：**能冒泡到父组件**\n\n#### 核心原理\n- Portal 虽然在 DOM 树中渲染到父组件之外，但在 **React 组件树中仍属于父组件**；\n- React 事件系统是**合成事件（SyntheticEvent）**，事件冒泡遵循 **React 组件树**，而非 DOM 树；\n- 因此，Portal 子组件的点击事件会冒泡到父组件，与普通子组件一致。\n\n#### 示例验证\n```jsx\nimport { createPortal } from 'react-dom';\n\nfunction PortalChild() {\n  return createPortal(\n    <button onClick={() => console.log('子组件点击')}>子按钮</button>,\n    document.body\n  );\n}\n\nfunction Parent() {\n  return (\n    <div onClick={() => console.log('父组件捕获点击')}>\n      <PortalChild />\n    </div>\n  );\n}\n\n// 点击子按钮，输出顺序：\n// 子组件点击 → 父组件捕获点击\n```\n\n#### 注意事项\n- 若在 Portal 子组件中调用 `e.stopPropagation()`，则会阻止事件冒泡到父组件；\n- 原生事件（如 `addEventListener`）会遵循 DOM 树冒泡，不会冒泡到父组件。\n\n### 总结\n- React 合成事件：**Portal 事件会冒泡到父组件**；\n- 原生事件：**Portal 事件不会冒泡到父组件**；\n- 核心：**React 事件冒泡遵循组件树，而非 DOM 树**。"
+    },
+    {
+        "id": "react-interview-045",
+        "topic": "React 为什么要废弃 componentWillMount、componentWillReceiveProps、componentWillUpdate 这三个生命周期钩子? 它们有哪些问题呢? React 又是如何解决的呢?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 废弃原因与解决方案\n\n#### 1. 三个钩子的问题\n- **`componentWillMount`**：\n  - 会在服务端渲染（SSR）和客户端各执行一次，导致状态不一致；\n  - 易被滥用，在其中执行副作用（如数据请求），导致内存泄漏。\n- **`componentWillReceiveProps`**：\n  - 命名误导，并非每次接收 props 都会执行（如父组件重渲染但 props 未变化）；\n  - 易导致状态混乱，与 `setState` 混用会引发无限循环；\n  - 无法区分 props 变化来源，难以维护。\n- **`componentWillUpdate`**：\n  - 与 `render` 顺序不确定，易导致状态不一致；\n  - 无法获取最新 props/state，难以处理副作用。\n\n#### 2. 核心问题\n- **异步渲染风险**：Fiber 架构下，这些钩子可能被多次调用，导致副作用重复执行；\n- **状态不可预测**：钩子执行时机不确定，易引发 bug；\n- **代码冗余**：逻辑分散，难以维护。\n\n#### 3. 解决方案\n- **`componentDidMount`**：替代 `componentWillMount`，在组件挂载后执行副作用（如数据请求）；\n- **`static getDerivedStateFromProps`**：替代 `componentWillReceiveProps`，根据 props 变化派生状态；\n- **`componentDidUpdate`**：替代 `componentWillUpdate`，在组件更新后执行副作用；\n- **`useEffect`**（函数组件）：统一处理所有副作用，替代类组件生命周期。\n\n#### 4. 新生命周期流程\n```\nconstructor → static getDerivedStateFromProps → render → componentDidMount\n\n更新：\nstatic getDerivedStateFromProps → shouldComponentUpdate → render → getSnapshotBeforeUpdate → componentDidUpdate\n```\n\n### 总结\n- 废弃原因：**异步渲染风险、状态不可预测、代码冗余**；\n- 解决方案：**新生命周期钩子 + useEffect**，保证状态一致性与可维护性；\n- 核心：**避免在 render 前执行副作用，保证渲染结果可预测**。"
+    },
+    {
+        "id": "react-interview-046",
+        "topic": "为什么 react 需要 fiber 架构, 而 Vue 却不需要?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 需要 Fiber 而 Vue 不需要的原因\n\n#### 1. 核心差异：更新模型不同\n- **React**：**不可变数据 + 虚拟 DOM Diff**：\n  - 状态更新后，生成新虚拟 DOM，与旧虚拟 DOM 全量 Diff；\n  - 大型组件树 Diff 耗时久，易阻塞主线程，导致卡顿；\n  - 因此需要 Fiber 架构实现**可中断 Diff**，避免阻塞。\n- **Vue**：**响应式数据 + 细粒度更新**：\n  - 状态更新后，精确通知依赖该状态的组件更新；\n  - 无需全量 Diff，更新粒度小，耗时短；\n  - 天然避免主线程阻塞，无需 Fiber 架构。\n\n#### 2. 渲染策略不同\n- **React**：\n  - 函数式编程，组件是纯函数，无内部状态跟踪；\n  - 必须通过 Diff 算法计算差异，更新量大时易卡顿；\n  - Fiber 架构将 Diff 拆分为小任务，实现时间切片。\n- **Vue**：\n  - 响应式系统，精确跟踪组件依赖；\n  - 更新时仅重渲染受影响的组件，更新量小；\n  - 配合微任务队列（`nextTick`）批量更新，保证性能。\n\n#### 3. 设计目标不同\n- **React**：追求**函数式、声明式、跨平台**，需要可中断渲染保证响应性；\n- **Vue**：追求**易用性、性能、渐进式**，响应式系统已解决性能问题。\n\n### 总结\n- React 需要 Fiber：**不可变 Diff + 全量更新**，易阻塞主线程，需可中断渲染；\n- Vue 不需要 Fiber：**响应式 + 细粒度更新**，天然高效，无需可中断渲染；\n- 本质：**更新模型差异**导致的架构选择不同。"
+    },
+    {
+        "id": "react-interview-047",
+        "topic": "React 中为什么不直接使用 requestIdleCallback?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 不直接使用 `requestIdleCallback` 的原因\n\n#### 1. 浏览器兼容性差\n- Safari/IE 不支持，移动端兼容性不佳；\n- 无法跨平台（如 React Native 环境）。\n\n#### 2. 触发时机不稳定\n- 仅在浏览器空闲时执行，可能长时间不触发；\n- 页面隐藏时可能停止执行，任务无法完成。\n\n#### 3. 优先级不可控\n- 无法自定义任务优先级，高优先级任务（如用户交互）无法插队；\n- 无法保证任务执行顺序，影响用户体验。\n\n#### 4. 时间片不可控\n- 浏览器自动分配剩余时间，无法精确控制任务执行时间；\n- 可能导致单帧执行时间过长，引发卡顿。\n\n#### 5. React 自定义调度器优势\n- **跨平台兼容**：基于 `MessageChannel`/`setTimeout` 实现，兼容性更好；\n- **优先级调度**：支持多优先级，高优先级任务可插队；\n- **精确时间切片**：手动控制任务执行时间，保证 60fps 流畅度；\n- **可中断/可恢复**：任务可暂停，下次继续执行；\n- **稳定可靠**：不受页面隐藏影响，保证任务执行。\n\n### 总结\n- `requestIdleCallback` 兼容性差、优先级不可控，无法满足 React 需求；\n- React 自定义调度器：**跨平台、优先级可控、精确时间切片**，实现高效并发渲染。"
+    },
+    {
+        "id": "react-interview-048",
+        "topic": "react 和 react-dom 是什么关系?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 与 React DOM 的关系\n\n#### 1. 核心定位\n- **`react`**：核心库，负责**组件定义、状态管理、虚拟 DOM 构建**；\n  - 与平台无关，可运行在浏览器、React Native、Node.js 等环境；\n  - 提供 `useState`/`useEffect`/`Component` 等 API，定义组件逻辑。\n- **`react-dom`**：平台渲染库，负责**将虚拟 DOM 渲染到浏览器 DOM**；\n  - 仅适用于浏览器环境；\n  - 提供 `render`/`createPortal`/`findDOMNode` 等 API，处理 DOM 操作。\n\n#### 2. 分工协作\n- `react` 生成虚拟 DOM，`react-dom` 将虚拟 DOM 转换为真实 DOM；\n- 示例：\n```jsx\nimport React from 'react';\nimport ReactDOM from 'react-dom/client';\n\n// react：定义组件（虚拟 DOM）\nfunction App() {\n  return <div>Hello React</div>;\n}\n\n// react-dom：渲染到浏览器 DOM\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(<App />);\n```\n\n#### 3. 跨平台体现\n- `react` 是核心，`react-dom` 是浏览器端实现；\n- React Native 对应 `react-native` 库，将虚拟 DOM 渲染为原生组件；\n- 实现「一次编写，多端运行」。\n\n#### 4. 版本一致性\n- `react` 与 `react-dom` 版本必须一致，避免 API 不兼容；\n- 如 React 18 要求 `react-dom` 也为 18 版本。\n\n### 总结\n- `react`：**核心逻辑，平台无关**；\n- `react-dom`：**浏览器渲染，平台特定**；\n- 关系：**分工协作，共同实现 React 组件到浏览器 DOM 的渲染**。"
+    },
+    {
+        "id": "react-interview-049",
+        "topic": "React Portals 有什么用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Portals 核心作用\n\n#### 1. 定义\n- `createPortal(children, domNode)`：将子组件渲染到**父组件 DOM 树之外的指定 DOM 节点**；\n- 子组件在 React 组件树中仍属于父组件，事件冒泡遵循组件树。\n\n#### 2. 核心用途\n- **解决样式/层级限制**：\n  - 避免父组件 `overflow: hidden`/`z-index`/`position` 等样式限制；\n  - 如 Modal/弹窗/Tooltip 需渲染到 body 下，避免被父组件遮挡。\n- **全局组件渲染**：\n  - 渲染全局通知/加载中/弹窗等组件到 body 下；\n  - 不影响父组件布局。\n- **跨 DOM 节点渲染**：\n  - 渲染到其他 DOM 节点（如 iframe、第三方容器）。\n\n#### 3. 示例代码\n```jsx\nimport { createPortal } from 'react-dom';\n\nfunction Modal({ children }) {\n  const modalRoot = document.getElementById('modal-root') || document.body;\n  return createPortal(children, modalRoot);\n}\n\n// 使用\nfunction App() {\n  return (\n    <div>\n      <h1>主页面</h1>\n      <Modal>\n        <div className=\"modal\">这是一个弹窗</div>\n      </Modal>\n    </div>\n  );\n}\n```\n\n#### 4. 关键特性\n- **DOM 分离，逻辑保留**：子组件在 DOM 树中位置改变，React 组件树结构不变；\n- **事件冒泡正常**：事件遵循 React 组件树，冒泡到父组件；\n- **生命周期一致**：子组件挂载/卸载/状态管理与普通组件一致。\n\n### 总结\n- Portals：**渲染到父组件 DOM 外，解决样式/层级限制**；\n- 场景：**Modal/弹窗/Tooltip/全局通知**等需要脱离父容器的组件。"
+    },
+    {
+        "id": "react-interview-050",
+        "topic": "useMemo 和 useCallback 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useMemo 与 useCallback 的区别\n\n| 特性 | `useMemo` | `useCallback` |\n| :--- | :--- | :--- |\n| **作用** | 缓存**计算结果**，避免重复计算 | 缓存**函数引用**，避免函数重建 |\n| **返回值** | 计算结果的值 | 函数本身（引用不变） |\n| **参数** | `(计算函数, 依赖数组)` | `(函数本身, 依赖数组)` |\n| **使用场景** | 昂贵的计算、复杂数据处理 | 传递给子组件的回调函数 |\n\n#### 1. `useMemo`\n- 缓存计算结果，仅当依赖变化时重新计算；\n- 示例：\n```jsx\n// 缓存复杂计算结果\nconst expensiveValue = useMemo(() => {\n  return computeExpensiveValue(a, b);\n}, [a, b]);\n```\n- 避免每次渲染都执行昂贵计算，提升性能。\n\n#### 2. `useCallback`\n- 缓存函数引用，仅当依赖变化时重建函数；\n- 示例：\n```jsx\n// 缓存回调函数，避免子组件重渲染\nconst handleClick = useCallback(() => {\n  onClick(id);\n}, [id, onClick]);\n```\n- 配合 `React.memo`，避免子组件因函数引用变化而重渲染。\n\n#### 3. 本质联系\n- `useCallback(fn, deps)` 等价于 `useMemo(() => fn, deps)`；\n- 都是基于 `memorizedState` 实现的记忆化 Hook。\n\n#### 4. 选择建议\n- **计算结果缓存**：用 `useMemo`；\n- **函数引用缓存**：用 `useCallback`；\n- 避免滥用：仅在性能瓶颈时使用，否则增加代码复杂度。\n\n### 总结\n- `useMemo`：**记忆化计算结果**，优化性能；\n- `useCallback`：**记忆化函数引用**，避免子组件重渲染；\n- 核心：**依赖数组控制缓存失效时机**。"
+    },
+    {
+        "id": "react-interview-051",
+        "topic": "如果在 useEffect 的第一个参数中 return 了一个函数, 那么第二个参数分别传空数组和传依赖数组, 该函数分别是在什么时候执行?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useEffect 清理函数执行时机\n\n#### 1. 第二个参数传空数组 `[]`\n- **清理函数执行时机**：仅在**组件卸载时**执行一次；\n- 原因：依赖数组为空，副作用仅在组件挂载时执行一次，清理函数仅在卸载时执行；\n- 场景：一次性订阅/定时器清理，仅需在卸载时清理。\n\n#### 2. 第二个参数传依赖数组 `[deps]`\n- **清理函数执行时机**：\n  1. 每次**重新渲染前（依赖变化时）**执行；\n  2. 组件**卸载时**执行；\n- 原因：依赖变化时，先执行清理函数，再执行新的副作用；\n- 场景：依赖变化时需要重新订阅/请求，需先清理旧的副作用。\n\n#### 示例对比\n```jsx\n// 空数组：仅卸载时清理\nuseEffect(() => {\n  const timer = setInterval(() => {}, 1000);\n  return () => clearInterval(timer); // 仅卸载时执行\n}, []);\n\n// 依赖数组：依赖变化时 + 卸载时清理\nuseEffect(() => {\n  const timer = setInterval(() => {}, delay);\n  return () => clearInterval(timer); // delay 变化时先清理，再创建新定时器\n}, [delay]);\n```\n\n### 总结\n- 空数组 `[]`：**组件卸载时**执行清理函数；\n- 依赖数组 `[deps]`：**依赖变化时（重新渲染前） + 组件卸载时**执行清理函数。"
+    },
+    {
+        "id": "react-interview-052",
+        "topic": "useEffect 的第二个参数, 传空数组和传依赖数组有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useEffect 第二个参数区别\n\n| 参数 | 执行时机 | 适用场景 |\n| :--- | :--- | :--- |\n| **空数组 `[]`** | 仅在**组件挂载时**执行一次，**卸载时**执行清理函数 | 一次性副作用（如初始数据请求、订阅、定时器） |\n| **依赖数组 `[deps]`** | 组件挂载时 + **依赖变化时**执行，依赖变化前 + 卸载时执行清理函数 | 依赖 props/state 变化的副作用（如根据 id 请求数据） |\n| **不传参数** | 每次渲染后都执行 | 极少使用，易导致性能问题 |\n\n#### 1. 空数组 `[]`\n- 等价于类组件的 `componentDidMount` + `componentWillUnmount`；\n- 示例：\n```jsx\nuseEffect(() => {\n  // 挂载时执行\n  fetchData();\n  return () => {\n    // 卸载时执行\n    cancelRequest();\n  };\n}, []);\n```\n\n#### 2. 依赖数组 `[deps]`\n- 等价于 `componentDidMount` + `componentDidUpdate(依赖变化时)` + `componentWillUnmount`；\n- 示例：\n```jsx\nuseEffect(() => {\n  fetchUser(userId); // 挂载时 + userId 变化时执行\n  return () => cancelRequest(); // userId 变化前 + 卸载时执行\n}, [userId]);\n```\n\n### 总结\n- 空数组：**仅执行一次**，适合初始化/一次性清理；\n- 依赖数组：**依赖变化时执行**，适合响应 props/state 变化的副作用；\n- 核心：**依赖数组控制副作用执行时机**。"
+    },
+    {
+        "id": "react-interview-053",
+        "topic": "怎么判断一个对象是否是 React 元素?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 判断 React 元素的方法\n\n#### 1. 使用 `React.isValidElement()`（推荐）\n- React 内置 API，专门用于判断对象是否是 React 元素；\n- 语法：`React.isValidElement(obj)`；\n- 返回 `true` 表示是 React 元素，否则不是；\n- 示例：\n```jsx\nimport React from 'react';\n\nconst div = <div>Hello</div>; // React 元素\nconst obj = { type: 'div', props: {} }; // 普通对象\n\nconsole.log(React.isValidElement(div)); // true\nconsole.log(React.isValidElement(obj)); // false\n```\n\n#### 2. 手动判断（了解原理）\n- React 元素是一个对象，包含 `$$typeof` 属性，值为 `Symbol.for('react.element')`；\n- 示例：\n```jsx\nfunction isReactElement(obj) {\n  return typeof obj === 'object' && obj !== null && obj.$$typeof === Symbol.for('react.element');\n}\n```\n- 注意：`$$typeof` 是内部属性，不推荐直接使用，优先使用 `React.isValidElement()`。\n\n### 总结\n- 推荐：**`React.isValidElement(obj)`**，简洁可靠；\n- 原理：React 元素包含特殊 `$$typeof` 标识，用于区分普通对象。"
+    },
+    {
+        "id": "react-interview-054",
+        "topic": "React 和 Vue 在技术层面有哪些区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 与 Vue 技术层面核心区别\n\n| 维度 | React | Vue |\n| :--- | :--- | :--- |\n| **编程范式** | 函数式编程，JSX 一切皆 JS | 选项式 API / 组合式 API，模板语法（HTML 扩展） |\n| **数据响应式** | 不可变数据 + 状态更新触发重渲染 | 响应式系统（Proxy/Object.defineProperty），自动追踪依赖 |\n| **更新模型** | 虚拟 DOM 全量 Diff，可中断 Fiber 架构 | 细粒度更新，精确通知依赖组件，无需全量 Diff |\n| **组件通信** | Props + Context + 状态管理库 | Props + 事件 emit + Provide/Inject + Vuex/Pinia |\n| **模板语法** | JSX（JavaScript 扩展），逻辑与 UI 混合 | 模板语法（HTML 扩展），逻辑与 UI 分离 |\n| **状态管理** | 原生无内置，依赖第三方库（Redux/Zustand） | 内置 Vuex/Pinia，轻量级场景可用 `ref`/`reactive` |\n| **渲染性能** | 需手动优化（memo/useMemo/useCallback） | 自动优化，响应式系统天然高效 |\n| **学习曲线** | 陡峭，需理解函数式编程、Hooks | 平缓，模板语法易上手，组合式 API 灵活 |\n\n#### 1. 核心差异\n- **React**：**函数式 + 不可变 + 虚拟 DOM Diff**，追求声明式、跨平台；\n- **Vue**：**响应式 + 模板 + 细粒度更新**，追求易用性、性能、渐进式。\n\n#### 2. 适用场景\n- React：大型应用、跨平台开发、团队协作，需要高度可维护性；\n- Vue：中小型应用、快速开发、对性能敏感的场景。\n\n### 总结\n- React：**函数式、不可变、跨平台**，灵活性高，学习成本高；\n- Vue：**响应式、模板、易用**，开发效率高，性能优秀。"
+    },
+    {
+        "id": "react-interview-055",
+        "topic": "React 中, 怎么实现父组件调用子组件中的方法?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 父组件调用子组件方法的实现\n\n#### 1. 类组件：直接通过 ref 获取实例\n- 类组件有实例，父组件通过 `ref` 获取子组件实例，直接调用方法；\n- 示例：\n```jsx\nclass Child extends React.Component {\n  childMethod() {\n    console.log('子组件方法被调用');\n  }\n  render() {\n    return <div>子组件</div>;\n  }\n}\n\nclass Parent extends React.Component {\n  childRef = React.createRef();\n  handleClick() {\n    this.childRef.current.childMethod(); // 调用子组件方法\n  }\n  render() {\n    return (\n      <div>\n        <Child ref={this.childRef} />\n        <button onClick={() => this.handleClick()}>调用子组件方法</button>\n      </div>\n    );\n  }\n}\n```\n\n#### 2. 函数组件：forwardRef + useImperativeHandle\n- 函数组件无实例，需通过 `forwardRef` + `useImperativeHandle` 暴露方法；\n- 示例：\n```jsx\nimport { forwardRef, useImperativeHandle, useRef } from 'react';\n\nconst Child = forwardRef((props, ref) => {\n  const childMethod = () => {\n    console.log('子组件方法被调用');\n  };\n  // 暴露方法给父组件\n  useImperativeHandle(ref, () => ({\n    childMethod\n  }));\n  return <div>子组件</div>;\n});\n\nfunction Parent() {\n  const childRef = useRef(null);\n  return (\n    <div>\n      <Child ref={childRef} />\n      <button onClick={() => childRef.current.childMethod()}>调用子组件方法</button>\n    </div>\n  );\n}\n```\n\n#### 3. 注意事项\n- 尽量避免直接调用子组件方法，优先通过 props/状态管理通信；\n- 仅在必须操作子组件内部逻辑时使用，避免破坏组件封装。\n\n### 总结\n- 类组件：**ref 获取实例，直接调用方法**；\n- 函数组件：**forwardRef + useImperativeHandle 暴露方法**；\n- 核心：**父组件通过 ref 获取子组件引用，调用暴露的方法**。"
+    },
+    {
+        "id": "react-interview-056",
+        "topic": "taro 2.x 和 taro 3 最大区别是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Taro 2.x 与 Taro 3 最大区别\n\n#### 1. 核心架构差异\n- **Taro 2.x**：**编译时架构**，将 React/Vue 代码编译为小程序原生代码；\n  - 类似小程序框架，将 JSX 转换为小程序 WXML/WXSS；\n  - 受小程序语法限制，无法完全复用 React/Vue 生态。\n- **Taro 3**：**运行时架构**，基于虚拟 DOM 实现跨平台渲染；\n  - 模拟浏览器 DOM 环境，让 React/Vue 直接运行在小程序/多端；\n  - 完全复用 React/Vue 生态，支持 Hooks、React Router 等。\n\n#### 2. 关键差异对比\n| 特性 | Taro 2.x | Taro 3 |\n| :--- | :--- | :--- |\n| **架构** | 编译时转换 | 运行时虚拟 DOM |\n| **生态兼容性** | 受限，无法完全复用 React/Vue 生态 | 完全兼容 React/Vue 生态，支持第三方库 |\n| **语法支持** | 部分 React/Vue 语法不支持 | 完整支持 React/Vue 语法（Hooks、Router 等） |\n| **性能** | 编译后接近原生，性能较好 | 虚拟 DOM 有一定开销，性能略逊于 2.x |\n| **跨端能力** | 支持小程序/H5/React Native | 支持更多端（如快应用、HarmonyOS） |\n\n#### 3. 优势与劣势\n- Taro 2.x：**性能好**，但生态受限，语法限制多；\n- Taro 3：**生态兼容好**，开发体验接近 React/Vue，性能略有损耗。\n\n### 总结\n- 最大区别：**架构从编译时变为运行时虚拟 DOM**；\n- Taro 3 实现了「一次编写，多端运行」，完全复用 React/Vue 生态，是 Taro 的重大升级。"
+    },
+    {
+        "id": "react-interview-057",
+        "topic": "taro 的实现原理是怎么样的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Taro 实现原理（以 Taro 3 为例）\n\n#### 1. 核心目标\n- 让 React/Vue 代码直接运行在小程序/多端，实现「一次编写，多端运行」。\n\n#### 2. 运行时架构（Taro 3）\n- **虚拟 DOM 层**：\n  - 模拟浏览器 DOM 环境（如 `document`/`Element`/`Event`）；\n  - React/Vue 生成虚拟 DOM，Taro 将虚拟 DOM 转换为各端原生节点。\n- **平台适配层**：\n  - 针对不同端（小程序/H5/React Native/快应用）实现原生渲染接口；\n  - 将虚拟 DOM 操作映射为各端原生 API 调用。\n- **事件系统**：\n  - 模拟浏览器事件冒泡/捕获机制，兼容 React/Vue 事件系统；\n  - 将各端原生事件转换为标准 DOM 事件。\n\n#### 3. 编译时辅助\n- 代码编译：将 JSX/TS 编译为标准 JS，处理平台差异；\n- 资源处理：将图片/样式等资源转换为各端支持格式；\n- 分包优化：自动处理小程序分包加载。\n\n#### 4. 渲染流程\n1. React/Vue 生成虚拟 DOM；\n2. Taro 虚拟 DOM 层接收虚拟 DOM，构建节点树；\n3. 平台适配层将节点树转换为各端原生节点；\n4. 原生端渲染节点，处理事件交互。\n\n### 总结\n- Taro 3 核心：**虚拟 DOM + 平台适配层**，模拟浏览器环境，让 React/Vue 运行在多端；\n- 本质：**跨平台渲染桥接**，连接 React/Vue 虚拟 DOM 与各端原生渲染。"
+    },
+    {
+        "id": "react-interview-058",
+        "topic": "单页应用如何提高加载速度?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 单页应用（SPA）加载速度优化方案\n\n#### 1. **代码分割（Code Splitting）**\n- 路由级分割：按页面拆分代码，按需加载；\n- 组件级分割：懒加载非首屏组件；\n- 工具：React.lazy + Suspense、Vite/Webpack 动态 import。\n\n#### 2. **资源优化**\n- **图片优化**：压缩图片、WebP 格式、懒加载、响应式图片；\n- **字体优化**：子集化字体、字体预加载、WOFF2 格式；\n- **脚本优化**：压缩混淆、Tree Shaking、移除冗余代码。\n\n#### 3. **缓存策略**\n- **浏览器缓存**：设置合理的 Cache-Control/ETag，缓存静态资源；\n- **Service Worker**：离线缓存，实现 PWA；\n- **CDN 加速**：静态资源托管到 CDN，就近访问。\n\n#### 4. **渲染优化**\n- **SSR/SSG**：服务端渲染/静态站点生成，首屏直出 HTML；\n- **骨架屏**：首屏加载时显示骨架屏，提升感知速度；\n- **预加载/预获取**：`link preload`/`prefetch`，提前加载关键资源。\n\n#### 5. **打包优化**\n- 拆分第三方库：将 `react`/`vue` 等大库单独打包，长期缓存；\n- 分析 bundle：使用 Webpack Bundle Analyzer 分析体积，优化大依赖；\n- 开启 Gzip/Brotli 压缩：减小传输体积。\n\n### 总结\n- 核心方向：**减小初始包体积 + 优化资源加载 + 缓存 + 渲染优化**；\n- 关键手段：**代码分割、资源压缩、缓存、SSR/SSG**。"
+    },
+    {
+        "id": "react-interview-059",
+        "topic": "实现 useUpdate 方法, 调用时强制组件重新渲染",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 实现 `useUpdate` Hook\n\n#### 1. 思路\n- 利用 `useState` 生成一个状态，调用时更新状态，触发组件重渲染；\n- 状态值无需实际意义，仅用于触发更新。\n\n#### 2. 实现代码\n```jsx\nimport { useState, useCallback } from 'react';\n\nfunction useUpdate() {\n  // 生成状态，用时间戳或随机数作为更新标识\n  const [, setState] = useState({});\n\n  // 返回更新函数，使用 useCallback 稳定引用\n  const update = useCallback(() => {\n    setState({}); // 每次传入新对象，触发重渲染\n  }, []);\n\n  return update;\n}\n\n// 使用示例\nfunction App() {\n  const update = useUpdate();\n  return (\n    <div>\n      <p>时间: {new Date().toLocaleTimeString()}</p>\n      <button onClick={update}>强制刷新</button>\n    </div>\n  );\n}\n```\n\n#### 3. 优化版本（避免重复创建对象）\n```jsx\nfunction useUpdate() {\n  const [count, setCount] = useState(0);\n  const update = useCallback(() => {\n    setCount(prev => prev + 1); // 递增计数，更高效\n  }, []);\n  return update;\n}\n```\n\n### 总结\n- `useUpdate`：**利用 useState 生成状态，更新状态触发重渲染**；\n- 核心：**状态变化 → 组件重渲染**，实现强制刷新。"
+    },
+    {
+        "id": "react-interview-060",
+        "topic": "怎么在代码中判断一个 React 组件是 class component 还是 function component?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 判断组件类型的方法\n\n#### 1. 基于 `prototype.isReactComponent`（推荐）\n- 类组件继承 `React.Component`，`Component` 原型上有 `isReactComponent` 标识；\n- 函数组件无此标识；\n- 示例：\n```jsx\nimport React from 'react';\n\nclass ClassComponent extends React.Component {}\nfunction FunctionComponent() {}\n\nconsole.log(ClassComponent.prototype.isReactComponent); // true\nconsole.log(FunctionComponent.prototype?.isReactComponent); // undefined\n```\n\n#### 2. 基于 `typeof` 与 `prototype`\n- 类组件是 `class`，`typeof` 为 `function`，且 `prototype` 包含 `render` 方法；\n- 函数组件是 `function`，`prototype` 为空；\n- 示例：\n```jsx\nfunction isClassComponent(component) {\n  return typeof component === 'function' && \n    component.prototype && \n    component.prototype.isReactComponent;\n}\n\nfunction isFunctionComponent(component) {\n  return typeof component === 'function' && \n    !component.prototype?.isReactComponent;\n}\n```\n\n#### 3. 注意事项\n- 箭头函数组件无 `prototype`，需兼容处理；\n- 优先使用 `isReactComponent` 标识，更可靠。\n\n### 总结\n- 类组件：`Component.prototype.isReactComponent` 为 `true`；\n- 函数组件：无 `isReactComponent` 标识；\n- 推荐：**检查 `component.prototype.isReactComponent`**，简洁可靠。"
+    },
+    {
+        "id": "react-interview-061",
+        "topic": "说说对 React 中 Element、Component、Node、Instance 四个概念的理解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 四个核心概念解析\n\n#### 1. **Element（React 元素）**\n- **定义**：描述 UI 结构的**不可变普通对象**，是 React 虚拟 DOM 的基本单元；\n- 结构：包含 `type`（标签/组件）、`props`（属性）、`key`、`ref` 等；\n- 示例：`<div />` 会被编译为 `{ type: 'div', props: {} }`；\n- 特点：轻量、无状态、不可变，仅描述 UI。\n\n#### 2. **Component（组件）**\n- **定义**：可复用的 UI 单元，接收 `props` 返回 React 元素；\n- 分类：\n  - 函数组件：`function Component(props) { return <div /> }`；\n  - 类组件：`class Component extends React.Component { render() { return <div /> } }`；\n- 特点：有状态/生命周期，是 React 组件化的核心。\n\n#### 3. **Node（React 节点）**\n- **定义**：可被渲染的内容，是 React 元素、字符串、数字、Fragment 等的统称；\n- 类型：\n  - React 元素（`{ type: 'div' }`）；\n  - 文本节点（字符串/数字）；\n  - 空节点（`null`/`undefined`/`false`）；\n  - Fragment（`<>`）；\n- 作用：描述组件树的可渲染内容。\n\n#### 4. **Instance（实例）**\n- **定义**：组件的**运行时实例**，保存状态、生命周期、DOM 引用等；\n- 分类：\n  - 类组件实例：`this`，由 React 自动创建；\n  - DOM 实例：真实 DOM 节点，通过 `ref` 获取；\n  - 函数组件无实例，需通过 `useRef`/`forwardRef` 模拟；\n- 特点：有状态、可变，对应组件的实际运行实例。\n\n### 关系总结\n- **Element → Component → Node → Instance**：\n  - Element 是 Component 的描述，Node 是 Element 的集合；\n  - Instance 是 Component/Element 的运行时实体。\n\n| 概念 | 本质 | 特点 |\n| :--- | :--- | :--- |\n| Element | 虚拟 DOM 对象 | 不可变、轻量、无状态 |\n| Component | UI 复用单元 | 有状态/生命周期，返回 Element |\n| Node | 可渲染内容 | Element/文本/空节点等统称 |\n| Instance | 运行时实体 | 可变、有状态，对应实际渲染实例 |"
+    },
+    {
+        "id": "react-interview-062",
+        "topic": "react 中怎么捕获异常?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 异常捕获方案\n\n#### 1. **错误边界（Error Boundary，类组件）**\n- 作用：捕获子组件渲染/生命周期中的错误，防止整个应用崩溃；\n- 实现：类组件实现 `static getDerivedStateFromError()` 和 `componentDidCatch()`；\n- 示例：\n```jsx\nclass ErrorBoundary extends React.Component {\n  state = { hasError: false };\n\n  static getDerivedStateFromError() {\n    return { hasError: true };\n  }\n\n  componentDidCatch(error, info) {\n    // 上报错误到监控系统\n    console.error(error, info);\n  }\n\n  render() {\n    if (this.state.hasError) {\n      return <h1>出错了，请刷新重试</h1>;\n    }\n    return this.props.children;\n  }\n}\n\n// 使用\n<ErrorBoundary>\n  <MyComponent />\n</ErrorBoundary>\n```\n\n#### 2. **try/catch（异步/事件处理）**\n- 捕获异步操作、事件处理中的错误；\n- 示例：\n```jsx\nasync function fetchData() {\n  try {\n    const res = await fetch('/api/data');\n    const data = await res.json();\n  } catch (err) {\n    console.error('请求失败', err);\n    // 显示错误提示\n  }\n}\n```\n\n#### 3. **React 18+ 错误边界增强**\n- 支持 `useEffect` 中的错误捕获；\n- 配合 `Suspense` 处理加载错误。\n\n#### 4. **全局错误监控**\n- 接入 Sentry/Bugsnag 等工具，上报未捕获的错误；\n- 监听 `window.onerror`/`unhandledrejection`。\n\n### 总结\n- **渲染/生命周期错误**：用**错误边界**；\n- **异步/事件错误**：用 `try/catch`；\n- **全局监控**：用第三方工具；\n- 注意：函数组件无错误边界，需用类组件包裹。"
+    },
+    {
+        "id": "react-interview-063",
+        "topic": "使用 redux 有哪些原则?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux 三大核心原则\n\n#### 1. **单一数据源（Single Source of Truth）**\n- 整个应用的状态存储在**唯一的 store** 中；\n- 便于状态管理、调试、序列化/持久化；\n- 示例：`const store = createStore(reducer)`。\n\n#### 2. **状态是只读的（State is Read-Only）**\n- 唯一修改状态的方式是**触发 action**（普通对象）；\n- 禁止直接修改 state，保证状态可预测、可追踪；\n- 示例：`store.dispatch({ type: 'ADD', payload: 1 })`。\n\n#### 3. **纯函数修改（Changes Are Made with Pure Functions）**\n- reducer 是纯函数，接收 `(state, action)`，返回新 state；\n- 纯函数特点：输入相同 → 输出相同，无副作用，不修改原 state；\n- 示例：\n```jsx\nfunction reducer(state = { count: 0 }, action) {\n  switch (action.type) {\n    case 'ADD':\n      return { ...state, count: state.count + 1 };\n    default:\n      return state;\n  }\n}\n```\n\n#### 4. 补充原则\n- **不可变性**：state 是不可变的，每次修改返回新对象；\n- **单向数据流**：action → reducer → store → 组件更新；\n- **分离关注点**：UI 与状态管理分离，组件仅负责渲染。\n\n### 总结\n- 三大核心：**单一数据源、只读状态、纯函数 reducer**；\n- 本质：**可预测、可追踪、可调试**的状态管理。"
+    },
+    {
+        "id": "react-interview-064",
+        "topic": "使用 React hooks 怎么实现类里面的所有生命周期?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Hooks 模拟类组件生命周期\n\n| 类组件生命周期 | Hooks 实现 |\n| :--- | :--- |\n| `constructor` | `useState`/`useRef` 初始化状态 |\n| `componentDidMount` | `useEffect(() => {}, [])` |\n| `componentDidUpdate` | `useEffect(() => {}, [deps])` |\n| `componentWillUnmount` | `useEffect(() => () => cleanup(), [])` |\n| `shouldComponentUpdate` | `React.memo`/`useMemo`/`useCallback` |\n| `getSnapshotBeforeUpdate` | 无直接等价，可通过 `useRef` 记录状态 |\n| `componentDidCatch` | 无 Hooks 等价，需用错误边界 |\n\n#### 1. 核心模拟\n- **挂载（componentDidMount）**：\n```jsx\nuseEffect(() => {\n  // 挂载后执行\n  fetchData();\n}, []); // 空数组 = 仅挂载时执行\n```\n- **更新（componentDidUpdate）**：\n```jsx\nuseEffect(() => {\n  // 挂载时 + 依赖变化时执行\n  fetchData(id);\n}, [id]); // 依赖数组 = 监听 props/state 变化\n```\n- **卸载（componentWillUnmount）**：\n```jsx\nuseEffect(() => {\n  const timer = setInterval(() => {}, 1000);\n  // 卸载时执行清理\n  return () => clearInterval(timer);\n}, []);\n```\n\n#### 2. 性能优化（shouldComponentUpdate）\n- `React.memo`：记忆化组件，避免不必要重渲染；\n- `useMemo`：记忆化计算结果；\n- `useCallback`：记忆化函数引用。\n\n### 总结\n- Hooks 用 `useEffect` 统一处理**挂载/更新/卸载**；\n- 用 `React.memo`/`useMemo`/`useCallback` 实现性能优化；\n- 本质：**函数式编程替代类生命周期**。"
+    },
+    {
+        "id": "react-interview-065",
+        "topic": "React.memo() 和 useMemo() 的用法是什么, 有哪些区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React.memo 与 useMemo 对比\n\n| 特性 | `React.memo` | `useMemo` |\n| :--- | :--- | :--- |\n| **类型** | 高阶组件（HOC） | Hook |\n| **作用** | 记忆化**组件**，避免 props 未变化时重渲染 | 记忆化**计算结果**，避免依赖未变化时重复计算 |\n| **参数** | `(Component, areEqual)` | `(computeFn, deps)` |\n| **返回值** | 记忆化组件 | 计算结果的值 |\n| **适用场景** | 纯展示组件，props 变化少 | 昂贵的计算、复杂数据处理 |\n\n#### 1. `React.memo`\n- 示例：\n```jsx\nconst MyComponent = React.memo(({ count }) => {\n  return <div>{count}</div>;\n}, (prevProps, nextProps) => {\n  // 自定义比较函数，默认浅比较\n  return prevProps.count === nextProps.count;\n});\n```\n- 作用：避免组件因父组件重渲染而重渲染，仅当 props 变化时重渲染。\n\n#### 2. `useMemo`\n- 示例：\n```jsx\nconst expensiveValue = useMemo(() => {\n  return computeExpensiveValue(a, b);\n}, [a, b]); // 仅当 a/b 变化时重新计算\n```\n- 作用：缓存计算结果，避免每次渲染都执行昂贵计算。\n\n### 总结\n- `React.memo`：**记忆化组件**，优化组件重渲染；\n- `useMemo`：**记忆化计算结果**，优化计算性能；\n- 核心：**浅比较 props/依赖，避免不必要的计算/渲染**。"
+    },
+    {
+        "id": "react-interview-066",
+        "topic": "实现一个 useTimeout Hook",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 实现 `useTimeout` Hook\n\n#### 1. 需求\n- 延迟执行回调，支持动态修改延迟时间，组件卸载时自动清理。\n\n#### 2. 实现代码\n```jsx\nimport { useEffect, useRef, useState } from 'react';\n\nfunction useTimeout(callback, delay) {\n  const callbackRef = useRef(callback);\n  const [isActive, setIsActive] = useState(true);\n\n  // 保存最新回调，避免闭包陷阱\n  useEffect(() => {\n    callbackRef.current = callback;\n  }, [callback]);\n\n  useEffect(() => {\n    if (!isActive || delay === null) return;\n\n    // 设置定时器\n    const timer = setTimeout(() => {\n      callbackRef.current();\n      setIsActive(false); // 执行后自动停止\n    }, delay);\n\n    // 清理定时器\n    return () => clearTimeout(timer);\n  }, [delay, isActive]);\n\n  // 重置定时器\n  const reset = () => setIsActive(true);\n  // 清除定时器\n  const clear = () => setIsActive(false);\n\n  return { reset, clear };\n}\n\n// 使用示例\nfunction App() {\n  const { reset, clear } = useTimeout(() => {\n    console.log('延迟执行');\n  }, 3000);\n\n  return (\n    <div>\n      <button onClick={reset}>重置</button>\n      <button onClick={clear}>清除</button>\n    </div>\n  );\n}\n```\n\n#### 3. 关键特性\n- **自动清理**：组件卸载时自动清除定时器；\n- **动态延迟**：修改 `delay` 会重新设置定时器；\n- **重置/清除**：提供 `reset`/`clear` 方法手动控制；\n- **闭包安全**：用 `useRef` 保存最新回调，避免闭包陷阱。\n\n### 总结\n- `useTimeout`：**封装 setTimeout 逻辑，自动清理，支持手动控制**；\n- 核心：`useEffect` + `useRef` 实现定时器管理。"
+    },
+    {
+        "id": "react-interview-067",
+        "topic": "React18 新特性",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 18 核心新特性\n\n#### 1. **并发渲染（Concurrent Rendering）**\n- 可中断渲染：将长任务拆分为小任务，在空闲时间执行；\n- 自动批量更新：所有更新（同步/异步）都会合并，减少重渲染；\n- 优先级调度：高优先级任务（如用户交互）可插队执行。\n\n#### 2. **自动批量更新（Automatic Batching）**\n- 之前：仅 React 事件处理中批量更新；\n- React 18：所有场景（setTimeout/Promise/原生事件）都会自动批量更新；\n- 示例：\n```jsx\nsetTimeout(() => {\n  setCount(1);\n  setText('hello'); // 两次更新合并为一次重渲染\n}, 0);\n```\n\n#### 3. **Suspense 改进**\n- 支持更多场景：数据获取、代码分割、资源加载；\n- `SuspenseList`：控制多个 Suspense 组件的加载顺序；\n- `useDeferredValue`：延迟更新非紧急状态，提升响应性。\n\n#### 4. **新 Hooks**\n- `useId`：生成唯一 ID，避免 SSR  hydration 不匹配；\n- `useTransition`：标记非紧急更新，避免阻塞 UI；\n- `useDeferredValue`：延迟更新非紧急状态；\n- `useSyncExternalStore`：同步外部状态，避免 tearing。\n\n#### 5. **服务端组件（Server Components）**\n- 零客户端 JS，提升首屏加载速度；\n- 直接在组件中 `async/await` 获取数据；\n- 支持客户端/服务端组件混合渲染。\n\n### 总结\n- 核心方向：**并发渲染 + 自动批量更新 + Suspense 增强**；\n- 价值：**提升性能、响应性、开发体验**。"
+    },
+    {
+        "id": "react-interview-068",
+        "topic": "说说你对 React Hook 的闭包陷阱的理解, 有哪些解决方案?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Hook 闭包陷阱\n\n#### 1. 定义\n- 闭包陷阱：Hook 回调中引用了旧的 props/state，导致使用过期值；\n- 原因：Hook 回调捕获了渲染时的 props/state 快照，未更新到最新值。\n\n#### 2. 示例\n```jsx\nfunction App() {\n  const [count, setCount] = useState(0);\n\n  useEffect(() => {\n    setInterval(() => {\n      console.log(count); // 永远打印 0，捕获了初始值\n    }, 1000);\n  }, []); // 空数组，未依赖 count\n\n  return <button onClick={() => setCount(count + 1)}>+1</button>;\n}\n```\n\n#### 3. 解决方案\n- **方案 1：添加依赖数组**（推荐）\n```jsx\nuseEffect(() => {\n  const timer = setInterval(() => {\n    console.log(count);\n  }, 1000);\n  return () => clearInterval(timer);\n}, [count]); // 依赖 count，更新时重新创建定时器\n```\n\n- **方案 2：使用 `useRef` 保存最新值**\n```jsx\nconst countRef = useRef(count);\nuseEffect(() => {\n  countRef.current = count;\n}, [count]);\n\nuseEffect(() => {\n  setInterval(() => {\n    console.log(countRef.current); // 获取最新值\n  }, 1000);\n}, []);\n```\n\n- **方案 3：函数式更新**\n```jsx\nsetCount(prev => prev + 1); // 基于旧值更新，无需依赖\n```\n\n- **方案 4：使用 `useEvent`（React 18+ 实验性）**\n```jsx\nconst onTick = useEvent(() => {\n  console.log(count);\n});\nuseEffect(() => {\n  setInterval(onTick, 1000);\n}, [onTick]);\n```\n\n### 总结\n- 闭包陷阱：**Hook 回调捕获旧的 props/state 快照**；\n- 解决方案：**添加依赖、useRef 保存最新值、函数式更新、useEvent**。"
+    },
+    {
+        "id": "react-interview-069",
+        "topic": "说说你对 useReducer 的理解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useReducer 核心理解\n\n#### 1. 定义\n- `useReducer` 是 React 提供的 Hook，用于**复杂状态管理**，替代 `useState`；\n- 语法：`const [state, dispatch] = useReducer(reducer, initialState, init)`；\n- 核心：**reducer 纯函数处理状态更新**，与 Redux 思想一致。\n\n#### 2. 核心概念\n- **reducer**：纯函数，接收 `(state, action)`，返回新 state；\n- **action**：普通对象，描述更新类型和数据（`{ type: 'ADD', payload: 1 }`）；\n- **dispatch**：触发 action，调用 reducer 更新 state。\n\n#### 3. 示例\n```jsx\nconst initialState = { count: 0 };\n\nfunction reducer(state, action) {\n  switch (action.type) {\n    case 'ADD':\n      return { ...state, count: state.count + 1 };\n    case 'SUB':\n      return { ...state, count: state.count - 1 };\n    default:\n      return state;\n  }\n}\n\nfunction App() {\n  const [state, dispatch] = useReducer(reducer, initialState);\n  return (\n    <div>\n      <p>{state.count}</p>\n      <button onClick={() => dispatch({ type: 'ADD' })}>+1</button>\n      <button onClick={() => dispatch({ type: 'SUB' })}>-1</button>\n    </div>\n  );\n}\n```\n\n#### 4. 优势\n- **状态逻辑集中**：复杂状态更新逻辑收敛到 reducer 中；\n- **可预测**：reducer 是纯函数，状态更新可预测；\n- **可测试**：reducer 纯函数易于测试；\n- **替代 Redux**：中小型项目可替代 Redux，实现全局状态管理。\n\n### 总结\n- `useReducer`：**函数式版 Redux**，适合复杂状态管理；\n- 核心：**reducer 纯函数 + action 描述更新 + dispatch 触发**。"
+    },
+    {
+        "id": "react-interview-070",
+        "topic": "讲讲 React.memo 和 JS 的 memorize 函数的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React.memo 与 JS memorize 函数区别\n\n| 特性 | `React.memo` | JS memorize 函数 |\n| :--- | :--- | :--- |\n| **本质** | React 高阶组件（HOC） | 通用函数缓存工具 |\n| **作用** | 记忆化 React 组件，避免 props 未变化时重渲染 | 记忆化函数返回值，避免重复计算 |\n| **比较方式** | 默认浅比较 props，可自定义 `areEqual` | 深比较/浅比较参数，缓存键值对 |\n| **适用场景** | React 纯展示组件 | 纯函数计算（如数学计算、数据转换） |\n| **依赖** | React 环境 | 通用 JS 环境 |\n\n#### 1. `React.memo`\n- 示例：\n```jsx\nconst MyComponent = React.memo(({ count }) => {\n  return <div>{count}</div>;\n});\n```\n- 特点：仅在 React 中使用，优化组件重渲染，浅比较 props。\n\n#### 2. JS memorize 函数\n- 示例（Lodash `memoize`）：\n```jsx\nimport { memoize } from 'lodash';\n\nconst expensiveCalc = memoize((a, b) => {\n  return a + b;\n});\n\ne expensiveCalc(1, 2); // 计算\n expensiveCalc(1, 2); // 直接返回缓存值\n```\n- 特点：通用 JS，缓存函数返回值，可自定义缓存键。\n\n### 总结\n- `React.memo`：**React 组件级记忆化**，优化渲染性能；\n- JS memorize：**函数级记忆化**，优化计算性能；\n- 核心：**缓存输入与输出的映射**，避免重复计算/渲染。"
+    },
+    {
+        "id": "react-interview-071",
+        "topic": "我们应该在什么场景下使用 useMemo 和 useCallback ?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useMemo 与 useCallback 适用场景\n\n#### 1. **useMemo**：缓存计算结果\n- **场景**：\n  - 组件内有**昂贵的计算逻辑**（如大数据遍历、复杂数学运算）；\n  - 计算结果被多次使用，且依赖未变化时无需重复计算；\n  - 子组件依赖该计算结果，需稳定引用避免重渲染。\n- 示例：\n```jsx\nconst filteredList = useMemo(() => {\n  return list.filter(item => item.price > 100);\n}, [list]);\n```\n\n#### 2. **useCallback**：缓存函数引用\n- **场景**：\n  - 函数作为 props 传递给子组件（配合 `React.memo` 避免子组件重渲染）；\n  - 函数作为依赖传入其他 Hook（如 `useEffect`），需稳定引用避免重复执行；\n  - 事件处理函数需在子组件中复用，避免每次渲染创建新函数。\n- 示例：\n```jsx\nconst handleClick = useCallback((id) => {\n  onClick(id);\n}, [onClick]);\n```\n\n#### 3. 注意事项\n- 避免滥用：仅在**性能瓶颈**时使用，否则增加代码复杂度；\n- 依赖数组必须完整：否则会导致缓存失效或闭包陷阱；\n- `useCallback(fn, deps)` 等价于 `useMemo(() => fn, deps)`。\n\n### 总结\n- **useMemo**：优化**计算性能**，缓存昂贵计算结果；\n- **useCallback**：优化**渲染性能**，缓存函数引用避免子组件重渲染；\n- 核心：**依赖数组控制缓存失效时机**，仅在必要时使用。"
+    },
+    {
+        "id": "react-interview-072",
+        "topic": "说说你对 dangerouslySetInnerHTML 的理解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### dangerouslySetInnerHTML 详解\n\n#### 1. 定义\n- React 提供的属性，用于**直接设置 DOM 元素的 innerHTML**；\n- 语法：`dangerouslySetInnerHTML={{ __html: '<div>HTML 内容</div>' }}`；\n- 命名含 `dangerously`，提示存在安全风险。\n\n#### 2. 作用\n- 渲染富文本内容（如编辑器生成的 HTML）；\n- 插入第三方 HTML 片段（如广告、统计代码）。\n\n#### 3. 安全风险（XSS 攻击）\n- 若 HTML 内容来自用户输入，可能包含恶意脚本（如 `<script>alert('xss')</script>`）；\n- 浏览器会执行脚本，导致 XSS 攻击，窃取用户信息或篡改页面。\n\n#### 4. 安全使用建议\n- **仅信任内容**：仅渲染**可信来源**的 HTML（如后端返回的富文本）；\n- **转义处理**：对用户输入的 HTML 进行转义（如使用 `dompurify` 库）；\n- 示例：\n```jsx\nimport DOMPurify from 'dompurify';\n\nconst html = DOMPurify.sanitize(userInputHtml);\n<div dangerouslySetInnerHTML={{ __html: html }} />\n```\n\n#### 5. 替代方案\n- 优先使用 React 组件渲染，避免直接操作 innerHTML；\n- 富文本场景：使用 `react-quill`/`draft-js` 等富文本库，生成安全的 React 元素。\n\n### 总结\n- `dangerouslySetInnerHTML`：**直接设置 DOM innerHTML**，适合富文本场景；\n- 风险：**XSS 攻击**，需严格校验 HTML 来源；\n- 安全使用：**信任来源 + 转义处理**。"
+    },
+    {
+        "id": "react-interview-073",
+        "topic": "react是否支持给标签设置自定义的属性, 比如给video标签设置webkit-playsinline?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 支持自定义属性\n\n#### 1. 标准自定义属性（data-*）\n- React 原生支持 `data-*` 格式的自定义属性；\n- 示例：\n```jsx\n<div data-id=\"123\" data-name=\"test\">自定义属性</div>\n```\n- 会被直接渲染到 DOM 中，可通过 `dataset` 访问。\n\n#### 2. 非标准自定义属性（如 `webkit-playsinline`）\n- React 16+ 支持**任意自定义属性**，包括非标准属性；\n- 示例：\n```jsx\n<video \n  src=\"video.mp4\" \n  webkit-playsinline=\"true\" \n  playsinline\n/>\n```\n- 注意：\n  - 驼峰命名会被转换为短横线命名（如 `playsInline` → `playsinline`）；\n  - 布尔属性：仅写属性名等价于 `true`（如 `playsinline` 等价于 `playsinline={true}`）；\n  - 非标准属性会被直接渲染到 DOM 中，浏览器会识别处理。\n\n#### 3. 特殊情况\n- 若属性名与 React 保留关键字冲突，需使用 `dangerouslySetInnerHTML` 或 `ref` 手动设置；\n- 示例：设置 `webkit-playsinline`：\n```jsx\nconst videoRef = useRef(null);\nuseEffect(() => {\n  videoRef.current.setAttribute('webkit-playsinline', 'true');\n}, []);\n<video ref={videoRef} />\n```\n\n### 总结\n- React **支持自定义属性**：\n  - `data-*` 标准属性：原生支持；\n  - 非标准属性（如 `webkit-playsinline`）：React 16+ 直接支持，或通过 `ref` 手动设置；\n- 核心：React 会将自定义属性直接传递给 DOM 元素。"
+    },
+    {
+        "id": "react-interview-074",
+        "topic": "你常用的 React Hooks 有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 常用 React Hooks 分类\n\n#### 1. **基础 Hooks**\n- `useState`：管理组件状态；\n- `useEffect`：处理副作用（数据请求、订阅、DOM 操作）；\n- `useContext`：访问 Context 数据，避免 props 透传。\n\n#### 2. **性能优化 Hooks**\n- `useMemo`：缓存昂贵计算结果；\n- `useCallback`：缓存函数引用，避免子组件重渲染；\n- `useRef`：保存 DOM 引用、跨渲染周期变量。\n\n#### 3. **状态管理 Hooks**\n- `useReducer`：复杂状态管理，替代 Redux 简单场景；\n- `useState` + `useContext`：实现轻量级全局状态。\n\n#### 4. **React 18+ 新增 Hooks**\n- `useId`：生成唯一 ID，避免 SSR  hydration 不匹配；\n- `useTransition`：标记非紧急更新，提升响应性；\n- `useDeferredValue`：延迟更新非紧急状态；\n- `useSyncExternalStore`：同步外部状态。\n\n#### 5. **自定义 Hooks**\n- 封装复用逻辑（如 `useTimeout`/`useLocalStorage`/`useFetch`）；\n- 示例：\n```jsx\nfunction useLocalStorage(key, initialValue) {\n  const [value, setValue] = useState(() => {\n    return localStorage.getItem(key) || initialValue;\n  });\n\n  useEffect(() => {\n    localStorage.setItem(key, value);\n  }, [key, value]);\n\n  return [value, setValue];\n}\n```\n\n### 总结\n- 基础 Hooks：`useState`/`useEffect`/`useContext` 是核心；\n- 性能 Hooks：`useMemo`/`useCallback`/`useRef` 优化性能；\n- 自定义 Hooks：**逻辑复用**，提升代码可维护性。"
+    },
+    {
+        "id": "react-interview-075",
+        "topic": "如何让 useEffect 支持 async/await?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useEffect 支持 async/await 的正确方式\n\n#### 1. 错误写法（直接传入 async 函数）\n```jsx\n// ❌ 错误：useEffect 回调不能直接返回 Promise\nuseEffect(async () => {\n  const data = await fetchData();\n  setData(data);\n}, []);\n```\n- 原因：`async` 函数返回 Promise，而 `useEffect` 回调需返回**清理函数**；\n- 后果：React 会将 Promise 误认为清理函数，导致报错。\n\n#### 2. 正确写法（内部定义 async 函数）\n```jsx\n// ✅ 正确：在 useEffect 内部定义 async 函数并调用\nuseEffect(() => {\n  const fetchData = async () => {\n    try {\n      const res = await fetch('/api/data');\n      const data = await res.json();\n      setData(data);\n    } catch (err) {\n      console.error('请求失败', err);\n    }\n  };\n\n  fetchData();\n}, []);\n```\n\n#### 3. 带清理函数的写法\n```jsx\nuseEffect(() => {\n  let isMounted = true;\n\n  const fetchData = async () => {\n    try {\n      const res = await fetch('/api/data');\n      const data = await res.json();\n      if (isMounted) setData(data); // 组件未卸载才更新状态\n    } catch (err) {\n      console.error('请求失败', err);\n    }\n  };\n\n  fetchData();\n\n  // 清理函数：组件卸载时标记为未挂载\n  return () => {\n    isMounted = false;\n  };\n}, []);\n```\n\n#### 4. 封装自定义 Hook（推荐）\n```jsx\nfunction useAsync(asyncFn, deps) {\n  const [data, setData] = useState(null);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n\n  useEffect(() => {\n    let isMounted = true;\n    setLoading(true);\n\n    const fetchData = async () => {\n      try {\n        const result = await asyncFn();\n        if (isMounted) setData(result);\n      } catch (err) {\n        if (isMounted) setError(err);\n      } finally {\n        if (isMounted) setLoading(false);\n      }\n    };\n\n    fetchData();\n\n    return () => {\n      isMounted = false;\n    };\n  }, deps);\n\n  return { data, loading, error };\n}\n\n// 使用\nconst { data, loading, error } = useAsync(() => fetchData(), [id]);\n```\n\n### 总结\n- 核心：**在 useEffect 回调内部定义 async 函数并调用**，避免直接返回 Promise；\n- 最佳实践：**封装自定义 Hook**，统一处理 loading/error/清理逻辑。"
+    },
+    {
+        "id": "react-interview-076",
+        "topic": "说说你对自定义hook的理解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 自定义 Hook 核心理解\n\n#### 1. 定义\n- 自定义 Hook 是**以 `use` 开头的函数**，内部可调用其他 React Hooks；\n- 本质：**逻辑复用函数**，将组件间复用的逻辑封装为可复用的 Hook。\n\n#### 2. 特点\n- **命名规范**：必须以 `use` 开头（React 识别为 Hook，检查 Hooks 调用规则）；\n- **状态隔离**：每个组件调用自定义 Hook，都会创建独立的状态；\n- **可组合**：可组合其他 Hooks（如 `useState`/`useEffect`/`useContext`）；\n- **无 UI**：仅封装逻辑，不渲染 UI，与组件解耦。\n\n#### 3. 示例：封装 `useLocalStorage`\n```jsx\nimport { useState, useEffect } from 'react';\n\nfunction useLocalStorage(key, initialValue) {\n  // 初始化状态：从 localStorage 读取\n  const [value, setValue] = useState(() => {\n    const storedValue = localStorage.getItem(key);\n    return storedValue ? JSON.parse(storedValue) : initialValue;\n  });\n\n  // 状态变化时同步到 localStorage\n  useEffect(() => {\n    localStorage.setItem(key, JSON.stringify(value));\n  }, [key, value]);\n\n  return [value, setValue];\n}\n\n// 使用\nfunction App() {\n  const [name, setName] = useLocalStorage('name', '');\n  return <input value={name} onChange={(e) => setName(e.target.value)} />;\n}\n```\n\n#### 4. 优势\n- **逻辑复用**：避免代码重复，提升可维护性；\n- **状态隔离**：组件间状态互不干扰；\n- **解耦 UI**：逻辑与 UI 分离，便于测试；\n- **符合 Hooks 规则**：可在组件中正常调用，享受 React 优化。\n\n### 总结\n- 自定义 Hook：**以 `use` 开头的函数，封装复用逻辑**；\n- 核心：**逻辑复用 + 状态隔离 + 解耦 UI**；\n- 价值：**提升代码可维护性，避免重复造轮子**。"
+    },
+    {
+        "id": "react-interview-077",
+        "topic": "说说你对 useMemo 的理解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useMemo 详解\n\n#### 1. 定义\n- `useMemo` 是 React 性能优化 Hook，用于**缓存计算结果**；\n- 语法：`const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);`；\n- 核心：仅当依赖数组变化时，才重新执行计算函数，否则返回缓存结果。\n\n#### 2. 原理\n- 首次渲染：执行计算函数，缓存结果；\n- 后续渲染：浅比较依赖数组，若依赖未变化，返回上次缓存结果；\n- 若依赖变化，重新执行计算函数，更新缓存。\n\n#### 3. 适用场景\n- **昂贵计算**：大数据遍历、复杂数学运算、深拷贝等耗时操作；\n- **子组件依赖**：计算结果作为 props 传递给子组件，需稳定引用避免子组件重渲染；\n- **多次使用**：计算结果在组件中多次使用，无需重复计算。\n\n#### 4. 示例\n```jsx\nconst filteredList = useMemo(() => {\n  console.log('重新计算');\n  return list.filter(item => item.price > 100);\n}, [list]); // 仅当 list 变化时重新计算\n```\n\n#### 5. 注意事项\n- **避免滥用**：仅在性能瓶颈时使用，否则增加代码复杂度；\n- **依赖数组必须完整**：否则会导致缓存失效或闭包陷阱；\n- **计算函数应为纯函数**：无副作用，输入相同输出相同。\n\n### 总结\n- `useMemo`：**缓存计算结果，避免重复计算**，优化组件性能；\n- 核心：**依赖数组控制缓存失效时机**，纯函数计算保证结果可预测。"
+    },
+    {
+        "id": "react-interview-078",
+        "topic": "说说你对 useContext 的理解",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useContext 详解\n\n#### 1. 定义\n- `useContext` 是 React Hook，用于**访问 Context 数据**；\n- 语法：`const value = useContext(MyContext);`；\n- 作用：避免 props 逐层透传（props drilling），实现跨组件层级共享数据。\n\n#### 2. 核心流程\n1. **创建 Context**：`const MyContext = createContext(defaultValue);`；\n2. **提供数据**：用 `MyContext.Provider` 包裹子组件，传递 `value`；\n3. **消费数据**：子组件中调用 `useContext(MyContext)` 获取最新 `value`。\n\n#### 3. 示例\n```jsx\nimport { createContext, useContext, useState } from 'react';\n\n// 1. 创建 Context\nconst ThemeContext = createContext('light');\n\n// 2. 提供数据\nfunction App() {\n  const [theme, setTheme] = useState('light');\n  return (\n    <ThemeContext.Provider value={theme}>\n      <Toolbar />\n      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>切换主题</button>\n    </ThemeContext.Provider>\n  );\n}\n\n// 3. 消费数据\nfunction Toolbar() {\n  const theme = useContext(ThemeContext);\n  return <div className={`toolbar ${theme}`}>工具栏</div>;\n}\n```\n\n#### 4. 特性\n- **响应式更新**：Provider `value` 变化时，所有消费组件会重渲染；\n- **默认值**：仅当组件未被 Provider 包裹时，使用 `createContext(defaultValue)`；\n- **嵌套 Context**：可嵌套多个 Provider，内层覆盖外层。\n\n#### 5. 优化建议\n- **拆分 Context**：将大 Context 拆分为多个小 Context，避免无关数据变化触发重渲染；\n- **稳定 value 引用**：用 `useMemo` 缓存 Provider `value`，避免不必要重渲染。\n\n### 总结\n- `useContext`：**跨组件共享数据，避免 props 透传**；\n- 核心：**Provider 提供数据，useContext 消费数据**；\n- 价值：**简化组件通信，提升代码可维护性**。"
+    },
+    {
+        "id": "react-interview-079",
+        "topic": "为什么不能在循环、条件或嵌套函数中调用 Hooks?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Hooks 调用规则原因\n\n#### 1. Hooks 依赖调用顺序\n- React 内部通过**链表**存储组件的 Hooks 状态，按**调用顺序**关联每个 Hook；\n- 若在循环/条件/嵌套函数中调用 Hooks，会导致**调用顺序不稳定**，状态关联错乱；\n- 示例：\n```jsx\n// ❌ 错误：条件调用 Hooks，顺序不稳定\nif (condition) {\n  const [count, setCount] = useState(0);\n}\n```\n- 若 `condition` 变化，Hooks 调用顺序改变，React 会将状态关联到错误的 Hook，导致 bug。\n\n#### 2. 保证状态一致性\n- React 要求 Hooks **在组件顶层调用**，保证每次渲染时 Hooks 调用顺序一致；\n- 只有顺序一致，React 才能正确关联状态与 Hook，保证状态可预测。\n\n#### 3. 正确写法\n```jsx\n// ✅ 正确：顶层调用 Hooks，顺序稳定\nfunction App() {\n  const [count, setCount] = useState(0);\n  const [text, setText] = useState('');\n\n  if (count > 0) {\n    // 条件逻辑中使用状态，而非调用 Hooks\n  }\n\n  return <div>{count}</div>;\n}\n```\n\n#### 4. 例外：自定义 Hook\n- 自定义 Hook 内部可调用其他 Hooks，但必须在**自定义 Hook 顶层**调用；\n- 自定义 Hook 最终会在组件顶层调用，保证顺序稳定。\n\n### 总结\n- 原因：**React 依赖 Hooks 调用顺序关联状态**，循环/条件/嵌套会导致顺序不稳定；\n- 规则：**只能在组件顶层或自定义 Hook 顶层调用 Hooks**；\n- 目的：**保证状态一致性与可预测性**。"
+    },
+    {
+        "id": "react-interview-080",
+        "topic": "react中, 父子组件的生命周期执行顺序是怎么样的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 父子组件生命周期执行顺序（类组件）\n\n#### 1. 挂载阶段（Mount）\n- **父组件先执行，子组件后执行**，子组件完成后父组件完成：\n1. 父 `constructor`\n2. 父 `static getDerivedStateFromProps`\n3. 父 `render`\n4. 子 `constructor`\n5. 子 `static getDerivedStateFromProps`\n6. 子 `render`\n7. 子 `componentDidMount`\n8. 父 `componentDidMount`\n\n#### 2. 更新阶段（Update）\n- **父组件更新**：\n1. 父 `static getDerivedStateFromProps`\n2. 父 `shouldComponentUpdate`\n3. 父 `render`\n4. 子 `static getDerivedStateFromProps`\n5. 子 `shouldComponentUpdate`\n6. 子 `render`\n7. 子 `getSnapshotBeforeUpdate`\n8. 父 `getSnapshotBeforeUpdate`\n9. 子 `componentDidUpdate`\n10. 父 `componentDidUpdate`\n\n- **子组件更新**：仅子组件执行更新生命周期，父组件不受影响（除非 props 变化）。\n\n#### 3. 卸载阶段（Unmount）\n- **先子后父**：\n1. 子 `componentWillUnmount`\n2. 父 `componentWillUnmount`\n\n#### 4. 函数组件（Hooks）\n- 挂载：父 `useEffect`（空数组）→ 子 `useEffect`（空数组）；\n- 更新：父 `render` → 子 `render` → 子 `useEffect` → 父 `useEffect`；\n- 卸载：子 `useEffect` 清理函数 → 父 `useEffect` 清理函数。\n\n### 总结\n- **挂载**：父先渲染，子完成后父完成；\n- **更新**：父先触发，子先完成更新；\n- **卸载**：先子后父；\n- 核心：**子组件优先完成渲染/更新，父组件最后完成**。"
+    },
+    {
+        "id": "react-interview-081",
+        "topic": "说说React事件和原生事件的执行顺序",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 事件与原生事件执行顺序\n\n#### 1. 核心机制\n- React 实现了**合成事件（SyntheticEvent）**，将所有事件委托到 **document（React 17+ 改为 root 容器）**；\n- 原生事件遵循 **捕获 → 目标 → 冒泡** 流程；\n- React 合成事件在**冒泡阶段**处理，且执行时机晚于原生事件。\n\n#### 2. 执行顺序\n1. **原生捕获阶段**：从 document 向下捕获到目标元素；\n2. **原生目标阶段**：目标元素触发原生事件；\n3. **React 合成事件**：事件冒泡到 document/root，React 处理合成事件；\n4. **原生冒泡阶段**：从目标元素向上冒泡到 document。\n\n#### 3. 示例验证\n```jsx\nfunction App() {\n  const handleReactClick = () => console.log('React 点击事件');\n  useEffect(() => {\n    const div = document.getElementById('test');\n    div.addEventListener('click', () => console.log('原生点击事件'));\n  }, []);\n  return <div id=\"test\" onClick={handleReactClick}>点击我</div>;\n}\n// 点击后输出顺序：\n// 原生点击事件 → React 点击事件\n```\n\n#### 4. 特殊情况\n- 若在原生事件中调用 `e.stopPropagation()`，会阻止事件冒泡，导致 **React 合成事件无法触发**；\n- React 合成事件的 `e.stopPropagation()` 仅阻止 React 事件冒泡，不影响原生事件。\n\n### 总结\n- 顺序：**原生事件先执行（捕获/目标/冒泡），React 合成事件后执行**；\n- 本质：React 事件委托到顶层，在原生冒泡阶段处理合成事件。"
+    },
+    {
+        "id": "react-interview-082",
+        "topic": "react 和 vue 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 与 Vue 核心区别\n\n| 维度 | React | Vue |\n| :--- | :--- | :--- |\n| **编程范式** | 函数式编程，JSX 一切皆 JS | 选项式 API / 组合式 API，模板语法（HTML 扩展） |\n| **数据响应式** | 不可变数据 + 状态更新触发重渲染 | 响应式系统（Proxy/Object.defineProperty），自动追踪依赖 |\n| **更新模型** | 虚拟 DOM 全量 Diff，可中断 Fiber 架构 | 细粒度更新，精确通知依赖组件，无需全量 Diff |\n| **组件通信** | Props + Context + 状态管理库 | Props + 事件 emit + Provide/Inject + Vuex/Pinia |\n| **模板语法** | JSX（JavaScript 扩展），逻辑与 UI 混合 | 模板语法（HTML 扩展），逻辑与 UI 分离 |\n| **状态管理** | 原生无内置，依赖第三方库（Redux/Zustand） | 内置 Vuex/Pinia，轻量级场景可用 `ref`/`reactive` |\n| **渲染性能** | 需手动优化（memo/useMemo/useCallback） | 自动优化，响应式系统天然高效 |\n| **学习曲线** | 陡峭，需理解函数式编程、Hooks | 平缓，模板语法易上手，组合式 API 灵活 |\n\n#### 1. 核心差异\n- **React**：**函数式 + 不可变 + 虚拟 DOM Diff**，追求声明式、跨平台；\n- **Vue**：**响应式 + 模板 + 细粒度更新**，追求易用性、性能、渐进式。\n\n#### 2. 适用场景\n- React：大型应用、跨平台开发、团队协作，需要高度可维护性；\n- Vue：中小型应用、快速开发、对性能敏感的场景。\n\n### 总结\n- React：**函数式、不可变、跨平台**，灵活性高，学习成本高；\n- Vue：**响应式、模板、易用**，开发效率高，性能优秀。"
+    },
+    {
+        "id": "react-interview-083",
+        "topic": "下面函数组件的输出分别是什么?",
+        "notes": "（假设代码如下）\n```jsx\nimport { useState, useEffect } from 'react';\n\nfunction App() {\n  const [count, setCount] = useState(0);\n\n  useEffect(() => {\n    setTimeout(() => {\n      console.log(count);\n    }, 3000);\n  }, []);\n\n  setCount(1);\n\n  return <div>{count}</div>;\n}\n```",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 输出结果：`0`\n\n#### 原因分析\n1. **状态更新是异步的**：\n   - `setCount(1)` 不会立即更新 `count`，而是将更新加入队列；\n   - 组件首次渲染时，`count` 仍为 `0`。\n\n2. **闭包陷阱**：\n   - `useEffect` 回调捕获了首次渲染时的 `count = 0`；\n   - 即使 `setCount(1)` 触发重渲染，`setTimeout` 回调仍使用旧的 `count` 值。\n\n3. **执行流程**：\n   1. 首次渲染：`count = 0`，`useEffect` 回调执行，`setTimeout` 入队；\n   2. `setCount(1)` 触发重渲染，`count = 1`；\n   3. 3 秒后，`setTimeout` 回调执行，打印捕获的 `count = 0`。\n\n#### 正确实现打印 `1`\n- 使用 `useRef` 保存最新值：\n```jsx\nconst countRef = useRef(count);\nuseEffect(() => {\n  countRef.current = count;\n}, [count]);\n\nuseEffect(() => {\n  setTimeout(() => {\n    console.log(countRef.current); // 打印 1\n  }, 3000);\n}, []);\n```\n\n### 总结\n- 输出：`0`；\n- 核心：**状态更新异步 + 闭包陷阱**，导致 `setTimeout` 回调使用旧值。"
+    },
+    {
+        "id": "react-interview-084",
+        "topic": "React 中怎么实现状态自动保存 (KeepAlive) ?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 实现 KeepAlive（状态自动保存）的方案\n\n#### 1. 方案一：手动缓存状态（简单场景）\n- 将状态提升到父组件或全局状态管理库（Redux/Zustand）；\n- 组件卸载时保存状态，重新挂载时恢复状态；\n- 示例：\n```jsx\nconst cache = {};\n\nfunction KeepAliveComponent({ id }) {\n  const [count, setCount] = useState(cache[id] || 0);\n\n  useEffect(() => {\n    return () => {\n      cache[id] = count; // 卸载时保存状态\n    };\n  }, [id, count]);\n\n  return <div>{count}</div>;\n}\n```\n\n#### 2. 方案二：`react-keep-alive` 库（推荐）\n- 第三方库，模拟 Vue 的 `<keep-alive>` 功能；\n- 核心：通过 `KeepAlive` 组件包裹，缓存组件实例，避免卸载；\n- 示例：\n```jsx\nimport { KeepAlive, useKeepAlive } from 'react-keep-alive';\n\nfunction App() {\n  return (\n    <KeepAlive>\n      <Component1 />\n      <Component2 />\n    </KeepAlive>\n  );\n}\n```\n\n#### 3. 方案三：手动实现 KeepAlive（复杂场景）\n- 原理：通过 `display: none` 隐藏组件，而非卸载；\n- 示例：\n```jsx\nfunction KeepAlive({ active, children }) {\n  return (\n    <div style={{ display: active ? 'block' : 'none' }}>\n      {children}\n    </div>\n  );\n}\n\n// 使用\n<KeepAlive active={tab === '1'}>\n  <Component1 />\n</KeepAlive>\n<KeepAlive active={tab === '2'}>\n  <Component2 />\n</KeepAlive>\n```\n\n#### 4. 方案四：React 18+ `Offscreen`（实验性）\n- React 内置组件，用于缓存组件状态；\n- 示例：\n```jsx\n<Offscreen mode={active ? 'visible' : 'hidden'}>\n  <Component />\n</Offscreen>\n```\n\n### 总结\n- 简单场景：**手动缓存状态**；\n- 推荐：**`react-keep-alive` 库**，开箱即用；\n- 复杂场景：**手动实现 KeepAlive** 或 React 内置 `Offscreen`。"
+    },
+    {
+        "id": "react-interview-085",
+        "topic": "useEffect 与 useLayoutEffect 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useEffect 与 useLayoutEffect 核心区别\n\n| 特性 | `useEffect` | `useLayoutEffect` |\n| :--- | :--- | :--- |\n| **执行时机** | 浏览器**绘制完成后**异步执行 | DOM 更新后、浏览器**绘制前**同步执行 |\n| **阻塞渲染** | 不阻塞，异步执行 | 同步执行，会阻塞浏览器绘制 |\n| **使用场景** | 数据请求、订阅、DOM 操作（不影响布局） | 读取 DOM 布局信息、同步更新 DOM |\n| **优先级** | 低优先级，可延迟执行 | 高优先级，必须在绘制前执行 |\n\n#### 1. 执行流程对比\n- **useEffect**：\n  1. React 渲染 → 2. 浏览器绘制 → 3. 执行 `useEffect` 回调；\n- **useLayoutEffect**：\n  1. React 渲染 → 2. 执行 `useLayoutEffect` 回调 → 3. 浏览器绘制。\n\n#### 2. 适用场景\n- **useEffect**：\n  - 数据请求、定时器、事件订阅、本地存储操作；\n  - 不影响页面布局的 DOM 操作。\n- **useLayoutEffect**：\n  - 读取 DOM 布局信息（如 `clientWidth`/`scrollTop`）；\n  - 同步更新 DOM，避免页面闪烁（如调整元素位置）。\n\n#### 3. 注意事项\n- `useLayoutEffect` 会阻塞浏览器绘制，**避免滥用**，仅在必要时使用；\n- 服务端渲染（SSR）时，`useLayoutEffect` 会报错，需替换为 `useEffect` 或手动处理。\n\n### 总结\n- `useEffect`：**异步、非阻塞，适合大多数副作用**；\n- `useLayoutEffect`：**同步、阻塞，适合布局相关副作用**；\n- 核心：**执行时机不同**，`useLayoutEffect` 在绘制前执行，`useEffect` 在绘制后执行。"
+    },
+    {
+        "id": "react-interview-086",
+        "topic": "React Hooks 在使用上有哪些限制?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Hooks 使用限制\n\n#### 1. **只能在顶层调用 Hooks**\n- 不能在循环、条件、嵌套函数中调用 Hooks；\n- 原因：React 依赖 Hooks 调用顺序关联状态，顺序不稳定会导致状态错乱。\n\n#### 2. **只能在函数组件或自定义 Hook 中调用**\n- 不能在类组件、普通函数、事件处理函数中调用 Hooks；\n- 自定义 Hook 必须以 `use` 开头，React 识别为 Hook 并检查调用规则。\n\n#### 3. **依赖数组必须完整**\n- `useEffect`/`useMemo`/`useCallback` 的依赖数组必须包含所有回调中使用的外部变量；\n- 否则会导致闭包陷阱，使用旧值引发 bug。\n\n#### 4. **不可变状态**\n- `useState` 返回的状态是不可变的，必须通过 `setState` 更新；\n- 直接修改状态不会触发重渲染，导致状态不一致。\n\n#### 5. **异步副作用限制**\n- `useEffect` 回调不能直接返回 `async` 函数；\n- 需在回调内部定义 `async` 函数并调用，避免 Promise 被误认为清理函数。\n\n#### 6. **服务端渲染（SSR）限制**\n- `useLayoutEffect` 在 SSR 时会报错，需替换为 `useEffect`；\n- 浏览器 API（如 `window`/`document`）只能在 `useEffect` 中访问，避免 SSR 时报错。\n\n### 总结\n- 核心限制：**顶层调用 + 函数组件/自定义 Hook 环境 + 完整依赖数组**；\n- 目的：**保证状态一致性与可预测性**，避免 bug。"
+    },
+    {
+        "id": "react-interview-087",
+        "topic": "为什么 useState 返回的是数组而不是对象?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useState 返回数组的原因\n\n#### 1. **灵活命名**\n- 数组解构允许自定义变量名，无需关心字段名；\n- 示例：`const [count, setCount] = useState(0)`，可自由命名状态和更新函数；\n- 若返回对象，需固定字段名（如 `{ state, setState }`），灵活性差。\n\n#### 2. **简洁性**\n- 数组解构语法简洁，代码更易读；\n- 对比：\n  - 数组：`const [count, setCount] = useState(0)`；\n  - 对象：`const { state: count, setState: setCount } = useState(0)`，冗余。\n\n#### 3. **顺序固定**\n- 数组元素顺序固定（状态在前，更新函数在后），符合直觉；\n- 对象解构需指定字段名，顺序无关，易混淆。\n\n#### 4. **可扩展性**\n- 未来可扩展返回更多元素（如 `[state, setState, error, loading]`），无需修改解构语法；\n- 对象扩展需新增字段，兼容性差。\n\n### 总结\n- 核心原因：**灵活命名 + 简洁性 + 顺序固定 + 可扩展性**；\n- 数组解构更适合 React Hooks 的使用场景，提升代码可读性与可维护性。"
+    },
+    {
+        "id": "react-interview-088",
+        "topic": "Redux中的connect有什么作用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux connect 作用详解\n\n#### 1. **核心定义**\n- `connect` 是 `react-redux` 提供的**高阶组件（HOC）**，用于连接 React 组件与 Redux store；\n- 语法：`connect(mapStateToProps, mapDispatchToProps)(Component)`。\n\n#### 2. **核心作用**\n- **映射状态到 props**：通过 `mapStateToProps` 将 Redux store 中的状态映射为组件的 props；\n- **映射 dispatch 到 props**：通过 `mapDispatchToProps` 将 `dispatch` 方法或 action creator 映射为组件的 props；\n- **订阅 store 变化**：自动订阅 Redux store，状态变化时自动更新组件 props，触发重渲染；\n- **解耦组件与 store**：组件无需直接访问 store，通过 props 接收状态和方法，便于测试与复用。\n\n#### 3. 示例\n```jsx\nimport { connect } from 'react-redux';\n\n// 映射状态到 props\nconst mapStateToProps = (state) => ({\n  count: state.count\n});\n\n// 映射 dispatch 到 props\nconst mapDispatchToProps = (dispatch) => ({\n  increment: () => dispatch({ type: 'INCREMENT' })\n});\n\n// 连接组件\nconst Counter = connect(mapStateToProps, mapDispatchToProps)(\n  ({ count, increment }) => (\n    <div>\n      <p>{count}</p>\n      <button onClick={increment}>+1</button>\n    </div>\n  )\n);\n```\n\n#### 4. 替代方案（React Redux 7+）\n- `useSelector`：替代 `mapStateToProps`，在组件中直接获取状态；\n- `useDispatch`：替代 `mapDispatchToProps`，在组件中直接获取 `dispatch`；\n- 示例：\n```jsx\nimport { useSelector, useDispatch } from 'react-redux';\n\nfunction Counter() {\n  const count = useSelector(state => state.count);\n  const dispatch = useDispatch();\n  return (\n    <div>\n      <p>{count}</p>\n      <button onClick={() => dispatch({ type: 'INCREMENT' })}>+1</button>\n    </div>\n  );\n}\n```\n\n### 总结\n- `connect`：**连接 React 组件与 Redux store**，映射状态与 dispatch，订阅状态变化；\n- 现代 React 推荐：**`useSelector` + `useDispatch`** 替代 `connect`，代码更简洁。"
+    },
+    {
+        "id": "react-interview-089",
+        "topic": "Redux 和 Vuex 有什么区别, 它们有什么共同思想吗?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux 与 Vuex 对比\n\n#### 1. 共同思想\n- **单一数据源**：整个应用状态存储在唯一的 store 中；\n- **状态只读**：唯一修改状态的方式是触发 action；\n- **纯函数修改**：通过 reducer（Redux）/ mutation（Vuex）纯函数修改状态；\n- **单向数据流**：action → reducer/mutation → store → 组件更新。\n\n#### 2. 核心区别\n| 特性 | Redux | Vuex |\n| :--- | :--- | :--- |\n| **状态修改** | reducer 纯函数，返回新 state | mutation 同步修改，action 异步封装 |\n| **异步处理** | 依赖中间件（Redux Thunk/Saga） | 内置 action 处理异步 |\n| **不可变性** | 强制不可变状态，每次返回新对象 | 可变状态，直接修改 state |\n| **模块化** | 通过 combineReducers 拆分 | 通过 modules 拆分模块 |\n| **调试工具** | Redux DevTools | Vue DevTools |\n| **框架绑定** | 与 React 解耦，可用于其他框架 | 与 Vue 强绑定，仅用于 Vue |\n\n#### 3. 详细对比\n- **Redux**：\n  - 不可变状态，纯函数 reducer，可预测性强；\n  - 异步依赖中间件，灵活性高；\n  - 与框架解耦，通用性强。\n- **Vuex**：\n  - 可变状态，直接修改，易用性高；\n  - 内置异步处理，开发效率高；\n  - 与 Vue 强绑定，性能优化好。\n\n### 总结\n- 共同思想：**单一数据源 + 单向数据流 + 纯函数修改状态**；\n- 区别：**Redux 不可变 + 中间件异步，Vuex 可变 + 内置异步**；\n- 本质：**同一状态管理思想的不同实现**。"
+    },
+    {
+        "id": "react-interview-090",
+        "topic": "mobx 和 redux 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### MobX 与 Redux 核心区别\n\n| 特性 | Redux | MobX |\n| :--- | :--- | :--- |\n| **编程范式** | 函数式编程，不可变数据 | 响应式编程，可变数据 |\n| **状态管理** | 单一 store，纯函数 reducer 修改 | 多 store，可观察对象（Observable）自动追踪依赖 |\n| **数据流动** | 单向数据流（action → reducer → store） | 双向数据流，自动响应状态变化 |\n| **不可变性** | 强制不可变，每次返回新对象 | 可变状态，直接修改 |\n| **异步处理** | 依赖中间件（Thunk/Saga） | 内置支持异步，无需中间件 |\n| **学习曲线** | 陡峭，需理解函数式编程、中间件 | 平缓，基于响应式编程，易上手 |\n| **可预测性** | 高，纯函数 reducer 可预测 | 低，自动响应难以追踪 |\n| **调试工具** | Redux DevTools，完整时间旅行 | MobX DevTools，功能较弱 |\n| **适用场景** | 大型应用，追求可预测性、可维护性 | 中小型应用，追求开发效率、响应性 |\n\n#### 1. 核心差异\n- **Redux**：**函数式 + 不可变 + 单向数据流**，可预测性强，适合大型团队协作；\n- **MobX**：**响应式 + 可变 + 双向数据流**，开发效率高，适合快速迭代。\n\n#### 2. 示例对比\n- Redux：\n```jsx\nconst reducer = (state = { count: 0 }, action) => {\n  switch (action.type) {\n    case 'INCREMENT':\n      return { ...state, count: state.count + 1 };\n    default:\n      return state;\n  }\n};\n```\n- MobX：\n```jsx\nimport { makeAutoObservable } from 'mobx';\n\nclass CounterStore {\n  count = 0;\n  constructor() {\n    makeAutoObservable(this);\n  }\n  increment() {\n    this.count++;\n  }\n}\n```\n\n### 总结\n- Redux：**可预测、可维护**，适合大型应用；\n- MobX：**高效、易用**，适合中小型应用；\n- 本质：**函数式编程 vs 响应式编程**的不同选择。"
+    },
+    {
+        "id": "react-interview-091",
+        "topic": "Redux 状态管理器和变量挂载到 window 中有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux 与 window 挂载变量的核心区别\n\n| 维度 | Redux 状态管理 | 变量挂载到 window |\n| :--- | :--- | :--- |\n| **可预测性** | 状态更新可预测，纯函数 reducer 处理 | 任意代码可修改，状态不可预测 |\n| **可追踪性** | 完整 action 日志，可回溯调试 | 无日志，难以追踪状态变化 |\n| **组件通信** | 跨组件共享状态，自动订阅更新 | 需手动监听变化，组件通信繁琐 |\n| **性能优化** | 精确订阅，仅更新受影响组件 | 全局状态变化，易导致全量重渲染 |\n| **安全性** | 状态隔离，避免全局污染 | 全局变量，易被篡改、冲突 |\n| **可维护性** | 模块化管理，代码结构清晰 | 全局变量，代码混乱，难以维护 |\n| **服务端渲染** | 支持 SSR，状态可序列化 | 依赖 window，SSR 报错 |\n\n#### 1. Redux 优势\n- **可预测性**：纯函数 reducer 保证状态更新可预测；\n- **可调试**：Redux DevTools 完整记录 action，支持时间旅行；\n- **组件化**：组件通过 props 接收状态，自动订阅变化，解耦组件与状态；\n- **可维护**：模块化拆分，状态逻辑集中管理。\n\n#### 2. window 挂载劣势\n- **不可预测**：任意代码可修改全局变量，状态变化无迹可寻；\n- **调试困难**：无日志，难以定位状态变化来源；\n- **性能差**：状态变化需手动通知组件，易导致全量重渲染；\n- **安全风险**：全局变量易被 XSS 攻击篡改。\n\n### 总结\n- Redux：**可预测、可调试、组件化**，适合复杂应用状态管理；\n- window 挂载：**不可预测、难维护、性能差**，仅适合简单全局常量，不推荐作为状态管理方案。"
+    },
+    {
+        "id": "react-interview-092",
+        "topic": "Redux 中异步的请求怎么处理",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux 异步请求处理方案\n\nRedux 本身只处理同步 action，异步请求需通过**中间件**处理，常用方案：\n\n#### 1. **Redux Thunk（简单易用）**\n- 原理：允许 action 返回函数，在函数中执行异步逻辑，dispatch 同步 action；\n- 示例：\n```jsx\n// action creator\nconst fetchData = () => {\n  return async (dispatch) => {\n    dispatch({ type: 'FETCH_START' });\n    try {\n      const res = await fetch('/api/data');\n      const data = await res.json();\n      dispatch({ type: 'FETCH_SUCCESS', payload: data });\n    } catch (err) {\n      dispatch({ type: 'FETCH_ERROR', payload: err });\n    }\n  };\n};\n```\n- 优势：简单、轻量，适合简单异步场景；\n- 劣势：逻辑分散，难以处理复杂异步流。\n\n#### 2. **Redux Saga（复杂异步流）**\n- 原理：基于 Generator 函数，使用 `takeEvery`/`takeLatest` 监听 action，执行异步逻辑；\n- 示例：\n```jsx\nimport { takeEvery, call, put } from 'redux-saga/effects';\n\nfunction* fetchDataSaga() {\n  try {\n    yield put({ type: 'FETCH_START' });\n    const res = yield call(fetch, '/api/data');\n    const data = yield res.json();\n    yield put({ type: 'FETCH_SUCCESS', payload: data });\n  } catch (err) {\n    yield put({ type: 'FETCH_ERROR', payload: err });\n  }\n}\n\nfunction* rootSaga() {\n  yield takeEvery('FETCH_DATA', fetchDataSaga);\n}\n```\n- 优势：处理复杂异步流（如取消、重试、并发），逻辑清晰；\n- 劣势：学习成本高，代码冗余。\n\n#### 3. **Redux Toolkit（现代推荐）**\n- 内置 `createAsyncThunk`，简化异步 action 定义；\n- 示例：\n```jsx\nimport { createAsyncThunk, createSlice } from '@reduxjs/toolkit';\n\nconst fetchData = createAsyncThunk('data/fetchData', async () => {\n  const res = await fetch('/api/data');\n  return res.json();\n});\n\nconst dataSlice = createSlice({\n  name: 'data',\n  initialState: { data: [], loading: false, error: null },\n  extraReducers: (builder) => {\n    builder\n      .addCase(fetchData.pending, (state) => { state.loading = true; })\n      .addCase(fetchData.fulfilled, (state, action) => {\n        state.loading = false;\n        state.data = action.payload;\n      })\n      .addCase(fetchData.rejected, (state, action) => {\n        state.loading = false;\n        state.error = action.error;\n      });\n  }\n});\n```\n- 优势：简洁、高效，内置 loading/error 状态，现代 Redux 推荐。\n\n### 总结\n- 简单场景：**Redux Thunk**；\n- 复杂异步流：**Redux Saga**；\n- 现代开发：**Redux Toolkit + createAsyncThunk**（推荐）。"
+    },
+    {
+        "id": "react-interview-093",
+        "topic": "使用 useState (const [test, setTest] = useState([])) 时, 为什么连续调用 setTest(...test, newValue) 会出现值的丢失?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 值丢失原因分析\n\n#### 1. 核心原因：状态更新异步 + 闭包陷阱\n- `setTest` 是异步更新，不会立即修改 `test`；\n- 连续调用时，每次 `setTest` 都捕获了**初始的 `test` 空数组**，而非最新值；\n- 示例：\n```jsx\nconst [test, setTest] = useState([]);\n\nconst handleAdd = () => {\n  setTest([...test, 'a']); // test = []\n  setTest([...test, 'b']); // test = []\n  setTest([...test, 'c']); // test = []\n};\n// 最终 test = ['c']，丢失了 'a' 和 'b'\n```\n- 原因：三次 `setTest` 都使用了初始 `test = []`，最后一次覆盖前两次。\n\n#### 2. 解决方案：函数式更新\n- 使用 `setTest(prev => [...prev, newValue])`，基于最新状态更新；\n- 示例：\n```jsx\nconst handleAdd = () => {\n  setTest(prev => [...prev, 'a']); // prev = []\n  setTest(prev => [...prev, 'b']); // prev = ['a']\n  setTest(prev => [...prev, 'c']); // prev = ['a', 'b']\n};\n// 最终 test = ['a', 'b', 'c']\n```\n- 原理：函数式更新接收最新的 `prev` 状态，保证每次更新基于最新值。\n\n### 总结\n- 丢失原因：**状态更新异步 + 闭包陷阱**，连续调用使用旧的 `test` 值；\n- 解决方案：**函数式更新**，基于 `prev` 状态更新，保证值不丢失。"
+    },
+    {
+        "id": "react-interview-094",
+        "topic": "说说对受控组件和非受控组件的理解, 以及应用场景?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 受控组件 vs 非受控组件\n\n| 特性 | 受控组件 | 非受控组件 |\n| :--- | :--- | :--- |\n| **状态管理** | 由 React 状态管理，值通过 props 传递 | 由 DOM 自身管理，值通过 ref 获取 |\n| **数据流动** | 单向数据流：state → value → onChange → state | 双向数据流：DOM 直接修改值 |\n| **控制粒度** | 完全控制输入值，可实时校验/格式化 | 仅控制初始值，无法实时干预 |\n| **使用方式** | `value={state} onChange={handleChange}` | `defaultValue={initialValue} ref={ref}` |\n| **适用场景** | 表单校验、实时搜索、联动输入 | 文件上传、一次性表单提交 |\n\n#### 1. 受控组件\n- 定义：组件的值由 React 状态管理，通过 `onChange` 同步更新状态；\n- 示例：\n```jsx\nfunction Input() {\n  const [value, setValue] = useState('');\n  return (\n    <input \n      type=\"text\" \n      value={value} \n      onChange={(e) => setValue(e.target.value)} \n    />\n  );\n}\n```\n- 优势：可实时校验、格式化、联动，数据可预测；\n- 劣势：代码繁琐，需手动管理状态。\n\n#### 2. 非受控组件\n- 定义：组件的值由 DOM 管理，通过 `ref` 获取最终值；\n- 示例：\n```jsx\nfunction Input() {\n  const inputRef = useRef(null);\n  const handleSubmit = () => {\n    console.log(inputRef.current.value);\n  };\n  return (\n    <div>\n      <input type=\"text\" defaultValue=\"hello\" ref={inputRef} />\n      <button onClick={handleSubmit}>提交</button>\n    </div>\n  );\n}\n```\n- 优势：代码简洁，无需管理状态；\n- 劣势：无法实时校验，数据不可预测。\n\n### 总结\n- **受控组件**：适合需要**实时控制、校验、联动**的场景；\n- **非受控组件**：适合**简单表单、文件上传**等无需实时控制的场景；\n- 推荐：优先使用受控组件，保证数据可预测。"
+    },
+    {
+        "id": "react-interview-095",
+        "topic": "说说React render方法的原理? 在什么时候会被触发?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React render 方法原理与触发时机\n\n#### 1. 原理\n- `render` 方法是组件的**核心渲染函数**，返回 React 元素（虚拟 DOM）；\n- 类组件：`render()` 方法必须实现，返回 JSX；\n- 函数组件：函数本身就是 render 方法，返回 JSX；\n- 作用：描述当前状态/ props 对应的 UI 结构，React 基于返回的虚拟 DOM 生成真实 DOM。\n\n#### 2. 触发时机\n- **类组件**：\n  1. 首次挂载：`constructor` → `static getDerivedStateFromProps` → `render` → `componentDidMount`；\n  2. 更新：`static getDerivedStateFromProps`/`shouldComponentUpdate` → `render` → `componentDidUpdate`；\n  3. 强制更新：`forceUpdate()` 直接触发 `render`。\n- **函数组件**：\n  1. 首次挂载：执行函数，返回 JSX；\n  2. 更新：状态/ props 变化时，重新执行函数，返回新 JSX；\n  3. 父组件重渲染：若子组件未被 `React.memo` 包裹，会触发重渲染。\n\n#### 3. 优化建议\n- 避免在 `render` 中执行昂贵计算，移至 `useMemo`/`componentWillMount`；\n- 使用 `React.memo`/`shouldComponentUpdate` 避免不必要重渲染；\n- 保持 `render` 纯函数，无副作用。\n\n### 总结\n- `render` 方法：**描述 UI 结构**，返回虚拟 DOM；\n- 触发时机：**挂载/更新/强制更新**，状态/ props 变化时触发；\n- 核心：**状态/ props → render → UI**，单向数据流。"
+    },
+    {
+        "id": "react-interview-096",
+        "topic": "说说React Router有几种模式, 以及实现原理?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Router 路由模式与原理\n\n#### 1. 三种路由模式\n| 模式 | 实现 | URL 示例 | 原理 |\n| :--- | :--- | :--- | :--- |\n| **BrowserRouter** | HTML5 History API | `https://example.com/home` | `pushState`/`replaceState` 管理历史记录，`popstate` 监听 URL 变化 |\n| **HashRouter** | URL hash | `https://example.com/#/home` | `hashchange` 监听 hash 变化，无需后端配置 |\n| **MemoryRouter** | 内存历史 | 无 URL 变化（仅内存管理） | 手动管理历史记录，适合测试/非浏览器环境 |\n\n#### 2. 核心原理\n- **BrowserRouter**：\n  - 使用 `history.pushState()`/`history.replaceState()` 修改 URL，不刷新页面；\n  - 监听 `popstate` 事件，URL 变化时触发组件更新；\n  - 需后端配置，将所有请求指向 `index.html`，避免 404。\n- **HashRouter**：\n  - URL hash 变化不会触发页面刷新；\n  - 监听 `hashchange` 事件，解析 hash 作为路由路径；\n  - 无需后端配置，兼容性好（支持 IE9+）。\n- **MemoryRouter**：\n  - 历史记录存储在内存中，与 URL 无关；\n  - 适合测试、React Native、Electron 等非浏览器环境。\n\n#### 3. 选择建议\n- **BrowserRouter**：推荐用于生产环境，URL 美观，SEO 友好；\n- **HashRouter**：适合静态站点、无后端配置的场景；\n- **MemoryRouter**：仅用于测试/非浏览器环境。\n\n### 总结\n- BrowserRouter：**HTML5 History API**，URL 美观，需后端配置；\n- HashRouter：**URL hash**，兼容性好，无需后端配置；\n- MemoryRouter：**内存历史**，适合测试/非浏览器环境。"
+    },
+    {
+        "id": "react-interview-097",
+        "topic": "说说你对React Router的理解? 常用的Router组件有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Router 核心理解\n\n#### 1. 定义\n- React Router 是 React 生态的**官方路由库**，用于实现单页应用（SPA）的路由管理；\n- 核心：**声明式路由**，通过组件配置路由，将 URL 映射到组件。\n\n#### 2. 常用组件（React Router 6+）\n- **路由容器**：\n  - `BrowserRouter`/`HashRouter`/`MemoryRouter`：路由模式容器，包裹整个应用；\n- **路由配置**：\n  - `Routes`：替代 `Switch`，包裹 `Route`，匹配第一个符合的路由；\n  - `Route`：定义路由规则，`path` 对应 URL，`element` 对应渲染组件；\n- **导航组件**：\n  - `Link`：声明式导航，渲染 `<a>` 标签，避免页面刷新；\n  - `NavLink`：`Link` 子类，支持激活样式；\n  - `Navigate`：编程式导航，重定向到指定路由；\n- **嵌套路由**：\n  - `Outlet`：渲染子路由组件，实现嵌套布局；\n- **Hook 工具**：\n  - `useNavigate`：编程式导航；\n  - `useParams`：获取路由参数；\n  - `useSearchParams`：获取查询参数；\n  - `useLocation`：获取当前 location 对象。\n\n#### 3. 示例\n```jsx\nimport { BrowserRouter, Routes, Route, Link, Outlet } from 'react-router-dom';\n\nfunction Layout() {\n  return (\n    <div>\n      <nav>\n        <Link to=\"/\">Home</Link>\n        <Link to=\"/about\">About</Link>\n      </nav>\n      <Outlet /> {/* 子路由渲染位置 */}\n    </div>\n  );\n}\n\nfunction App() {\n  return (\n    <BrowserRouter>\n      <Routes>\n        <Route path=\"/\" element={<Layout />}>\n          <Route index element={<Home />} />\n          <Route path=\"about\" element={<About />} />\n        </Route>\n      </Routes>\n    </BrowserRouter>\n  );\n}\n```\n\n### 总结\n- React Router：**声明式路由管理**，将 URL 映射到组件；\n- 核心组件：`BrowserRouter`/`Routes`/`Route`/`Link`/`Outlet`；\n- 优势：**声明式、嵌套路由、编程式导航**，适合 SPA 开发。"
+    },
+    {
+        "id": "react-interview-098",
+        "topic": "你在React项目中是如何使用Redux的? 项目结构是如何划分的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux 项目使用与结构划分\n\n#### 1. 现代 Redux 使用（Redux Toolkit 推荐）\n- 使用 `@reduxjs/toolkit` 简化 Redux 配置；\n- 核心 API：`createSlice`（定义 reducer + action）、`configureStore`（创建 store）、`createAsyncThunk`（异步 action）；\n- 示例：\n```jsx\n// store/index.js\nimport { configureStore } from '@reduxjs/toolkit';\nimport counterSlice from './counterSlice';\n\nexport const store = configureStore({\n  reducer: {\n    counter: counterSlice\n  }\n});\n\n// store/counterSlice.js\nimport { createSlice } from '@reduxjs/toolkit';\n\nconst counterSlice = createSlice({\n  name: 'counter',\n  initialState: { value: 0 },\n  reducers: {\n    increment: (state) => { state.value += 1 },\n    decrement: (state) => { state.value -= 1 }\n  }\n});\n\nexport const { increment, decrement } = counterSlice.actions;\nexport default counterSlice.reducer;\n```\n\n#### 2. 项目结构划分（模块化）\n```\nsrc/\n├── store/                  # Redux 状态管理\n│   ├── index.js           # 配置 store\n│   ├── slices/            # 模块化 slice\n│   │   ├── counterSlice.js\n│   │   ├── userSlice.js\n│   │   └── ...\n│   └── middleware/        # 自定义中间件（可选）\n├── components/            # 通用组件\n├── pages/                 # 页面组件\n│   ├── Home.jsx           # 页面组件，使用 useSelector/useDispatch\n│   └── ...\n└── App.jsx                # 根组件\n```\n\n#### 3. 组件使用\n- `useSelector`：获取状态；\n- `useDispatch`：触发 action；\n- 示例：\n```jsx\nimport { useSelector, useDispatch } from 'react-redux';\nimport { increment } from '../store/slices/counterSlice';\n\nfunction Home() {\n  const count = useSelector(state => state.counter.value);\n  const dispatch = useDispatch();\n  return (\n    <div>\n      <p>{count}</p>\n      <button onClick={() => dispatch(increment())}>+1</button>\n    </div>\n  );\n}\n```\n\n### 总结\n- 使用：**Redux Toolkit** 简化配置，模块化 slice 管理状态；\n- 结构：按功能模块划分 slice，组件通过 `useSelector`/`useDispatch` 连接 Redux；\n- 优势：**代码简洁、可维护性高、开发效率高**。"
+    },
+    {
+        "id": "react-interview-099",
+        "topic": "说说对Redux中间件的理解? 常用的中间件有哪些? 实现原理?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux 中间件详解\n\n#### 1. 定义\n- 中间件是 **action 与 reducer 之间的扩展机制**，用于处理异步、日志、异常等副作用；\n- 本质：高阶函数，包装 `dispatch` 方法，在 action 传递到 reducer 前执行逻辑。\n\n#### 2. 常用中间件\n| 中间件 | 作用 |\n| :--- | :--- |\n| **redux-thunk** | 允许 action 返回函数，处理异步请求 |\n| **redux-saga** | 基于 Generator，处理复杂异步流 |\n| **redux-logger** | 日志中间件，记录 action 与状态变化 |\n| **redux-promise** | 允许 action 返回 Promise，处理异步 |\n| **redux-observable** | 基于 RxJS，处理响应式异步流 |\n\n#### 3. 实现原理\n- 中间件本质是 `({ dispatch, getState }) => next => action => {}`；\n- 洋葱模型：多个中间件层层嵌套，从外到内执行，再从内到外返回；\n- 示例（简化版 redux-thunk）：\n```jsx\nconst thunk = ({ dispatch, getState }) => next => action => {\n  if (typeof action === 'function') {\n    return action(dispatch, getState);\n  }\n  return next(action);\n};\n```\n- 流程：\n  1. 中间件接收 `dispatch`/`getState`；\n  2. 返回函数接收 `next`（下一个中间件/原始 dispatch）；\n  3. 执行 action，若为函数则调用，否则传递给 `next`。\n\n#### 4. 应用场景\n- 异步请求：redux-thunk/redux-saga；\n- 日志记录：redux-logger；\n- 异常处理：自定义中间件捕获错误；\n- 性能监控：记录 action 执行时间。\n\n### 总结\n- 中间件：**扩展 Redux 功能，处理副作用**；\n- 原理：**洋葱模型**，包装 dispatch，在 action 传递前执行逻辑；\n- 常用：**redux-thunk**（简单异步）、**redux-saga**（复杂异步）、**redux-logger**（日志）。"
+    },
+    {
+        "id": "react-interview-100",
+        "topic": "说说你对Redux的理解? 其工作原理?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Redux 核心理解与工作原理\n\n#### 1. 核心定义\n- Redux 是 **JavaScript 状态管理库**，用于管理复杂应用的全局状态；\n- 三大原则：**单一数据源**、**状态只读**、**纯函数修改**。\n\n#### 2. 核心概念\n- **Store**：唯一状态容器，保存全局状态；\n- **Action**：普通对象，描述状态更新类型（`{ type: 'INCREMENT' }`）；\n- **Reducer**：纯函数，接收 `(state, action)`，返回新 state；\n- **Dispatch**：触发 action，调用 reducer 更新 state；\n- **Subscribe**：订阅状态变化，通知组件更新。\n\n#### 3. 工作流程\n1. **触发 Action**：组件调用 `dispatch(action)`；\n2. **中间件处理**：中间件拦截 action，处理异步/日志等副作用；\n3. **Reducer 更新**：Store 调用 root reducer，传入当前 state 和 action，返回新 state；\n4. **状态变更**：Store 保存新 state；\n5. **通知订阅**：Store 通知所有订阅者（组件）状态变化；\n6. **组件更新**：组件获取新 state，重新渲染 UI。\n\n#### 4. 示例流程\n```jsx\n// 1. 创建 store\nconst store = createStore(reducer);\n\n// 2. 触发 action\nstore.dispatch({ type: 'INCREMENT' });\n\n// 3. reducer 处理\nfunction reducer(state = { count: 0 }, action) {\n  switch (action.type) {\n    case 'INCREMENT':\n      return { ...state, count: state.count + 1 };\n    default:\n      return state;\n  }\n}\n\n// 4. 订阅更新\nstore.subscribe(() => console.log(store.getState()));\n```\n\n### 总结\n- Redux：**可预测的状态管理库**，三大原则保证状态一致性；\n- 工作原理：**action → middleware → reducer → store → component**，单向数据流；\n- 价值：**状态可预测、可调试、可维护**，适合复杂应用状态管理。"
+    },
+    {
+        "id": "react-interview-101",
+        "topic": "在react中怎么实现组件间的过渡动画?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 组件过渡动画实现方案\n\n#### 1. **React Transition Group（官方推荐）**\n- 核心组件：\n  - `Transition`：管理组件进入/退出的过渡状态；\n  - `CSSTransition`：基于 CSS 类名实现过渡动画；\n  - `SwitchTransition`：管理组件切换过渡；\n  - `TransitionGroup`：包裹多个过渡组件，管理列表过渡。\n- 示例：\n```jsx\nimport { CSSTransition } from 'react-transition-group';\n\nfunction Fade({ in: inProp, children }) {\n  return (\n    <CSSTransition\n      in={inProp}\n      timeout={300}\n      classNames=\"fade\"\n      unmountOnExit\n    >\n      {children}\n    </CSSTransition>\n  );\n}\n\n// CSS\n.fade-enter { opacity: 0; }\n.fade-enter-active { opacity: 1; transition: opacity 300ms; }\n.fade-exit { opacity: 1; }\n.fade-exit-active { opacity: 0; transition: opacity 300ms; }\n```\n\n#### 2. **Framer Motion（更易用）**\n- 声明式 API，无需手动管理状态；\n- 示例：\n```jsx\nimport { motion } from 'framer-motion';\n\nfunction Fade({ isVisible }) {\n  return (\n    <motion.div\n      initial={{ opacity: 0 }}\n      animate={{ opacity: isVisible ? 1 : 0 }}\n      transition={{ duration: 0.3 }}\n    >\n      内容\n    </motion.div>\n  );\n}\n```\n\n#### 3. **React Spring（物理动画）**\n- 基于弹簧物理模型，实现更自然的动画；\n- 示例：\n```jsx\nimport { useSpring, animated } from 'react-spring';\n\nfunction Fade({ isVisible }) {\n  const props = useSpring({\n    opacity: isVisible ? 1 : 0,\n    config: { duration: 300 }\n  });\n  return <animated.div style={props}>内容</animated.div>;\n}\n```\n\n### 总结\n- 轻量场景：**React Transition Group + CSS**；\n- 易用场景：**Framer Motion**；\n- 物理动画：**React Spring**。"
+    },
+    {
+        "id": "react-interview-102",
+        "topic": "React构建组件的方式有哪些? 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 组件构建方式对比\n\n| 方式 | 语法 | 状态管理 | 生命周期 | 适用场景 |\n| :--- | :--- | :--- | :--- | :--- |\n| **函数组件（现代主流）** | `function Component() { return <div /> }` | Hooks（useState/useEffect） | 无，用 Hooks 模拟 | 所有场景，推荐使用 |\n| **类组件** | `class Component extends React.Component { render() { return <div /> } }` | this.state/this.setState | 完整生命周期（componentDidMount等） | 旧项目、复杂生命周期场景 |\n| **高阶组件（HOC）** | `function withHOC(Component) { return WrappedComponent }` | 可注入状态/Props | 继承被包裹组件 | 横切关注点（日志、权限） |\n| **Render Props** | `Component({ children: (data) => <div /> })` | 内部状态，通过函数传递 | 无 | 状态共享、动态渲染 |\n| **React.memo** | `const Component = React.memo(Component)` | 无，优化渲染 | 无 | 纯展示组件，避免不必要重渲染 |\n\n#### 1. 核心差异\n- **函数组件**：简洁、轻量，配合 Hooks 实现状态与副作用；\n- **类组件**：完整生命周期，适合复杂逻辑，代码冗余；\n- **HOC/Render Props**：逻辑复用方式，现代推荐用自定义 Hooks 替代。\n\n### 总结\n- 推荐：**函数组件 + Hooks**，现代 React 最佳实践；\n- 类组件：逐步淘汰，仅用于旧项目；\n- 逻辑复用：**自定义 Hooks** 替代 HOC/Render Props。"
+    },
+    {
+        "id": "react-interview-103",
+        "topic": "state 和 props有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### state 与 props 核心区别\n\n| 特性 | state | props |\n| :--- | :--- | :--- |\n| **来源** | 组件内部定义，管理自身状态 | 父组件传递，外部传入 |\n| **可修改性** | 可修改（this.setState/setState） | 只读，不可直接修改 |\n| **作用域** | 仅组件内部可见 | 组件间传递，子组件接收 |\n| **目的** | 管理组件内部可变状态 | 父子组件通信，传递数据/回调 |\n| **更新触发** | 自身更新触发重渲染 | 父组件更新传递新 props 触发重渲染 |\n\n#### 1. 核心理解\n- **state**：组件的**私有数据仓库**，用于存储会变化的数据，组件自身可修改；\n- **props**：组件的**外部接口**，用于接收父组件数据/回调，只读不可改。\n\n#### 2. 示例\n```jsx\n// 父组件\nfunction Parent() {\n  const [count, setCount] = useState(0);\n  return <Child count={count} onClick={() => setCount(count + 1)} />;\n}\n\n// 子组件\nfunction Child({ count, onClick }) {\n  // count 和 onClick 是 props，只读\n  // 若需修改，需调用 onClick 通知父组件\n  return <button onClick={onClick}>{count}</button>;\n}\n```\n\n### 总结\n- state：**内部、可变、自管理**；\n- props：**外部、只读、父子通信**；\n- 核心：**单向数据流**，父组件通过 props 传递数据，子组件通过回调通知父组件修改 state。"
+    },
+    {
+        "id": "react-interview-104",
+        "topic": "说说react中引入css的方式有哪几种? 区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 引入 CSS 的方式\n\n| 方式 | 语法 | 作用域 | 优点 | 缺点 |\n| :--- | :--- | :--- | :--- | :--- |\n| **全局 CSS** | `import './style.css'` | 全局 | 简单、原生 | 样式冲突、难以维护 |\n| **CSS Modules** | `import styles from './style.module.css'` | 局部（类名哈希） | 避免冲突、可复用 | 类名冗长、动态样式弱 |\n| **内联样式** | `style={{ color: 'red' }}` | 组件内 | 动态样式强 | 无法使用伪类/媒体查询 |\n| **CSS-in-JS** | `styled.div` | 组件级 | 动态样式、组件化 | 学习成本高、运行时开销 |\n| **Sass/Less** | `import './style.scss'` | 同 CSS | 变量、混合、嵌套 | 需预处理器、全局冲突 |\n\n#### 1. 核心区别\n- **全局 CSS**：样式全局生效，易冲突，适合全局样式；\n- **CSS Modules**：类名哈希化，局部作用域，避免冲突；\n- **内联样式**：直接写在元素上，动态样式强，功能受限；\n- **CSS-in-JS**：将 CSS 写在 JS 中，组件级作用域，动态样式强。\n\n#### 2. 推荐场景\n- 全局样式：**全局 CSS**；\n- 组件样式：**CSS Modules** 或 **CSS-in-JS**；\n- 动态样式：**内联样式** 或 **CSS-in-JS**。\n\n### 总结\n- 简单场景：**CSS Modules**；\n- 复杂动态样式：**CSS-in-JS**（如 styled-components）；\n- 避免：**全局 CSS** 滥用，防止样式冲突。"
+    },
+    {
+        "id": "react-interview-105",
+        "topic": "说说你对immutable的理解? 如何应用在react项目中?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Immutable 核心理解与 React 应用\n\n#### 1. 定义\n- Immutable：**不可变数据**，数据一旦创建不可修改，修改时返回新对象；\n- 核心：**不可变性保证数据可预测、可追踪**，避免副作用。\n\n#### 2. 优势\n- **可预测性**：数据不可变，状态变化可追踪；\n- **性能优化**：浅比较即可判断数据变化，避免深拷贝；\n- **调试方便**：历史状态可回溯，便于调试；\n- **并发安全**：多线程/异步场景下无数据竞争。\n\n#### 3. React 应用\n- **原生方式**：展开运算符 `...`、`Object.assign`、`Array.map/filter`；\n  ```jsx\n  const newState = { ...state, count: state.count + 1 };\n  ```\n- **Immutable.js**：提供不可变数据结构（List/Map），高效操作；\n  ```jsx\n  import { Map } from 'immutable';\n  const state = Map({ count: 0 });\n  const newState = state.set('count', 1);\n  ```\n- **Immer**：更易用的不可变库，通过 `produce` 生成新状态；\n  ```jsx\n  import { produce } from 'immer';\n  const newState = produce(state, draft => {\n    draft.count += 1;\n  });\n  ```\n\n#### 4. 最佳实践\n- React 状态更新必须返回新对象，避免直接修改原状态；\n- 配合 `React.memo`/`useMemo`/`useCallback` 优化性能；\n- 推荐：**Immer**，简单易用，无需学习新数据结构。\n\n### 总结\n- Immutable：**不可变数据，保证可预测性与性能**；\n- React 应用：**原生展开运算符/Immutable.js/Immer**，推荐 Immer。"
+    },
+    {
+        "id": "react-interview-106",
+        "topic": "说说React Jsx转换成真实DOM过程?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### JSX 转换为真实 DOM 的完整流程\n\n#### 1. **编译阶段：JSX → React.createElement**\n- Babel 或 TypeScript 将 JSX 编译为 `React.createElement(type, props, ...children)`；\n- 示例：`<div className=\"box\">Hello</div>` → `React.createElement('div', { className: 'box' }, 'Hello')`。\n\n#### 2. **创建虚拟 DOM（Virtual DOM）**\n- `React.createElement` 返回虚拟 DOM 对象：\n  ```jsx\n  {\n    type: 'div',\n    props: { className: 'box', children: 'Hello' },\n    key: null,\n    ref: null\n  }\n  ```\n- 虚拟 DOM 是轻量 JS 对象，描述真实 DOM 结构。\n\n#### 3. **调和阶段（Reconciliation）**\n- React 对比新旧虚拟 DOM，找出差异（Diff 算法）；\n- 生成 Fiber 树，标记需要更新的节点；\n- 可中断渲染，保证页面响应性。\n\n#### 4. **提交阶段（Commit）**\n- 将差异应用到真实 DOM：\n  - 插入新节点；\n  - 更新节点属性；\n  - 删除旧节点；\n- 执行生命周期/副作用（componentDidMount/useEffect）。\n\n#### 5. **浏览器绘制**\n- 真实 DOM 更新后，浏览器重排/重绘，渲染到页面。\n\n### 总结\n- 流程：**JSX → React.createElement → 虚拟 DOM → Fiber 调和 → 真实 DOM → 绘制**；\n- 核心：**虚拟 DOM + Diff 算法**，实现高效更新。"
+    },
+    {
+        "id": "react-interview-107",
+        "topic": "说说你在React项目是如何捕获错误的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 项目错误捕获方案\n\n#### 1. **错误边界（Error Boundary）**\n- 捕获子组件渲染/生命周期中的错误，防止应用崩溃；\n- 类组件实现 `static getDerivedStateFromError()` 和 `componentDidCatch()`；\n- 示例：\n```jsx\nclass ErrorBoundary extends React.Component {\n  state = { hasError: false };\n  static getDerivedStateFromError() {\n    return { hasError: true };\n  }\n  componentDidCatch(error, info) {\n    // 上报错误\n    console.error(error, info);\n  }\n  render() {\n    if (this.state.hasError) return <h1>出错了</h1>;\n    return this.props.children;\n  }\n}\n// 使用\n<ErrorBoundary>\n  <MyComponent />\n</ErrorBoundary>\n```\n\n#### 2. **try/catch（异步/事件处理）**\n- 捕获异步操作、事件处理中的错误；\n- 示例：\n```jsx\nasync function fetchData() {\n  try {\n    const res = await fetch('/api/data');\n    return res.json();\n  } catch (err) {\n    console.error('请求失败', err);\n  }\n}\n```\n\n#### 3. **全局错误监听**\n- 监听 `window.onerror`/`unhandledrejection`，捕获未处理的同步/异步错误；\n- 示例：\n```jsx\nuseEffect(() => {\n  const handleError = (event) => {\n    console.error('全局错误', event.error);\n  };\n  window.addEventListener('error', handleError);\n  return () => window.removeEventListener('error', handleError);\n}, []);\n```\n\n#### 4. **React 18+ Suspense 错误处理**\n- 配合 `ErrorBoundary` 处理 Suspense 加载错误。\n\n### 总结\n- 渲染/生命周期错误：**错误边界**；\n- 异步/事件错误：**try/catch**；\n- 全局错误：**window.onerror/unhandledrejection**。"
+    },
+    {
+        "id": "react-interview-108",
+        "topic": "说说React服务端渲染怎么做? 原理是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 服务端渲染（SSR）实现与原理\n\n#### 1. **实现步骤（Next.js 推荐）**\n- **Next.js**：开箱即用的 SSR 框架，简化配置；\n- 核心 API：\n  - `getServerSideProps`：服务端获取数据，注入到组件 props；\n  - `getStaticProps`：静态生成页面（SSG）；\n- 示例：\n```jsx\n// pages/home.js\nexport async function getServerSideProps() {\n  const res = await fetch('https://api.example.com/data');\n  const data = await res.json();\n  return { props: { data } };\n}\n\nfunction Home({ data }) {\n  return <div>{data.title}</div>;\n}\n\nexport default Home;\n```\n\n#### 2. **原生 SSR 实现**\n1. **服务端渲染**：\n   - 使用 `ReactDOMServer.renderToString()` 将组件渲染为 HTML 字符串；\n   - 注入初始状态到 window；\n2. **客户端 hydration**：\n   - 客户端加载 JS，使用 `ReactDOM.hydrateRoot()` 绑定事件，激活页面。\n- 示例：\n```jsx\n// 服务端\nimport { renderToString } from 'react-dom/server';\nconst html = renderToString(<App />);\nconst page = `\n  <html>\n    <body>\n      <div id=\"root\">${html}</div>\n      <script>window.__INITIAL_STATE__ = ${JSON.stringify(state)}</script>\n      <script src=\"/client.js\"></script>\n    </body>\n  </html>\n`;\n\n// 客户端\nimport { hydrateRoot } from 'react-dom/client';\nconst root = document.getElementById('root');\nhydrateRoot(root, <App />);\n```\n\n#### 3. **原理**\n- **服务端**：将 React 组件渲染为 HTML，返回给浏览器，首屏直出；\n- **客户端**：加载 JS，绑定事件，将静态 HTML 激活为可交互页面；\n- 优势：**首屏加载快、SEO 友好**；\n- 劣势：**服务端压力大、开发复杂**。\n\n### 总结\n- 实现：**Next.js（推荐）** 或 **ReactDOMServer.renderToString + hydrate**；\n- 原理：**服务端渲染 HTML + 客户端 hydration**，提升首屏速度与 SEO。"
+    },
+    {
+        "id": "react-interview-109",
+        "topic": "react中懒加载的实现原理是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 懒加载实现原理\n\n#### 1. **React.lazy + Suspense（官方方案）**\n- `React.lazy`：动态导入组件，返回 Promise；\n- `Suspense`：包裹懒加载组件，显示加载状态；\n- 示例：\n```jsx\nconst MyComponent = React.lazy(() => import('./MyComponent'));\n\nfunction App() {\n  return (\n    <Suspense fallback={<div>加载中...</div>}>\n      <MyComponent />\n    </Suspense>\n  );\n}\n```\n\n#### 2. **原理**\n- **动态导入**：利用 ES 模块 `import()` 动态加载组件代码，分割 bundle；\n- **Promise 处理**：`React.lazy` 接收返回 Promise 的函数，Promise resolve 后渲染组件；\n- **Suspense 协调**：`Suspense` 监听组件加载状态，显示 fallback，加载完成后渲染组件；\n- **webpack 支持**：webpack 自动将动态导入的代码分割为独立 chunk，按需加载。\n\n#### 3. **优势**\n- 减小初始 bundle 体积，提升首屏加载速度；\n- 按需加载，节省流量；\n- 配合路由实现路由级懒加载。\n\n#### 4. **替代方案**\n- `loadable-components`：更灵活的懒加载库，支持服务端渲染。\n\n### 总结\n- 原理：**动态导入 + Promise + Suspense 协调**；\n- 作用：**代码分割，按需加载，提升首屏性能**。"
+    },
+    {
+        "id": "react-interview-110",
+        "topic": "React中的路由懒加载是什么? 原理是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 路由懒加载\n\n#### 1. **定义**\n- 路由懒加载：按页面路由分割代码，仅加载当前页面的组件代码；\n- 核心：**减小初始 bundle 体积，提升首屏加载速度**。\n\n#### 2. **实现（React Router 6+）**\n- 结合 `React.lazy` + `Suspense` + 路由配置；\n- 示例：\n```jsx\nimport { BrowserRouter, Routes, Route, Suspense } from 'react-router-dom';\n\nconst Home = React.lazy(() => import('./pages/Home'));\nconst About = React.lazy(() => import('./pages/About'));\n\nfunction App() {\n  return (\n    <BrowserRouter>\n      <Suspense fallback={<div>加载中...</div>}>\n        <Routes>\n          <Route path=\"/\" element={<Home />} />\n          <Route path=\"/about\" element={<About />} />\n        </Routes>\n      </Suspense>\n    </BrowserRouter>\n  );\n}\n```\n\n#### 3. **原理**\n- **代码分割**：webpack 将每个路由组件打包为独立 chunk；\n- **动态导入**：访问路由时，动态加载对应 chunk；\n- **Suspense 管理**：`Suspense` 显示加载状态，chunk 加载完成后渲染路由组件；\n- **路由触发**：路由切换时触发组件加载，按需加载。\n\n#### 4. **优势**\n- 首屏加载快：仅加载必要代码；\n- 按需加载：节省流量；\n- 缓存友好：路由 chunk 可独立缓存。\n\n### 总结\n- 路由懒加载：**按路由分割代码，按需加载**；\n- 原理：**动态导入 + 代码分割 + Suspense 协调**，提升首屏性能。"
+    },
+    {
+        "id": "react-interview-111",
+        "topic": "React有哪些性能优化的方法?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 性能优化核心方法\n\n#### 1. **减少不必要的重渲染**\n- `React.memo`：记忆化组件，浅比较 props，避免无变化时重渲染；\n- `useMemo`：缓存昂贵计算结果，避免重复计算；\n- `useCallback`：缓存函数引用，避免子组件因函数引用变化而重渲染；\n- 类组件：`shouldComponentUpdate`/`PureComponent` 手动控制更新。\n\n#### 2. **代码分割与懒加载**\n- `React.lazy + Suspense`：组件级/路由级懒加载，减小初始 bundle 体积；\n- 路由懒加载：按页面分割代码，按需加载。\n\n#### 3. **虚拟 DOM 优化**\n- 合理使用 `key`：避免用 index 作为 key，保证 Diff 算法高效；\n- 避免在 `render` 中创建新对象/函数，防止 props 变化触发重渲染。\n\n#### 4. **状态与数据优化**\n- 状态本地化：将状态下沉到子组件，避免父组件重渲染；\n- Immutable 数据：使用不可变数据结构，方便浅比较；\n- 防抖/节流：处理高频事件（如输入、滚动）。\n\n#### 5. **渲染优化**\n- 列表虚拟化：`react-window`/`react-virtualized` 只渲染可视区域列表项；\n- 避免频繁 DOM 操作：批量更新 DOM。\n\n#### 6. **构建与部署优化**\n- 开启 Gzip/Brotli 压缩；\n- 图片优化：压缩、WebP 格式、懒加载；\n- Tree Shaking：移除未使用代码；\n- CDN 加速：静态资源托管到 CDN。\n\n### 总结\n- 核心方向：**减少重渲染 + 代码分割 + 渲染优化 + 构建优化**；\n- 关键手段：`React.memo`/`useMemo`/`useCallback` + 懒加载 + 列表虚拟化。"
+    },
+    {
+        "id": "react-interview-112",
+        "topic": "React Fiber 是如何实现更新过程可控?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Fiber 更新可控的实现原理\n\n#### 1. **核心目标**\n- 将同步的 Diff 过程拆分为可中断的小任务，保证页面响应性；\n- 实现**优先级调度**，高优先级任务（如用户交互）可插队执行。\n\n#### 2. **数据结构：Fiber 节点**\n- Fiber 节点是虚拟 DOM 的扩展，包含：\n  - `child`/`sibling`/`return`：构建链表树，方便遍历；\n  - `priority`：任务优先级；\n  - `alternate`：双缓冲，保存新旧 Fiber；\n  - `effectTag`：标记需要执行的 DOM 操作（插入/更新/删除）。\n\n#### 3. **可中断的调和阶段**\n- **遍历方式**：深度优先遍历（DFS），以链表形式遍历 Fiber 树；\n- **时间切片**：每个任务单元执行不超过 5ms，执行完后让出主线程；\n- **中断与恢复**：通过 `requestIdleCallback`/`MessageChannel` 实现，下次空闲时继续执行剩余任务；\n- **优先级调度**：高优先级任务（如用户输入）可打断低优先级任务，优先执行。\n\n#### 4. **提交阶段不可中断**\n- 调和阶段标记所有需要更新的 Fiber 节点；\n- 提交阶段一次性将所有更新应用到真实 DOM，保证 UI 一致性。\n\n### 总结\n- Fiber 通过 **Fiber 链表结构 + 时间切片 + 优先级调度** 实现更新可控；\n- 调和阶段可中断，提交阶段不可中断，平衡性能与响应性。"
+    },
+    {
+        "id": "react-interview-113",
+        "topic": "Fiber 为什么是 React 性能的一个飞跃?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### Fiber 带来的性能飞跃\n\n#### 1. **解决旧架构瓶颈**\n- 旧架构（Stack Reconciler）：同步 Diff，大型组件树 Diff 耗时久，阻塞主线程，导致页面卡顿、交互无响应；\n- 新架构（Fiber Reconciler）：将 Diff 拆分为小任务，可中断/恢复，避免阻塞主线程。\n\n#### 2. **核心性能优势**\n- **可中断渲染**：Diff 过程可随时让出主线程，保证用户交互（点击/输入）优先响应，避免卡顿；\n- **优先级调度**：高优先级任务（如用户交互）可插队执行，提升页面响应性；\n- **增量更新**：只更新必要部分，避免全量 Diff；\n- **更好的并发渲染**：支持 Suspense、Transitions 等并发特性，实现更流畅的用户体验。\n\n#### 3. **用户体验提升**\n- 页面交互更流畅，无明显卡顿；\n- 首屏加载更快，可优先渲染关键内容；\n- 支持更复杂的交互场景（如拖拽、动画）。\n\n### 总结\n- Fiber 通过 **可中断渲染 + 优先级调度** 解决了旧架构阻塞主线程的问题，实现了性能与响应性的飞跃，是 React 16+ 性能优化的核心。"
+    },
+    {
+        "id": "react-interview-114",
+        "topic": "不同版本的 React 都做过哪些优化?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 各版本核心优化\n\n#### 1. **React 16（Fiber 架构）**\n- 引入 Fiber 架构，实现可中断渲染、优先级调度；\n- 支持错误边界（Error Boundary），捕获渲染错误；\n- 支持 Portals，渲染到 DOM 其他位置。\n\n#### 2. **React 16.8（Hooks 正式发布）**\n- 引入 Hooks，替代类组件，实现逻辑复用、状态管理；\n- 函数组件性能更优，避免类组件的生命周期冗余；\n- 支持自定义 Hook，封装复用逻辑。\n\n#### 3. **React 17**\n- 事件委托从 document 改为 root 容器，避免多版本 React 冲突；\n- 优化 useEffect 清理逻辑，避免内存泄漏；\n- 支持 JSX 转换无需导入 React。\n\n#### 4. **React 18（并发渲染）**\n- 自动批量更新：所有场景（setTimeout/Promise/原生事件）自动批量更新，减少重渲染；\n- 并发渲染：支持 Suspense、Transitions、useDeferredValue 等并发特性；\n- 服务端组件：零客户端 JS，提升首屏加载速度；\n- useId/useSyncExternalStore 等新 Hooks，优化 SSR 与状态同步。\n\n### 总结\n- React 16：**Fiber 架构**，解决卡顿问题；\n- React 16.8：**Hooks**，逻辑复用与性能优化；\n- React 18：**并发渲染**，自动批量更新，提升响应性。"
+    },
+    {
+        "id": "react-interview-115",
+        "topic": "React Hooks当中的useEffect是如何区分生命周期钩子的",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### useEffect 模拟生命周期的原理\n\n#### 1. **核心机制：依赖数组控制执行时机**\n- `useEffect` 接收两个参数：副作用函数 + 依赖数组；\n- 依赖数组决定副作用函数的执行时机，从而模拟类组件生命周期。\n\n#### 2. **模拟不同生命周期**\n| 类组件生命周期 | useEffect 写法 | 执行时机 |\n| :--- | :--- | :--- |\n| `componentDidMount` | `useEffect(() => {}, [])` | 仅挂载后执行一次 |\n| `componentDidUpdate` | `useEffect(() => {}, [deps])` | 挂载后 + 依赖变化时执行 |\n| `componentWillUnmount` | `useEffect(() => () => cleanup(), [])` | 仅卸载时执行清理函数 |\n| `componentDidMount + componentDidUpdate` | `useEffect(() => {})` | 每次渲染后执行 |\n\n#### 3. **原理**\n- 空数组 `[]`：无依赖，仅在挂载时执行，卸载时清理；\n- 依赖数组 `[deps]`：依赖变化时执行，之前的副作用先清理；\n- 无依赖数组：每次渲染后执行；\n- React 会对比前后依赖数组，若变化则执行副作用。\n\n### 总结\n- useEffect 通过 **依赖数组** 控制执行时机，统一模拟了类组件的挂载、更新、卸载生命周期；\n- 核心：**依赖数组决定执行时机**，实现函数组件的副作用管理。"
+    },
+    {
+        "id": "react-interview-116",
+        "topic": "列举几个常见的 Hook?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 常见 React Hooks 分类\n\n#### 1. **基础 Hooks**\n- `useState`：管理组件状态；\n- `useEffect`：处理副作用（数据请求、订阅、DOM 操作）；\n- `useContext`：访问 Context 数据，避免 props 透传。\n\n#### 2. **性能优化 Hooks**\n- `useMemo`：缓存昂贵计算结果；\n- `useCallback`：缓存函数引用，避免子组件重渲染；\n- `useRef`：保存 DOM 引用、跨渲染周期变量。\n\n#### 3. **状态管理 Hooks**\n- `useReducer`：复杂状态管理，替代 Redux 简单场景；\n- `useState` + `useContext`：轻量级全局状态。\n\n#### 4. **React 18+ 新增 Hooks**\n- `useId`：生成唯一 ID，避免 SSR hydration 不匹配；\n- `useTransition`：标记非紧急更新，提升响应性；\n- `useDeferredValue`：延迟更新非紧急状态；\n- `useSyncExternalStore`：同步外部状态。\n\n#### 5. **自定义 Hooks**\n- 封装复用逻辑（如 `useTimeout`/`useLocalStorage`/`useFetch`）。\n\n### 总结\n- 基础 Hooks：`useState`/`useEffect`/`useContext` 是核心；\n- 性能 Hooks：`useMemo`/`useCallback`/`useRef` 优化性能；\n- 自定义 Hooks：**逻辑复用**，提升代码可维护性。"
+    },
+    {
+        "id": "react-interview-117",
+        "topic": "React Hooks带来了什么便利?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Hooks 带来的核心便利\n\n#### 1. **逻辑复用更便捷**\n- 自定义 Hook：将复用逻辑封装为函数，替代 HOC/Render Props，代码更简洁、易维护；\n- 无嵌套地狱，逻辑清晰。\n\n#### 2. **代码更简洁**\n- 函数组件替代类组件，避免 `this` 绑定、生命周期冗余；\n- 用 `useEffect` 统一管理副作用，替代 `componentDidMount`/`componentDidUpdate`/`componentWillUnmount`。\n\n#### 3. **状态管理更灵活**\n- `useState`：细粒度状态管理，按需拆分状态；\n- `useReducer`：复杂状态管理，可预测性强；\n- 状态与副作用解耦，代码更易读。\n\n#### 4. **性能优化更简单**\n- `useMemo`/`useCallback`：便捷优化性能，避免不必要重渲染；\n- 函数组件天然轻量，性能优于类组件。\n\n#### 5. **更好的类型支持**\n- TypeScript 友好，类型推断更准确；\n- 避免类组件 `this` 类型问题。\n\n### 总结\n- Hooks 让 React 开发更**简洁、灵活、高效**，实现了逻辑复用、代码简化、性能优化，是 React 现代开发的核心。"
+    },
+    {
+        "id": "react-interview-118",
+        "topic": "在 React 中可以做哪些性能优化?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 性能优化全景\n\n#### 1. **组件级优化**\n- `React.memo`：记忆化组件，浅比较 props；\n- `useMemo`：缓存计算结果；\n- `useCallback`：缓存函数引用；\n- 类组件：`PureComponent`/`shouldComponentUpdate`。\n\n#### 2. **渲染优化**\n- 列表虚拟化：`react-window` 只渲染可视区域；\n- 避免在 `render` 中创建新对象/函数；\n- 合理使用 `key`，优化 Diff 算法。\n\n#### 3. **代码分割**\n- `React.lazy + Suspense`：组件/路由懒加载；\n- 动态导入：分割 bundle，按需加载。\n\n#### 4. **状态优化**\n- 状态本地化：将状态下沉到子组件；\n- Immutable 数据：方便浅比较；\n- 防抖/节流：处理高频事件。\n\n#### 5. **构建与部署**\n- Gzip/Brotli 压缩；\n- 图片优化：压缩、懒加载；\n- Tree Shaking、CDN 加速。\n\n#### 6. **React 18+ 优化**\n- 自动批量更新：减少重渲染；\n- `useTransition`/`useDeferredValue`：并发渲染，提升响应性。\n\n### 总结\n- 核心：**减少不必要的重渲染 + 代码分割 + 渲染优化**；\n- 手段：`React.memo`/`useMemo`/`useCallback` + 懒加载 + 列表虚拟化 + 构建优化。"
+    },
+    {
+        "id": "react-interview-119",
+        "topic": "React中的VM 一定会提高性能吗?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 虚拟 DOM（VM）不一定总能提高性能\n\n#### 1. **性能提升场景**\n- **复杂页面更新**：虚拟 DOM 对比差异，只更新必要部分，避免全量重绘，性能提升明显；\n- **跨平台开发**：虚拟 DOM 抽象了平台差异，可运行在浏览器、React Native 等环境，开发效率高。\n\n#### 2. **性能下降场景**\n- **简单页面更新**：如单个节点文本变化，虚拟 DOM 的 Diff 开销大于直接操作 DOM，性能略差；\n- **频繁小更新**：如高频输入、动画，虚拟 DOM 的 Diff 与调和开销会累积，导致性能下降；\n- **内存开销**：虚拟 DOM 是额外的 JS 对象，占用更多内存，大型页面可能导致内存压力。\n\n#### 3. **结论**\n- 虚拟 DOM 是**权衡方案**：提升复杂场景性能，牺牲简单场景性能；\n- 核心价值：**开发效率 + 跨平台 + 可预测性**，而非单纯性能；\n- 性能优化需结合场景，并非依赖虚拟 DOM 即可。\n\n### 总结\n- 虚拟 DOM **不一定**提高性能，复杂场景提升，简单场景可能下降；\n- 核心价值：**开发效率与跨平台**，性能是附带收益。"
+    },
+    {
+        "id": "react-interview-120",
+        "topic": "为什么React的 VM 可以提高性能?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 虚拟 DOM（VM）提升性能的原因\n\n#### 1. **避免频繁 DOM 操作**\n- 真实 DOM 操作昂贵（重排/重绘），虚拟 DOM 是轻量 JS 对象，操作更快；\n- 虚拟 DOM 批量收集差异，一次性更新真实 DOM，减少 DOM 操作次数。\n\n#### 2. **高效 Diff 算法**\n- 虚拟 DOM 采用**同层对比**，只对比同一层级节点，时间复杂度 O(n)；\n- 合理使用 `key`，可快速识别新增/删除/移动节点，避免不必要的重建。\n\n#### 3. **批量更新**\n- 虚拟 DOM 收集所有更新，批量应用到真实 DOM，避免多次重排/重绘；\n- React 18+ 自动批量更新，进一步减少重渲染次数。\n\n#### 4. **跨平台与可预测性**\n- 虚拟 DOM 抽象了平台差异，可运行在多端，开发效率高；\n- 状态变化 → 虚拟 DOM → 真实 DOM，流程可预测，便于优化。\n\n### 总结\n- 虚拟 DOM 通过 **批量 DOM 操作 + 高效 Diff 算法 + 批量更新**，避免频繁真实 DOM 操作，从而提升复杂场景性能；\n- 核心：**用 JS 对象的轻量操作替代昂贵的 DOM 操作**。"
+    },
+    {
+        "id": "react-interview-121",
+        "topic": "react 的虚拟 dom 是怎么实现的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 虚拟 DOM 实现原理\n\n#### 1. **虚拟 DOM 定义**\n- 虚拟 DOM 是用 **轻量 JavaScript 对象** 描述真实 DOM 结构的抽象；\n- 每个虚拟 DOM 节点包含：`type`（标签/组件）、`props`（属性/子节点）、`key`、`ref` 等。\n\n#### 2. **核心实现步骤**\n1. **JSX 编译**：Babel 将 JSX 编译为 `React.createElement(type, props, ...children)`；\n2. **创建虚拟 DOM**：`React.createElement` 返回虚拟 DOM 对象；\n3. **调和（Reconciliation）**：\n   - 对比新旧虚拟 DOM，找出差异（Diff 算法）；\n   - 生成 Fiber 树，标记需要更新的节点；\n4. **提交（Commit）**：将差异批量应用到真实 DOM，完成更新。\n\n#### 3. **Diff 算法优化**\n- **同层对比**：只对比同一层级节点，时间复杂度 O(n)；\n- **key 优化**：通过 `key` 快速识别新增/删除/移动节点，避免不必要重建；\n- 类型不同则直接销毁重建，类型相同则更新属性。\n\n#### 4. **Fiber 架构扩展**\n- Fiber 节点是虚拟 DOM 的扩展，增加了优先级、链表结构（`child`/`sibling`/`return`），实现可中断渲染。\n\n### 总结\n- 虚拟 DOM：**JS 对象描述 DOM + Diff 算法找差异 + 批量更新 DOM**；\n- 核心价值：**高效更新、跨平台、可预测性**。"
+    },
+    {
+        "id": "react-interview-122",
+        "topic": "React 中的 ref 有什么用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React ref 的核心作用\n\n#### 1. **访问真实 DOM 节点**\n- 获取 DOM 元素的引用，执行原生 DOM 操作（如聚焦、获取尺寸、播放视频）；\n- 示例：\n```jsx\nconst inputRef = useRef(null);\nuseEffect(() => {\n  inputRef.current.focus(); // 聚焦输入框\n}, []);\n<input ref={inputRef} />\n```\n\n#### 2. **访问类组件实例**\n- 调用类组件的方法（仅类组件适用）；\n- 示例：\n```jsx\nclass Child extends React.Component {\n  childMethod() {}\n  render() { return <div /> }\n}\n\nclass Parent extends React.Component {\n  childRef = React.createRef();\n  componentDidMount() {\n    this.childRef.current.childMethod();\n  }\n  render() { return <Child ref={this.childRef} /> }\n}\n```\n\n#### 3. **保存跨渲染周期变量**\n- 保存定时器 ID、之前的状态/ props 等，不会因重渲染而重置；\n- 示例：\n```jsx\nconst timerRef = useRef(null);\nuseEffect(() => {\n  timerRef.current = setInterval(() => {}, 1000);\n  return () => clearInterval(timerRef.current);\n}, []);\n```\n\n### 总结\n- ref 作用：**访问 DOM/组件实例、保存跨渲染周期变量**；\n- 注意：避免滥用 ref，优先使用 props/state 管理状态。"
+    },
+    {
+        "id": "react-interview-123",
+        "topic": "在 shouldComponentUpdate 或 componentWillUpdate 中使用 setState 会发生什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 在 shouldComponentUpdate / componentWillUpdate 中调用 setState 的后果\n\n#### 1. **shouldComponentUpdate 中调用 setState**\n- **后果**：**无限循环**；\n- 原因：\n  - `shouldComponentUpdate` 是在更新前判断是否需要重渲染；\n  - 调用 `setState` 会触发新的更新，再次调用 `shouldComponentUpdate`，形成死循环；\n- React 会抛出警告并阻止执行。\n\n#### 2. **componentWillUpdate 中调用 setState**\n- **后果**：**无限循环 + 状态不一致**；\n- 原因：\n  - `componentWillUpdate` 是在 render 前执行；\n  - 调用 `setState` 会触发新的更新，再次执行 `componentWillUpdate`，形成死循环；\n- React 16.3+ 已废弃 `componentWillUpdate`，推荐用 `getSnapshotBeforeUpdate`/`componentDidUpdate`。\n\n### 总结\n- **禁止**在 `shouldComponentUpdate`/`componentWillUpdate` 中调用 `setState`；\n- 正确时机：`componentDidMount`/`componentDidUpdate`（需加条件判断避免循环）。"
+    },
+    {
+        "id": "react-interview-124",
+        "topic": "setState 之后发生了什么",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### setState 后的完整流程\n\n#### 1. **状态更新入队**\n- `setState` 将状态更新加入队列，不会立即修改 `state`；\n- 批量更新：多个 `setState` 会被合并为一次更新。\n\n#### 2. **调和阶段（Reconciliation）**\n- 生成新的虚拟 DOM，与旧虚拟 DOM 对比（Diff 算法）；\n- 标记需要更新的 Fiber 节点，可中断渲染。\n\n#### 3. **提交阶段（Commit）**\n- 将差异批量应用到真实 DOM；\n- 执行生命周期/副作用：\n  - 类组件：`componentDidUpdate`；\n  - 函数组件：`useEffect` 清理函数 + 新副作用。\n\n#### 4. **组件重渲染**\n- 组件重新执行 `render`（类组件）或函数体（函数组件），生成新 UI；\n- 子组件若 props 变化，也会触发重渲染。\n\n### 总结\n- 流程：**入队 → 调和 → 提交 → 重渲染**；\n- 核心：**异步批量更新**，避免频繁重渲染，提升性能。"
+    },
+    {
+        "id": "react-interview-125",
+        "topic": "setState 是同步, 还是异步的?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### setState 同步 vs 异步\n\n#### 1. **React 18 之前**\n- **异步**：在 React 事件处理（如 onClick）、合成事件中，`setState` 是异步的，状态更新会被批量延迟到事件结束后执行；\n- **同步**：在原生事件（如 `addEventListener`）、`setTimeout`/`Promise` 中，`setState` 是同步的，状态立即更新。\n\n#### 2. **React 18 之后**\n- **自动批量更新**：所有场景（包括 `setTimeout`/`Promise`/原生事件）的 `setState` 都被**异步批量处理**，状态更新会被合并，避免频繁重渲染；\n- 若需同步获取更新后状态，可使用 `flushSync`。\n\n#### 3. **函数式更新**\n- `setState(prev => prev + 1)` 总是基于最新状态计算，不受异步影响。\n\n### 总结\n- React 18 前：**场景决定同步/异步**；\n- React 18 后：**默认异步批量更新**，所有场景一致；\n- 核心：**批量更新优化性能**，函数式更新保证状态正确性。"
+    },
+    {
+        "id": "react-interview-126",
+        "topic": "React 中为什么要给组件设置 key?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React key 的作用\n\n#### 1. **优化 Diff 算法**\n- key 是虚拟 DOM 的唯一标识，帮助 React 识别：\n  - 新增节点；\n  - 删除节点；\n  - 移动节点；\n- 无 key 时，React 会按索引对比，导致不必要的节点重建；\n- 有 key 时，React 可复用现有节点，提升性能。\n\n#### 2. **保证组件状态稳定**\n- 列表项组件有状态时，key 保证组件实例与列表项一一对应，避免状态错乱；\n- 若用 index 作为 key，列表顺序变化时会导致状态丢失/错乱。\n\n#### 3. **正确使用 key**\n- 推荐：用**唯一稳定标识**（如 id）作为 key；\n- 禁止：用 index 作为 key（列表变化时导致性能问题与状态错乱）。\n\n### 总结\n- key 作用：**优化 Diff 算法、保证组件状态稳定**；\n- 核心：**唯一稳定标识**，帮助 React 高效更新列表。"
+    },
+    {
+        "id": "react-interview-127",
+        "topic": "React 组件间怎么进行通信?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 组件通信方式\n\n#### 1. **父子组件通信**\n- **父 → 子**：通过 props 传递数据/回调函数；\n- **子 → 父**：子组件调用父组件传递的回调函数，传递数据；\n- 示例：\n```jsx\n// 父 → 子\n<Child count={count} />\n// 子 → 父\n<Child onAdd={(num) => setCount(count + num)} />\n```\n\n#### 2. **兄弟组件通信**\n- 方式一：**状态提升**：将状态提升到共同父组件，通过 props 传递；\n- 方式二：**Context**：用 Context 共享状态；\n- 方式三：**全局状态管理**（Redux/Zustand）。\n\n#### 3. **跨级组件通信**\n- **Context API**：跨层级共享状态，避免 props 透传；\n- 示例：\n```jsx\nconst MyContext = createContext();\n<MyContext.Provider value={data}>\n  <Child />\n</MyContext.Provider>\n// 子组件\nconst data = useContext(MyContext);\n```\n\n#### 4. **全局通信**\n- **Redux/Zustand/Pinia**：全局状态管理库，适用于复杂应用；\n- **事件总线**：简单场景用 `EventEmitter`。\n\n### 总结\n- 父子：**props + 回调**；\n- 跨级：**Context**；\n- 全局：**状态管理库**。"
+    },
+    {
+        "id": "react-interview-128",
+        "topic": "React 中如果绑定事件使用匿名函数有什么影响?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 绑定事件用匿名函数的影响\n\n#### 1. **性能影响**\n- 每次渲染都会创建新的匿名函数，导致：\n  - 子组件若用 `React.memo` 包裹，会因 props 变化触发不必要重渲染；\n  - 内存开销增加，频繁创建销毁函数。\n\n#### 2. **闭包陷阱**\n- 匿名函数捕获渲染时的状态/ props，若状态更新后未重新绑定，会使用旧值，导致 bug。\n\n#### 3. **解决方案**\n- **类组件**：用 `this.handleClick = this.handleClick.bind(this)` 或 class 属性语法；\n- **函数组件**：用 `useCallback` 缓存函数引用：\n```jsx\nconst handleClick = useCallback(() => {\n  onClick(id);\n}, [id, onClick]);\n<button onClick={handleClick} />;\n```\n\n### 总结\n- 影响：**性能下降 + 闭包陷阱**；\n- 优化：**useCallback（函数组件）/ bind（类组件）** 缓存函数引用。"
+    },
+    {
+        "id": "react-interview-129",
+        "topic": "React 的事件代理机制和原生事件绑定混用会有什么问题?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 事件代理与原生事件混用的问题\n\n#### 1. **事件冒泡顺序混乱**\n- React 事件委托到 `document`（React 17+ 为 root 容器），在**冒泡阶段**处理；\n- 原生事件绑定到具体元素，在**捕获/冒泡阶段**处理；\n- 若原生事件调用 `e.stopPropagation()`，会阻止事件冒泡到 React 委托容器，导致 **React 合成事件无法触发**。\n\n#### 2. **事件对象不一致**\n- React 合成事件（`SyntheticEvent`）是原生事件的包装，与原生事件对象不同；\n- 混用可能导致 `e.preventDefault()`/`e.stopPropagation()` 行为异常。\n\n#### 3. **内存泄漏风险**\n- 原生事件绑定需手动清理，若组件卸载时未移除事件监听，会导致内存泄漏；\n- React 事件会自动清理，无需手动处理。\n\n### 总结\n- 核心问题：**原生事件阻止冒泡导致 React 事件失效**；\n- 建议：优先使用 React 合成事件，避免混用。"
+    },
+    {
+        "id": "react-interview-130",
+        "topic": "React 的事件代理机制和原生事件绑定有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 事件代理 vs 原生事件绑定\n\n| 特性 | React 事件代理 | 原生事件绑定 |\n| :--- | :--- | :--- |\n| **绑定位置** | 委托到 `document`（React 17+ 为 root 容器） | 绑定到具体 DOM 元素 |\n| **事件对象** | 合成事件 `SyntheticEvent`（跨平台、兼容） | 原生事件对象 |\n| **冒泡机制** | 遵循 React 组件树冒泡 | 遵循 DOM 树冒泡 |\n| **内存管理** | 自动清理，无需手动移除 | 需手动 `removeEventListener`，否则内存泄漏 |\n| **性能** | 减少事件监听器数量，提升性能 | 每个元素绑定监听器，内存开销大 |\n| **兼容性** | 抹平浏览器差异 | 需处理浏览器兼容性问题 |\n\n#### 1. **React 事件代理优势**\n- **性能优**：统一委托，减少监听器数量；\n- **易管理**：自动清理，避免内存泄漏；\n- **跨平台**：合成事件兼容多端；\n- **可预测**：遵循组件树冒泡。\n\n#### 2. **原生事件绑定优势**\n- **更灵活**：可精确控制捕获/冒泡阶段；\n- **特殊场景**：如监听 `window`/`document` 全局事件。\n\n### 总结\n- React 事件代理：**高效、自动管理、跨平台**；\n- 原生事件绑定：**灵活、手动管理、兼容性差**；\n- 推荐：优先使用 React 事件代理。"
+    },
+    {
+        "id": "react-interview-131",
+        "topic": "简述下 React 的事件代理机制?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 事件代理机制\n\n#### 1. **核心原理**\nReact 并不会把事件直接绑定到具体的 DOM 元素上，而是采用**事件委托（Event Delegation）**：\n- **React 16 及之前**：将所有事件统一委托到 **`document`** 对象上；\n- **React 17+**：将事件委托到 **根容器（`root` DOM 节点）**，避免多版本 React 之间的事件冲突。\n\n#### 2. **执行流程**\n1. 事件触发后，先在 DOM 中正常冒泡/捕获；\n2. 事件冒泡到委托节点（`document` 或 `root`）；\n3. React 接收事件，找到对应的 React 组件，封装成 **合成事件（`SyntheticEvent`）**；\n4. 按 React 组件树的结构模拟冒泡，执行绑定的事件回调。\n\n#### 3. **优势**\n- **性能更好**：减少大量事件监听器的创建与销毁；\n- **自动管理**：组件卸载时 React 自动清理相关事件，避免内存泄漏；\n- **跨平台兼容**：合成事件抹平了浏览器差异，提供一致的 API。\n\n### 总结\n事件代理是 React 用 **统一委托 + 合成事件** 实现高效、安全、跨平台的事件处理机制。"
+    },
+    {
+        "id": "react-interview-132",
+        "topic": "react-router 里的 <Link> 标签和 <a> 标签有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### `<Link>` vs `<a>` 标签的区别\n\n| 特性 | `<Link>`（react-router） | `<a>`（原生 HTML） | | :--- | :--- | :--- | | **页面行为** | 阻止默认跳转，实现**单页路由切换** | 触发浏览器跳转，**刷新整个页面** | | **路由管理** | 由 React Router 管理历史栈，支持前进/后退 | 由浏览器管理历史栈 | | **性能** | 只更新变化的组件，无页面刷新 | 重新加载整个页面，性能差 | | **样式** | 可通过 `activeClassName`/`activeStyle` 配置激活样式 | 无内置激活状态 | | **渲染结果** | 最终渲染为 `<a>` 标签，但阻止了默认点击行为 | 原生 `<a>`，点击默认跳转 |\n\n#### 核心区别\n- `<Link>` 是 **SPA 路由导航**，不刷新页面，只更新视图；\n- `<a>` 是 **传统页面跳转**，会触发浏览器全页刷新。\n\n### 总结\n在 React SPA 中，**优先使用 `<Link>`** 做路由跳转，避免全页刷新，保证流畅体验。"
+    },
+    {
+        "id": "react-interview-133",
+        "topic": "简单介绍下 React 中的 diff 算法",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Diff 算法\n\n#### 1. **设计目标**\n高效对比新旧虚拟 DOM，找出最小差异，批量更新真实 DOM，将时间复杂度从 O(n³) 优化到 **O(n)**。\n\n#### 2. **核心策略**\n- **同层对比**：只对比同一层级的虚拟 DOM 节点，不跨层比较；\n- **类型优先**：\n  - 节点类型不同（如 `div` → `p`）：直接销毁旧节点，创建新节点；\n  - 节点类型相同：只更新变化的属性；\n- **Key 优化**：列表节点通过 `key` 识别身份，快速判断是新增、删除还是移动，避免不必要的重建。\n\n#### 3. **列表 Diff 细节**\n- 有 `key` 时：React 会根据 `key` 匹配新旧节点，复用可复用的节点；\n- 无 `key` 时：React 按索引对比，容易导致大量节点重建，性能差且状态错乱。\n\n### 总结\nReact Diff 算法通过 **同层对比 + 类型判断 + Key 复用**，实现了高效的虚拟 DOM 对比，是 React 高性能的核心之一。"
+    },
+    {
+        "id": "react-interview-134",
+        "topic": "React 中, 能否直接将 props 的值复制给 state?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 可以直接复制，但要注意数据同步问题\n\n#### 1. **基础用法（不推荐）**\n可以在 `constructor`（类组件）或 `useState` 初始值（函数组件）中把 props 赋值给 state：\n```jsx\n// 类组件\nconstructor(props) {\n  super(props);\n  this.state = { count: props.count }; // 直接复制\n}\n\n// 函数组件\nconst [count, setCount] = useState(props.count);\n```\n\n#### 2. **潜在问题**\n- **状态不同步**：父组件更新 `props.count` 时，子组件的 state **不会自动更新**，因为 state 只在初始化时赋值一次；\n- 导致 UI 显示旧数据，产生 bug。\n\n#### 3. **解决方案**\n- **类组件**：在 `componentWillReceiveProps`（旧）或 `getDerivedStateFromProps`（新）中同步 props 到 state；\n- **函数组件**：用 `useEffect` 监听 props 变化，更新 state：\n  ```jsx\n  useEffect(() => {\n    setCount(props.count);\n  }, [props.count]);\n  ```\n- **更好实践**：尽量直接使用 props，避免将 props 复制到 state，减少状态冗余。\n\n### 总结\n可以直接复制，但**必须处理 props 更新时的同步问题**，否则会出现数据不一致的 bug。"
+    },
+    {
+        "id": "react-interview-135",
+        "topic": "简述下 React 的生命周期? 每个生命周期都做了什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 类组件生命周期（新版）\n\n#### 1. **挂载阶段（Mount）**\n1. `constructor()`：初始化 state、绑定方法；\n2. `static getDerivedStateFromProps(props, state)`：用 props 派生 state（很少用）；\n3. `render()`：返回虚拟 DOM；\n4. `componentDidMount()`：挂载后执行，适合**数据请求、DOM 操作、订阅**。\n\n#### 2. **更新阶段（Update）**\n1. `static getDerivedStateFromProps(props, state)`：同挂载；\n2. `shouldComponentUpdate(nextProps, nextState)`：判断是否需要重渲染，用于性能优化；\n3. `render()`：返回新虚拟 DOM；\n4. `getSnapshotBeforeUpdate(prevProps, prevState)`：在 DOM 更新前获取快照（如滚动位置）；\n5. `componentDidUpdate(prevProps, prevState, snapshot)`：更新后执行，适合**监听 props/state 变化、更新 DOM**。\n\n#### 3. **卸载阶段（Unmount）**\n1. `componentWillUnmount()`：卸载前执行，用于**清理定时器、取消订阅、移除事件监听**，防止内存泄漏。\n\n#### 函数组件替代\n- `useEffect` 统一模拟 `componentDidMount`/`componentDidUpdate`/`componentWillUnmount`。\n\n### 总结\n生命周期是类组件的**状态与副作用管理机制**，函数组件用 Hooks 实现了更灵活的替代方案。"
+    },
+    {
+        "id": "react-interview-136",
+        "topic": "如何在 React 中应用样式?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 样式方案\n\n#### 1. **全局 CSS**\n- 直接 `import './style.css'`，样式全局生效；\n- 优点：简单、原生；\n- 缺点：易冲突、难以维护，适合全局样式。\n\n#### 2. **CSS Modules**\n- 文件名 `style.module.css`，导入后类名会被哈希化，作用域局部；\n- 示例：\n  ```jsx\n  import styles from './style.module.css';\n  <div className={styles.box} />\n  ```\n- 优点：避免样式冲突，可复用；\n- 缺点：类名冗长，动态样式弱。\n\n#### 3. **内联样式**\n- `style={{ color: 'red', fontSize: 16 }}`，直接写在 JSX 中；\n- 优点：动态样式强；\n- 缺点：无法使用伪类、媒体查询，代码混乱。\n\n#### 4. **CSS-in-JS**\n- 库：`styled-components`、`emotion`；\n- 示例：\n  ```jsx\n  const Box = styled.div`\n    color: red;\n    font-size: 16px;\n  `;\n  <Box />;\n  ```\n- 优点：组件级作用域、动态样式强、逻辑与样式统一；\n- 缺点：学习成本高，运行时开销。\n\n#### 5. **Sass/Less**\n- 预处理器，支持变量、混合、嵌套，需配合 `css-loader` 使用；\n- 优点：功能强大，适合复杂样式。\n\n### 总结\n- 简单场景：**CSS Modules**；\n- 动态样式：**CSS-in-JS**；\n- 全局样式：**全局 CSS**；\n- 避免滥用内联样式。"
+    },
+    {
+        "id": "react-interview-137",
+        "topic": "什么是 React?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React 是什么？\n\nReact 是由 Facebook 开发的 **用于构建用户界面的 JavaScript 库**，核心定位是「**UI = f(state)**」—— 用状态驱动视图更新。\n\n#### 1. **核心特性**\n- **声明式 UI**：只需描述 UI 长什么样，React 自动更新 DOM；\n- **组件化**：将界面拆分为可复用、可组合的组件，代码更易维护；\n- **虚拟 DOM**：用 JS 对象描述 DOM，通过 Diff 算法高效更新，提升性能；\n- **单向数据流**：数据从父组件流向子组件，状态可预测，便于调试；\n- **跨平台**：一次编写，多端运行（Web、React Native、桌面等）。\n\n#### 2. **生态定位**\nReact 只关注「视图层」，不包含路由、状态管理等，需配合 React Router、Redux 等库构建完整应用。\n\n### 总结\nReact 是一个 **声明式、组件化、高效的前端视图库**，用于构建可扩展、可维护的用户界面。"
+    },
+    {
+        "id": "react-interview-138",
+        "topic": "React.PureComponent 和 React.Component 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### `PureComponent` vs `Component`\n\n| 特性 | `React.PureComponent` | `React.Component` | | :--- | :--- | :--- | | **`shouldComponentUpdate`** | 内置实现，对 `props` 和 `state` 做**浅比较** | 无内置实现，默认返回 `true`（每次都重渲染） | | **性能** | 避免不必要重渲染，性能更好 | 可能因无变化的 props/state 触发重渲染 | | **使用限制** | 依赖 `props`/`state` 是不可变数据，否则浅比较会失效 | 无限制，需手动实现 `shouldComponentUpdate` | | **适用场景** | 纯展示组件，props/state 简单且不可变 | 复杂逻辑组件，需精细控制更新 |\n\n#### 核心区别\n- `PureComponent` 自动帮你做了 `shouldComponentUpdate(nextProps, nextState) { return shallowEqual(this.props, nextProps) && shallowEqual(this.state, nextState) }`；\n- `Component` 需要手动实现该方法来优化性能。\n\n#### 注意事项\n- 如果 `props`/`state` 是引用类型（对象/数组），修改内部值不会触发重渲染，因为浅比较认为值未变；\n- 必须保证数据是 **不可变更新**（返回新对象/数组）。\n\n### 总结\n`PureComponent` 是 **带浅比较优化的 Component**，适合纯展示组件，提升性能。"
+    },
+    {
+        "id": "react-interview-139",
+        "topic": "为什么不能用数组下标来作为 react 组件中的 key?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 不能用数组下标作为 key 的原因\n\n#### 1. **Diff 算法失效，性能下降**\n- 当列表项**新增、删除、顺序变化**时，下标会改变，React 会误认为是不同节点：\n  - 原本可复用的节点会被销毁重建；\n  - 导致大量不必要的 DOM 操作，性能急剧下降。\n\n#### 2. **组件状态错乱**\n- 如果列表项组件有内部状态（如输入框值、勾选状态），key 变化会导致组件实例与列表项不匹配：\n  - 原第一项的状态会被绑定到新第一项，出现数据错乱；\n  - 造成 UI 显示 bug，难以排查。\n\n#### 3. **正确做法**\n- 使用列表项的 **唯一稳定标识**（如 `id`、`uuid`）作为 key：\n  ```jsx\n  {list.map(item => <Item key={item.id} data={item} />)}\n  ```\n\n### 总结\n数组下标作为 key 会导致 **Diff 算法失效、性能下降、状态错乱**，必须使用唯一稳定的标识作为 key。"
+    },
+    {
+        "id": "react-interview-141",
+        "topic": "使用React Hooks有什么优势?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### React Hooks 的核心优势 ✨\n\n#### 1. **逻辑复用更优雅**\n- 自定义 Hook 可以封装复用逻辑，替代高阶组件（HOC）和 Render Props，避免「嵌套地狱」，代码更清晰。\n\n#### 2. **代码更简洁**\n- 函数组件 + Hooks 替代类组件，无需处理 `this` 绑定、生命周期冗余，代码量大幅减少，可读性更强。\n\n#### 3. **状态管理更灵活**\n- `useState` 支持细粒度状态拆分，`useReducer` 处理复杂状态，状态与副作用解耦，更易维护。\n\n#### 4. **性能优化更便捷**\n- `useMemo`/`useCallback` 可以精准缓存计算结果和函数，避免不必要的重渲染，优化性能更直观。\n\n#### 5. **更好的 TypeScript 支持**\n- 函数组件和 Hooks 对类型推断更友好，避免类组件中 `this` 带来的类型问题。\n\n#### 6. **逻辑与 UI 分离**\n- 业务逻辑可以封装在自定义 Hook 中，与 UI 渲染层解耦，便于测试和复用。\n\n### 总结\nHooks 让 React 开发更**简洁、灵活、高效**，是现代 React 开发的标准范式。"
+    },
+    {
+        "id": "react-interview-142",
+        "topic": "为什么不能直接使用 this.state 改变数据?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 不能直接修改 `this.state` 的原因\n\n#### 1. **React 无法感知状态变化**\n- React 是通过 `setState` 来触发状态更新和组件重渲染的；\n- 直接修改 `this.state.value = 1` 不会触发 `setState`，React 认为状态没有变化，**UI 不会更新**。\n\n#### 2. **破坏不可变性原则**\n- React 状态应是**不可变数据**，直接修改会破坏数据的可预测性和可追溯性；\n- 会导致 Diff 算法失效，无法高效对比状态变化，性能下降。\n\n#### 3. **异步更新问题**\n- `setState` 是批量异步更新的，直接修改会导致状态与 UI 不一致，出现难以调试的 bug；\n- 多次直接修改还会覆盖之前的状态，造成数据丢失。\n\n### 正确做法\n使用 `this.setState({ value: 1 })` 或函数式更新 `this.setState(prev => ({ value: prev.value + 1 }))`。\n\n> 核心：**React 只认 `setState` 触发的状态变化**，直接修改会让状态与 UI 脱节。"
+    },
+    {
+        "id": "react-interview-143",
+        "topic": "什么是JSX?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### JSX 是什么？\n\nJSX 是 **JavaScript XML** 的缩写，是 React 中用于描述 UI 的语法扩展，看起来像 HTML，但本质是 JavaScript。\n\n#### 1. **本质**\n- JSX 会被 Babel 编译为 `React.createElement(type, props, ...children)`；\n- 最终生成虚拟 DOM 对象，用于描述 UI 结构。\n\n#### 2. **核心特性**\n- **标签语法**：类似 HTML，直观易读，`<div className=\"box\">Hello</div>`；\n- **嵌入表达式**：用 `{}` 包裹 JavaScript 表达式，如 `<div>{count}</div>`；\n- **组件化**：可以直接使用自定义组件 `<MyComponent />`。\n\n#### 3. **优势**\n- **声明式 UI**：直观描述 UI 结构，逻辑与视图合一；\n- **类型安全**：配合 TypeScript 可以提前发现错误；\n- **组件复用**：天然支持组件化，提升开发效率。\n\n### 示例\n```jsx\n// JSX\nconst element = <h1 className=\"title\">Hello, {name}</h1>;\n\n// 编译后\nconst element = React.createElement('h1', { className: 'title' }, 'Hello, ', name);\n```\n\n> JSX 让 React 代码更像「写 UI」，而不是拼接字符串，大大提升了开发体验。"
+    },
+    {
+        "id": "react-interview-144",
+        "topic": "什么是受控组件?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 受控组件（Controlled Component）\n\n受控组件是指 **表单元素的值由 React 状态（state）完全控制** 的组件，数据与 UI 保持同步。\n\n#### 1. **核心特点**\n- 表单元素的 `value`（或 `checked`）绑定到 React state；\n- 通过 `onChange` 事件监听输入，同步更新 state；\n- React 是「单一数据源」，表单值完全由 state 决定。\n\n#### 2. **示例**\n```jsx\nfunction Input() {\n  const [value, setValue] = useState('');\n  return (\n    <input\n      type=\"text\"\n      value={value}\n      onChange={(e) => setValue(e.target.value)}\n    />\n  );\n}\n```\n\n#### 3. **优势**\n- **实时控制**：可以实时校验、格式化输入值（如限制输入长度、转大写）；\n- **数据可预测**：表单值与 state 完全同步，便于提交、联动其他组件；\n- **易于测试**：状态可预测，测试更简单。\n\n#### 4. **对比非受控组件**\n- 非受控组件：值由 DOM 自身管理，通过 `ref` 获取，适合简单场景；\n- 受控组件：适合需要实时校验、联动的复杂表单场景。\n\n> 受控组件 = React state + onChange + 表单元素，实现「数据驱动 UI」。"
+    },
+    {
+        "id": "react-interview-145",
+        "topic": "constructor中super与props参数一起使用的目的是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### `super(props)` 的作用\n\n在 React 类组件的 `constructor` 中，`super(props)` 有两个核心目的：\n\n#### 1. **继承父类（React.Component）**\n- `super()` 是 ES6 类继承语法，必须在 `this` 之前调用，用来调用父类的构造函数，完成组件实例的初始化；\n- 如果不调用 `super()`，`this` 会未定义，无法使用 `this.state`、`this.props`。\n\n#### 2. **初始化 `this.props`**\n- 传入 `props` 参数，父类构造函数会将 `props` 挂载到实例上，即 `this.props = props`；\n- 这样在 `constructor` 内部就可以通过 `this.props` 访问到父组件传递的 props；\n- 如果省略 `props`（只写 `super()`），`this.props` 在 `constructor` 中会是 `undefined`（但在其他生命周期中仍可访问）。\n\n#### 示例\n```jsx\nclass MyComponent extends React.Component {\n  constructor(props) {\n    super(props); // 必须先调用\n    this.state = { count: props.initialCount }; // 可访问 this.props\n  }\n}\n```\n\n> 总结：`super(props)` 是为了 **继承父类并初始化 `this.props`**，让组件在构造阶段就能使用 props。"
+    },
+    {
+        "id": "react-interview-146",
+        "topic": "什么是高阶组件?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 高阶组件（HOC, Higher-Order Component）\n\n高阶组件是一个 **接收组件并返回新组件的函数**，是 React 中复用组件逻辑的高级技巧。\n\n#### 1. **定义形式**\n```jsx\nconst withHOC = (Component) => {\n  return class WrappedComponent extends React.Component {\n    // 复用逻辑（状态、方法、props 注入）\n    render() {\n      return <Component {...this.props} extraProp=\"value\" />;\n    }\n  };\n};\n```\n\n#### 2. **作用**\n- **逻辑复用**：将通用逻辑（如日志、权限校验、数据获取）封装到 HOC 中，注入到多个组件；\n- **props 代理**：可以修改、添加、删除传递给被包裹组件的 props；\n- **继承反转**：可以继承被包裹组件，重写生命周期。\n\n#### 3. **典型场景**\n- `connect`（react-redux）：将 Redux 状态和 dispatch 注入组件；\n- `withRouter`（react-router）：将路由信息注入组件；\n- 权限控制、埋点、日志等横切关注点。\n\n#### 4. **缺点**\n- 容易产生「嵌套地狱」（多个 HOC 层层包裹）；\n- 会导致 props 来源不清晰，调试困难；\n- 现代 React 推荐用 **自定义 Hook** 替代 HOC。\n\n> HOC 是「组件的装饰器」，用来给组件「增强功能」。"
+    },
+    {
+        "id": "react-interview-147",
+        "topic": "React中的类组件和函数组件之间有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 类组件 vs 函数组件\n\n| 维度 | 类组件（Class Component） | 函数组件（Function Component） | | :--- | :--- | :--- | | **定义方式** | `class extends React.Component` | `function Component() {}` | | **状态管理** | `this.state` + `this.setState` | Hooks（`useState`/`useReducer`） | | **生命周期** | 完整生命周期（`componentDidMount` 等） | Hooks（`useEffect` 模拟） | | `this` 绑定 | 需要手动绑定 `this`（如 `this.handleClick = this.handleClick.bind(this)`） | 无 `this`，避免绑定问题 | | **代码量** | 冗余，模板代码多 | 简洁，逻辑清晰 | | **性能** | 较重，实例开销大 | 轻量，性能更好 | | **逻辑复用** | HOC/Render Props，易嵌套 | 自定义 Hook，复用更优雅 | | **TypeScript** | `this` 类型复杂 | 类型推断更友好 |\n\n#### 核心差异\n- 类组件是 **面向对象** 思想，依赖实例和生命周期；\n- 函数组件是 **函数式编程** 思想，依赖 Hooks 管理状态和副作用。\n\n### 总结\n现代 React 开发 **优先使用函数组件 + Hooks**，代码更简洁、易维护、性能更好。"
+    },
+    {
+        "id": "react-interview-148",
+        "topic": "什么是虚拟DOM?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify6"
+        ],
+        "tagList": [
+            "React 相关"
+        ],
+        "answerContent": "### 虚拟 DOM（Virtual DOM）\n\n虚拟 DOM 是 **用 JavaScript 对象描述真实 DOM 结构的抽象**，是 React 高效更新 UI 的核心。\n\n#### 1. **结构**\n一个虚拟 DOM 节点通常包含：\n- `type`：标签名（如 `'div'`）或组件（如 `MyComponent`）；\n- `props`：属性（如 `className`、`children`）；\n- `key`：优化 Diff 算法的标识；\n- `ref`：DOM 引用。\n\n#### 2. **作用**\n- **高效更新**：先对比新旧虚拟 DOM（Diff 算法），找出最小差异，再批量更新真实 DOM，避免频繁操作 DOM 带来的性能损耗；\n- **跨平台**：虚拟 DOM 抽象了平台差异，可渲染到 Web、React Native、小程序等多端；\n- **可预测性**：状态变化 → 虚拟 DOM → 真实 DOM，流程可预测。\n\n#### 3. **对比真实 DOM**\n- 真实 DOM 操作昂贵（重排/重绘），虚拟 DOM 是轻量 JS 对象，操作更快；\n- 虚拟 DOM 批量收集差异，一次性更新真实 DOM，减少 DOM 操作次数。\n\n### 示例\n```jsx\n// 虚拟 DOM 对象（由 JSX 编译而来）\nconst vdom = {\n  type: 'div',\n  props: { className: 'box', children: 'Hello' }\n};\n```\n\n> 虚拟 DOM 是 React 的「性能护城河」，用「对象 diff + 批量 DOM 操作」换高效更新。"
+    }
+]
