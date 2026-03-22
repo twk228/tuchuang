@@ -10,6 +10,11 @@
         "icon": "https://picturbed.netlify.app/icon-js.png"
     },
     {
+        "id": "classify5",
+        "name": "TS相关",
+        "icon": "https://picturbed.netlify.app/icon-ts.png"
+    },
+    {
         "id": "classify3",
         "name": "CSS相关",
         "icon": "https://picturbed.netlify.app/icon-css.png"

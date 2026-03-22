@@ -1,0 +1,716 @@
+[
+    {
+        "id": "ts-interview-001",
+        "topic": "如何管理和优化 tsconfig?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 管理与优化 tsconfig.json\n\n#### 1. 核心配置管理\n- **分层配置**：使用 `extends` 继承基础配置，区分环境（`tsconfig.base.json`、`tsconfig.dev.json`、`tsconfig.prod.json`）；\n- **路径别名**：配置 `baseUrl` + `paths`，简化模块导入；\n- **严格模式**：开启 `strict: true`，启用所有严格类型检查；\n- **模块/输出**：根据场景选择 `module`（ESNext/CommonJS）和 `target`（ES2016+）。\n\n#### 2. 性能优化\n- **增量编译**：开启 `incremental: true`，生成 `.tsbuildinfo` 缓存文件，加速二次编译；\n- **范围限制**：使用 `include`/`exclude`/`files` 精确指定编译范围，避免编译无关文件；\n- **跳过类型检查**：`skipLibCheck: true` 跳过 node_modules 类型检查，提升速度；\n- **noEmitOnError**：出错时不生成输出，避免坏代码。\n\n#### 3. 工程化实践\n- **与构建工具集成**：配合 Webpack/Vite/Rollup，确保 `tsconfig` 与构建配置一致；\n- **类型声明**：`declaration: true` 生成 `.d.ts`，供其他项目使用；\n- **团队规范**：统一配置，配合 ESLint/Prettier 保证代码风格。\n\n#### 示例配置片段：\n```json\n{\n  \"extends\": \"./tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"incremental\": true,\n    \"skipLibCheck\": true,\n    \"baseUrl\": \".\",\n    \"paths\": { \"@/*\": [\"src/*\"] }\n  },\n  \"include\": [\"src/**/*\"],\n  \"exclude\": [\"node_modules\", \"dist\"]\n}\n```\n\n### 总结\n- 管理：**分层配置 + 精确范围 + 团队规范**；\n- 优化：**增量编译 + 跳过检查 + 严格模式**。"
+    },
+    {
+        "id": "ts-interview-002",
+        "topic": "Boolean 和 boolean 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### boolean（原始类型） vs Boolean（包装对象类型）\n\n| 特性 | `boolean` | `Boolean` |\n| :--- | :--- | :--- |\n| **类型** | 原始类型（JS 原始值） | 包装对象类型（JS 构造函数） |\n| **值** | `true`/`false` | `Boolean` 实例，或 `new Boolean(true)` |\n| **typeof** | `'boolean'` | `'object'` |\n| **场景** | 日常变量/函数参数类型 | 极少使用，仅在特殊对象场景 |\n\n#### 示例：\n```typescript\n// boolean（推荐）\nlet a: boolean = true;\na = false;\n\n// Boolean（不推荐）\nlet b: Boolean = new Boolean(true);\nconsole.log(typeof b); // 'object'\nconsole.log(b.valueOf()); // true\n\n// 注意：Boolean 也可接受原始值，但类型不匹配\nlet c: Boolean = true; // 允许（装箱），但不推荐\n```\n\n#### 关键区别：\n- `boolean` 是 TS 中表示布尔值的**原始类型**，对应 JS 的 `true`/`false`；\n- `Boolean` 是 JS 中 `Boolean` 构造函数的**对象类型**，对应包装对象实例；\n- 日常开发**永远使用 `boolean`**，避免 `Boolean` 导致的类型混淆。\n\n### 总结\n- `boolean`：**原始类型，推荐使用**；\n- `Boolean`：**包装对象类型，避免使用**。"
+    },
+    {
+        "id": "ts-interview-003",
+        "topic": "你了解 ts 工具类型 Exclude 与 Omit 的使用吗? 及它们两个的区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### Exclude vs Omit\n\n#### 1. Exclude<T, U>\n- **作用**：从联合类型 `T` 中**排除**可分配给 `U` 的类型；\n- **场景**：处理联合类型，过滤成员；\n- **实现**：`T extends U ? never : T`；\n- **示例**：\n  ```typescript\n  type T = 'a' | 'b' | 'c';\n  type U = 'a' | 'd';\n  type Excluded = Exclude<T, U>; // 'b' | 'c'\n  ```\n\n#### 2. Omit<T, K>\n- **作用**：从对象类型 `T` 中**删除**指定键 `K`；\n- **场景**：处理对象类型，移除属性；\n- **实现**：`Pick<T, Exclude<keyof T, K>>`；\n- **示例**：\n  ```typescript\n  type User = { id: number; name: string; age: number };\n  type UserWithoutId = Omit<User, 'id'>; // { name: string; age: number }\n  ```\n\n#### 核心区别：\n- **操作对象**：\n  - `Exclude`：操作**联合类型**，过滤类型成员；\n  - `Omit`：操作**对象类型**，过滤对象键；\n- **本质**：\n  - `Exclude`：联合类型的差集；\n  - `Omit`：对象类型的属性删除（基于 `Exclude` + `Pick`）。\n\n### 总结\n- `Exclude`：**联合类型 → 排除类型成员**；\n- `Omit`：**对象类型 → 排除指定键**。"
+    },
+    {
+        "id": "ts-interview-004",
+        "topic": "说说 Typscript 的 extends 关键字会在哪些场景下使用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 中 extends 的 4 大场景\n\n#### 1. 接口继承（Interface）\n- 接口继承其他接口，扩展属性/方法；\n```typescript\ninterface Animal { name: string; }\ninterface Dog extends Animal { bark(): void; }\n// Dog 拥有 { name: string; bark(): void }\n```\n\n#### 2. 类继承（Class）\n- 类继承父类，实现面向对象继承；\n```typescript\nclass Animal { eat() {} }\nclass Dog extends Animal { bark() {} }\n```\n\n#### 3. 条件类型（Conditional Type）\n- 类型层面的「if-else」，判断类型关系；\n```typescript\ntype IsString<T> = T extends string ? true : false;\ntype A = IsString<string>; // true\ntype B = IsString<number>; // false\n```\n\n#### 4. 泛型约束（Generic Constraint）\n- 限制泛型参数的类型范围；\n```typescript\nfunction logName<T extends { name: string }>(obj: T) {\n  console.log(obj.name);\n}\nlogName({ name: '张三' }); // 允许\nlogName({ age: 18 }); // 报错（无 name）\n```\n\n#### 5. 类型继承（Type Alias，间接）\n- 类型别名通过交叉类型 `&` 实现类似继承，或在条件类型中使用；\n```typescript\ntype Animal = { name: string };\ntype Dog = Animal & { bark(): void };\n```\n\n### 总结\n- 核心场景：**接口/类继承**、**条件类型**、**泛型约束**；\n- 本质：**类型层面的「扩展/约束/判断」**。"
+    },
+    {
+        "id": "ts-interview-005",
+        "topic": "纯 TS 项目工程中, 如何使用 alias path?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TS 项目 alias path 配置步骤\n\n#### 1. 配置 tsconfig.json\n- 设置 `baseUrl` 为项目根目录；\n- 在 `paths` 中定义别名映射；\n```json\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@/*\": [\"src/*\"],\n      \"@/utils/*\": [\"src/utils/*\"],\n      \"@/components/*\": [\"src/components/*\"]\n    }\n  },\n  \"include\": [\"src/**/*\"]\n}\n```\n\n#### 2. 配合构建工具（以 Vite/Webpack 为例）\n- **Vite**：在 `vite.config.ts` 中配置 `resolve.alias`，与 `tsconfig` 保持一致；\n  ```typescript\n  import { defineConfig } from 'vite';\n  import path from 'path';\n  export default defineConfig({\n    resolve: {\n      alias: {\n        '@': path.resolve(__dirname, 'src'),\n        '@/utils': path.resolve(__dirname, 'src/utils')\n      }\n    }\n  });\n  ```\n- **Webpack**：在 `webpack.config.js` 中配置 `resolve.alias`；\n\n#### 3. 配合 ESLint（可选）\n- 安装 `eslint-import-resolver-typescript`，让 ESLint 识别别名；\n```json\n{\n  \"settings\": {\n    \"import/resolver\": {\n      \"typescript\": { \"project\": \"./tsconfig.json\" }\n    }\n  }\n}\n```\n\n#### 4. 使用示例\n```typescript\n// 原写法\nimport { utils } from '../../utils/helper';\n// 别名写法\nimport { utils } from '@/utils/helper';\n```\n\n### 总结\n- 核心：**tsconfig paths + 构建工具 alias 双配置**；\n- 优势：**简化导入路径，避免深层嵌套 `../`**。"
+    },
+    {
+        "id": "ts-interview-006",
+        "topic": "枚举和常量枚举的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 枚举（enum） vs 常量枚举（const enum）\n\n| 特性 | 普通枚举 `enum` | 常量枚举 `const enum` |\n| :--- | :--- | :--- |\n| **编译结果** | 生成 JS 对象，保留运行时 | 编译时被删除，直接内联值 |\n| **性能** | 运行时存在对象，开销大 | 无运行时开销，性能更好 |\n| **灵活性** | 可反向映射（`Enum[value]`） | 无反向映射，仅正向使用 |\n| **使用限制** | 可动态访问 | 只能用字面量访问，不可动态 |\n\n#### 示例：\n```typescript\n// 普通枚举\nenum Status { Success = 200, Error = 500 }\n// 编译后：\n// const Status = { Success: 200, Error: 500, 200: 'Success', 500: 'Error' };\n\n// 常量枚举\nconst enum Status { Success = 200, Error = 500 }\n// 编译后：\n// 直接内联为 200 / 500，无对象生成\nconsole.log(Status.Success); // → console.log(200);\n```\n\n#### 适用场景：\n- **普通枚举**：需要**反向映射**或运行时动态访问；\n- **常量枚举**：追求**性能优化**，仅需要字面量值。\n\n### 总结\n- 普通枚举：**运行时存在，支持反向映射**；\n- 常量枚举：**编译时内联，无运行时开销**。"
+    },
+    {
+        "id": "ts-interview-007",
+        "topic": "说说 const 和 readonly 的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### const（JS） vs readonly（TS）\n\n| 特性 | `const` | `readonly` |\n| :--- | :--- | :--- |\n| **语言层面** | JavaScript 关键字 | TypeScript 类型修饰符 |\n| **作用对象** | 变量/常量（顶层/块级） | 类属性/接口属性/类型属性 |\n| **赋值时机** | 声明时必须初始化，之后不可修改 | 可在声明时或构造函数中初始化，之后不可修改 |\n| **运行时** | 运行时生效，禁止重新赋值 | 仅编译时检查，运行时无限制 |\n| **引用类型** | 变量引用不可变，内部属性可改 | 同 const，引用不可变，内部属性可改 |\n\n#### 示例：\n```typescript\n// const（变量）\nconst a = 1;\na = 2; // 报错（运行时+编译时）\n\n// readonly（类属性）\nclass User {\n  readonly name: string;\n  constructor(name: string) {\n    this.name = name;\n  }\n}\nconst u = new User('张三');\nu.name = '李四'; // 报错（编译时）\n\n// readonly（接口）\ninterface Config {\n  readonly apiUrl: string;\n}\nconst config: Config = { apiUrl: 'https://a.com' };\nconfig.apiUrl = 'https://b.com'; // 报错（编译时）\n```\n\n#### 关键区别：\n- `const`：**JS 层面，限制变量引用**，运行时生效；\n- `readonly`：**TS 层面，限制属性/类型只读**，仅编译时检查。\n\n### 总结\n- `const`：**变量只读，运行时约束**；\n- `readonly`：**属性/类型只读，编译时约束**。"
+    },
+    {
+        "id": "ts-interview-008",
+        "topic": "never 是什么类型, 详细讲一下",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### never 类型：**永不存在的值的类型**\n\n#### 核心定义：\n- `never` 是 TS 中的**底层类型**，表示**永远不会发生的值**；\n- 任何类型都不能赋值给 `never`，除了 `never` 本身；\n- `never` 是所有类型的子类型，可分配给任何类型。\n\n#### 产生场景：\n1. **函数抛出错误**：\n   ```typescript\n   function throwError(): never {\n     throw new Error('error');\n   }\n   ```\n2. **函数无限循环**：\n   ```typescript\n   function loop(): never {\n     while (true) {}\n   }\n   ```\n3. **类型守卫的不可能分支**：\n   ```typescript\n   function fn(x: string | number) {\n     if (typeof x === 'string') {}\n     else if (typeof x === 'number') {}\n     else {\n       // x 类型为 never，代表不可能到达\n       const _exhaustiveCheck: never = x;\n     }\n   }\n   ```\n\n#### 与 void 的区别：\n- `void`：函数无返回值（可返回 `undefined`）；\n- `never`：函数**永远不会返回**（抛出错误/无限循环）。\n\n#### 应用场景：\n- **类型穷尽检查**：确保联合类型所有分支都被处理；\n- **错误处理函数**：标记永远抛出错误的函数；\n- **不可能状态**：表示代码永远不会执行到的分支。\n\n### 总结\n- `never`：**永不存在的值**；\n- 场景：**错误抛出、无限循环、类型穷尽检查**。"
+    },
+    {
+        "id": "ts-interview-009",
+        "topic": "unknown 是什么类型?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### unknown 类型：**类型安全的 any 替代**\n\n#### 核心定义：\n- `unknown` 是 TS 3.0 引入的**顶层类型**，表示**未知类型**；\n- 任何类型都可赋值给 `unknown`，但 `unknown` 不能直接赋值给其他类型（需类型守卫）；\n- 相比 `any`，`unknown` 保留了类型检查，更安全。\n\n#### 与 any 的对比：\n| 特性 | `unknown` | `any` |\n| :--- | :--- | :--- |\n| 赋值 | 任何类型可赋值 | 任何类型可赋值 |\n| 访问属性 | 禁止直接访问 | 允许任意访问 |\n| 类型检查 | 保留类型检查 | 关闭类型检查 |\n\n#### 示例：\n```typescript\nlet a: unknown = 1;\na = 'str';\na = true;\n\n// 安全使用：需类型守卫\nif (typeof a === 'number') {\n  console.log(a + 1); // 允许（a 类型为 number）\n}\n\n// 错误：不能直接赋值给其他类型\nlet b: string = a; // 报错\n\n// any 对比\nlet c: any = 1;\nconsole.log(c.toUpperCase()); // 允许（无类型检查，运行时可能报错）\n```\n\n#### 应用场景：\n- **接收未知数据**：如 API 响应、用户输入；\n- **类型安全的动态值**：替代 `any`，避免类型丢失；\n- **类型断言前的中间类型**。\n\n### 总结\n- `unknown`：**类型安全的顶层类型**，替代 `any` 实现安全的动态类型。"
+    },
+    {
+        "id": "ts-interview-010",
+        "topic": "联合类型是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 联合类型（Union Type）：**表示值可以是多种类型之一**\n\n#### 语法：\n- 使用 `|` 分隔多个类型，如 `T1 | T2 | T3`；\n- 表示变量/参数可以是其中任意一种类型。\n\n#### 示例：\n```typescript\n// 基本联合类型\nlet x: string | number;\nx = 'hello'; // 允许\nx = 123; // 允许\nx = true; // 报错\n\n// 联合类型作为函数参数\nfunction format(value: string | number): string {\n  return value.toString();\n}\nformat('123'); // 允许\nformat(123); // 允许\n```\n\n#### 类型守卫（缩小联合类型）：\n- 需通过类型守卫缩小范围，才能访问联合类型的共有/独有属性；\n```typescript\nfunction fn(x: string | number) {\n  if (typeof x === 'string') {\n    console.log(x.toUpperCase()); // 仅 string 有\n  } else {\n    console.log(x.toFixed(2)); // 仅 number 有\n  }\n}\n```\n\n#### 与交叉类型的区别：\n- 联合类型 `|`：**或**，满足其中一种类型；\n- 交叉类型 `&`：**且**，同时满足所有类型。\n\n#### 应用场景：\n- **多类型参数**：函数可接收多种类型输入；\n- **可选状态**：如 `loading | success | error`；\n- **API 响应**：成功/失败两种结构。\n\n### 总结\n- 联合类型：**值可以是多种类型之一**，用 `|` 定义；\n- 核心：**类型守卫缩小范围，安全访问属性**。"
+    },
+    {
+        "id": "ts-interview-011",
+        "topic": "extends 条件类型怎么定义?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 条件类型（Conditional Type）\n- **语法**：`T extends U ? X : Y`；\n- 类比 JS 的三元表达式，在**类型层面**进行判断；\n- 核心：判断类型 T 是否可以赋值给 U，返回不同的类型。\n\n#### 示例：\n```typescript\n// 基础定义\ntype IsString<T> = T extends string ? 'string' : 'not string';\ntype A = IsString<string>; // 'string'\ntype B = IsString<number>; // 'not string'\n\n// 联合类型分发\ntype Naked<T> = T extends string ? T : never;\ntype Union = Naked<string | number>; // string（裸类型分发）\n\n// 非裸类型（无类型变量）不会分发\ntype Wrapped<T> = [T] extends [string] ? T : never;\ntype WrappedUnion = Wrapped<string | number>; // never（均不匹配）\n```\n\n#### 核心规则：\n- **裸类型**：`T` 直接参与 extends，会对联合类型**逐个判断**；\n- **非裸类型**：`[T]`、`Promise<T>` 等，联合类型**整体判断**；\n- 可嵌套使用实现复杂逻辑。\n\n### 总结\n- 定义：`T extends U ? X : Y`；\n- 核心：**类型层面的三元运算，支持联合类型分发**。"
+    },
+    {
+        "id": "ts-interview-012",
+        "topic": "infer 关键字是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### infer（类型推断）\n- **定义**：在**条件类型中**「推断」出类型并绑定给变量；\n- 必须配合 `extends` 使用，用于**提取泛型中的类型**；\n- 只能在条件类型的 `true` 分支中使用。\n\n#### 核心场景：\n1. **提取函数返回值**：\n   ```typescript\n   type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;\n   type FnReturn = ReturnType<() => string>; // string\n   ```\n2. **提取数组元素类型**：\n   ```typescript\n   type ElementType<T> = T extends (infer U)[] ? U : never;\n   type ArrElement = ElementType<number[]>; // number\n   ```\n3. **提取 Promise 类型**：\n   ```typescript\n   type PromiseType<T> = T extends Promise<infer U> ? U : T;\n   type P = PromiseType<Promise<number>>; // number\n   ```\n\n#### 注意：\n- 仅能在条件类型 `true` 分支中使用；\n- 可用于提取联合类型、函数、Promise、数组等中的内部类型。\n\n### 总结\n- `infer`：**类型推断关键字，用于提取泛型内部类型**；\n- 场景：**提取返回值、数组元素、Promise 类型等**。"
+    },
+    {
+        "id": "ts-interview-013",
+        "topic": "in 运算符作用是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### in 运算符（类型遍历）\n- **作用**：**遍历联合类型/对象类型的键/成员**，用于**批量映射/过滤**；\n- 常与 `keyof` 配合，遍历对象的所有键；\n- 分为「对象遍历」和「联合类型遍历」。\n\n#### 1. 遍历对象键（配合 keyof）\n- 从对象类型中取出所有键，逐一处理；\n```typescript\ntype User = { id: number; name: string };\ntype ReadonlyUser = { [K in keyof User]: readonly User[K] };\n// 结果：{ id: readonly number; name: readonly string }\n```\n\n#### 2. 遍历联合类型\n- 遍历联合类型的每个成员；\n```typescript\ntype T = 'a' | 'b';\ntype MapT = { [K in T]: K };\n// 结果：{ a: 'a'; b: 'b' }\n```\n\n#### 3. 与工具类型结合\n- 实现 `Pick`/`Omit`/`Required`/`Partial` 等工具类型的核心；\n```typescript\n// 自定义 Pick\ntype MyPick<T, K extends keyof T> = { [P in K]: T[P] };\n```\n\n### 总结\n- `in`：**类型遍历运算符**，配合 `keyof` 遍历对象键；\n- 核心：**批量生成/映射类型**。"
+    },
+    {
+        "id": "ts-interview-014",
+        "topic": "说说 TypeScript 中, 有哪些内置的类型方法和工具类型",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 内置工具类型与类型方法\n\n#### 一、核心工具类型（常用）\n1. **基础处理**：\n   - `Partial<T>`：将所有属性设为可选；\n   - `Required<T>`：将所有属性设为必选；\n   - `Readonly<T>`：将所有属性设为只读；\n   - `Pick<T, K>`：从 T 中挑选 K 个属性；\n   - `Omit<T, K>`：从 T 中删除 K 个属性。\n\n2. **联合/类型推断**：\n   - `Exclude<T, U>`：从 T 中排除 U 的类型；\n   - `Extract<T, U>`：提取 T 中可分配给 U 的类型；\n   - `ReturnType<T>`：提取函数返回值类型；\n   - `Parameters<T>`：提取函数参数类型；\n   - `InstanceType<T>`：提取类构造函数的实例类型。\n\n3. **高级类型**：\n   - `ThisType<T>`：标记 `this` 类型，用于对象字面量；\n   - `NonNullable<T>`：排除 `null`/`undefined`。\n\n#### 二、内置类型方法（对象/数组等）\n- `Array`：`map`/`filter`/`reduce` 等泛型方法；\n- `Promise`：`Promise<T>` 表示异步返回值；\n- `ReadonlyArray<T>`：只读数组；\n- `Record<K, T>`：定义键为 K 类型、值为 T 类型的对象；\n- `Extract`/`Exclude`：联合类型操作；\n- `Awaited<T>`：提取 Promise  resolved 类型（替代手动 infer）。\n\n#### 示例：\n```typescript\n// Record 定义对象类型\ntype Config = Record<'api' | 'mock', string>;\nconst config: Config = { api: 'https://a.com', mock: 'https://b.com' };\n\n// ReturnType 提取返回值\ntype Fn = () => number;\ntype Res = ReturnType<Fn>; // number\n```\n\n### 总结\n- 工具类型：**Partial/Omit/Pick/ReturnType 等**，用于快速复用类型逻辑；\n- 类型方法：**Array/Promise/Record 等**，丰富类型表达。"
+    },
+    {
+        "id": "ts-interview-015",
+        "topic": "在开发过程中, 使用过哪些 TS 的特性或者能力?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 开发常用特性与能力\n\n#### 1. 静态类型与类型推断\n- **显式类型**：`let a: number = 1`；\n- **类型推断**：`let b = 2`（自动推断 number）；\n- **提升代码可读性与可维护性**。\n\n#### 2. 泛型（Generic）\n- 定义可复用的组件/函数，支持不同类型；\n- 场景：通用工具函数、React 组件 props。\n\n#### 3. 接口（Interface）与类型别名（Type）\n- 接口：描述对象结构，支持扩展；\n- 类型别名：定义联合/交叉/复杂类型；\n- 配合 `extends` 实现继承。\n\n#### 4. 类型守卫与类型缩小\n- `typeof`/`instanceof`/`in`/`自定义函数`；\n- 缩小联合类型范围，安全访问属性。\n\n#### 5. 条件类型与 infer\n- 实现工具类型（如 `ReturnType`/`Omit`）；\n- 提取类型内部信息（如函数返回值、数组元素）。\n\n#### 6. 装饰器（Decorator）\n- 类/方法/属性装饰；\n- 如 `@Component`、`@Prop`（Vue2/3 结合）。\n\n#### 7. 模块系统（ESM）\n- `import/export`，与构建工具配合实现按需加载。\n\n#### 8. 类型声明（d.ts）\n- 声明第三方库类型、全局类型。\n\n#### 开发实践：\n- 结合 ESLint/Prettier 保证代码风格；\n- 使用 `tsconfig` 管理编译选项；\n- 结合 Jest 做类型测试。\n\n### 总结\n- 核心：**静态类型、泛型、接口、条件类型、类型守卫**；\n- 实践：**工程化、模块化、类型安全**。"
+    },
+    {
+        "id": "ts-interview-016",
+        "topic": "typescript 中的 is 关键字有什么用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### is 关键字（类型谓词 / 类型守卫）\n- **作用**：在**函数返回值**中标记，作为**类型守卫**，告诉 TS 函数返回 `true` 时，参数的类型为指定类型；\n- 语法：`parameter is Type`；\n- 用于**自定义类型守卫**，缩小类型范围。\n\n#### 示例：\n```typescript\n// 定义类型守卫\nfunction isString(x: unknown): x is string {\n  return typeof x === 'string';\n}\n\n// 使用\nfunction handle(x: string | number) {\n  if (isString(x)) {\n    // x 类型被缩小为 string\n    console.log(x.toUpperCase());\n  } else {\n    // x 类型被缩小为 number\n    console.log(x.toFixed(2));\n  }\n}\n```\n\n#### 与类型断言的区别：\n- `is`：**类型守卫，基于逻辑判断**，安全；\n- `as`：**类型断言，强制转换**，可能不安全。\n\n#### 适用场景：\n- 复杂的类型判断逻辑；\n- 第三方库类型适配；\n- 框架内部的类型推断。\n\n### 总结\n- `is`：**自定义类型守卫，标记函数返回值为类型谓词**；\n- 核心：**让 TS 精准识别类型缩小，提升类型安全**。"
+    },
+    {
+        "id": "ts-interview-027",
+        "topic": "如何定义一个数组，它的元素可能是字符串类型，也可能是数值类型？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 定义方式\n使用**联合类型** `string | number` 来表示元素可以是字符串或数值。\n\n#### 写法 1：泛型数组（推荐）\n```typescript\nconst arr: Array<string | number> = [1, '2', 3, '4'];\n```\n\n#### 写法 2：简写语法\n```typescript\nconst arr: (string | number)[] = [1, '2', 3, '4'];\n```\n\n#### 说明\n- `string | number` 表示元素可以是字符串或数值；\n- 两种写法效果完全一致，推荐使用 `Array<T>` 或 `T[]` 语法；\n- 数组中可以混合存放字符串和数值。\n\n### 总结\n- 核心：**联合类型 `string | number`**；\n- 写法：`(string | number)[]` 或 `Array<string | number>`。"
+    },
+    {
+        "id": "ts-interview-028",
+        "topic": "使用TS实现一个判断传入参数是否是数组类型的方法",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 实现方法\n使用 `Array.isArray()` 原生方法，并配合类型谓词 `is any[]` 来缩小类型范围。\n\n#### 完整代码\n```typescript\nfunction isArray(value: unknown): value is any[] {\n  return Array.isArray(value);\n}\n\n// 使用示例\nconst a = [1, 2, 3];\nconst b = { name: '张三' };\n\nconsole.log(isArray(a)); // true\nconsole.log(isArray(b)); // false\n\nif (isArray(a)) {\n  // 此时 TS 知道 a 是数组类型，可以调用数组方法\n  a.push(4);\n}\n```\n\n#### 说明\n- `Array.isArray()` 是 JS 原生判断数组的方法，兼容性好；\n- `value is any[]` 是类型谓词，告诉 TS：当函数返回 `true` 时，`value` 是数组类型；\n- 若需要更严格的类型，可以指定为 `value is number[]` 等。\n\n### 总结\n- 核心：`Array.isArray()` + 类型谓词 `is any[]`；\n- 作用：**判断并缩小类型为数组**，提升类型安全。"
+    },
+    {
+        "id": "ts-interview-029",
+        "topic": "如何将 unknown 类型指定为一个更具体的类型？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 方式 1：类型守卫（推荐，安全）\n使用 `typeof`/`instanceof`/`in` 或自定义类型守卫来缩小类型范围。\n```typescript\nfunction handle(x: unknown) {\n  if (typeof x === 'string') {\n    // x 类型缩小为 string\n    console.log(x.toUpperCase());\n  } else if (typeof x === 'number') {\n    // x 类型缩小为 number\n    console.log(x.toFixed(2));\n  } else if (Array.isArray(x)) {\n    // x 类型缩小为 any[]\n    console.log(x.length);\n  }\n}\n```\n\n### 方式 2：类型断言（强制转换，不安全）\n使用 `as` 关键字强制指定类型，需确保类型正确。\n```typescript\nconst x: unknown = 'hello';\nconst y = x as string; // 强制断言为 string\nconsole.log(y.toUpperCase());\n```\n\n### 方式 3：类型转换函数（封装类型守卫）\n```typescript\nfunction asString(x: unknown): string {\n  if (typeof x === 'string') return x;\n  throw new Error('不是字符串类型');\n}\n\nconst s = asString('test'); // s: string\n```\n\n### 总结\n- **推荐**：**类型守卫**（安全，编译时检查）；\n- **谨慎使用**：**类型断言**（强制转换，可能导致运行时错误）。"
+    },
+    {
+        "id": "ts-interview-030",
+        "topic": "ts中any和unknown有什么区别？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 核心区别\n| 特性 | `any` | `unknown` |\n| :--- | :--- | :--- |\n| **类型检查** | 关闭所有类型检查，允许任意操作 | 保留类型检查，禁止直接操作 |\n| **赋值** | 任何类型可赋值给 `any`，`any` 可赋值给任何类型 | 任何类型可赋值给 `unknown`，但 `unknown` 不能直接赋值给其他类型 |\n| **访问属性** | 允许访问任意属性/方法 | 禁止直接访问，需先缩小类型 |\n| **安全性** | 不安全，丢失类型信息 | 安全，强制类型判断 |\n\n#### 示例对比\n```typescript\n// any\nlet a: any = 1;\na = 'str';\na.toUpperCase(); // 允许（无类型检查，运行时可能报错）\nlet b: number = a; // 允许（丢失类型）\n\n// unknown\nlet x: unknown = 1;\nx = 'str';\n// x.toUpperCase(); // 报错（禁止直接操作）\nif (typeof x === 'string') {\n  x.toUpperCase(); // 允许（类型缩小后）\n}\n// let y: number = x; // 报错（不能直接赋值）\n```\n\n### 总结\n- `any`：**类型逃逸，关闭检查，不安全**；\n- `unknown`：**类型安全的顶层类型，强制类型判断，推荐使用**。"
+    },
+    {
+        "id": "ts-interview-031",
+        "topic": "说说对 TypeScript 中命名空间与模块的理解? 区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 命名空间（Namespace）\n- **定义**：使用 `namespace` 关键字，用于**组织全局代码**，避免全局变量污染；\n- **本质**：本质是一个对象，将代码包裹在对象内部；\n- **使用**：通过 `/// <reference path=\"file.ts\" />` 引入，访问时需加命名空间前缀；\n- **场景**：旧版 TS 代码、全局库、浏览器环境。\n\n#### 示例：\n```typescript\nnamespace Utils {\n  export function format(str: string) { return str.trim(); }\n}\nUtils.format(' hello ');\n```\n\n---\n\n### 模块（Module）\n- **定义**：基于 ES Module 标准，使用 `import/export` 关键字，**文件级别的隔离**；\n- **本质**：每个文件是一个独立模块，有自己的作用域；\n- **使用**：通过 `import` 引入，`export` 导出；\n- **场景**：现代前端工程化、Node.js 环境、组件化开发。\n\n#### 示例：\n```typescript\n// utils.ts\nexport function format(str: string) { return str.trim(); }\n\n// main.ts\nimport { format } from './utils';\nformat(' hello ');\n```\n\n---\n\n### 核心区别\n| 特性 | 命名空间 | 模块 |\n| :--- | :--- | :--- |\n| **隔离级别** | 逻辑分组（全局对象） | 文件级别（独立作用域） |\n| **语法** | `namespace`/`/// <reference>` | `import`/`export` |\n| **依赖管理** | 手动引用 | 自动依赖分析 |\n| **适用环境** | 浏览器全局、旧项目 | 现代工程化、Node.js |\n| **工具支持** | 弱（无 Tree Shaking） | 强（Tree Shaking、代码分割） |\n\n### 总结\n- 命名空间：**旧版组织方式，适合全局代码**；\n- 模块：**现代标准，适合工程化**；\n- 推荐：**优先使用模块（ES Module）**。"
+    },
+    {
+        "id": "ts-interview-032",
+        "topic": "说说你对 typescript 的理解? 与 javascript 的区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 理解\n- **定义**：TypeScript 是 JavaScript 的**超集**，由微软开发；\n- **核心**：在 JS 基础上增加了**静态类型系统**和**面向对象特性**；\n- **编译**：TS 代码编译为 JS 代码，可运行在任何 JS 环境。\n\n---\n\n### 与 JavaScript 的核心区别\n| 特性 | JavaScript | TypeScript |\n| :--- | :--- | :--- |\n| **类型系统** | 动态类型（运行时检查） | 静态类型（编译时检查） |\n| **类型注解** | 无 | 支持显式类型注解、类型推断 |\n| **面向对象** | 原型继承 | 类、接口、继承、泛型等完整 OOP |\n| **编译** | 无需编译，直接运行 | 需编译为 JS |\n| **工具支持** | 弱（智能提示有限） | 强（类型检查、智能提示、重构） |\n| **适用场景** | 小型项目、脚本 | 中大型项目、团队协作、工程化 |\n\n#### 示例对比\n```javascript\n// JS（动态类型，运行时才发现错误）\nlet a = 1;\na = 'str';\na.toFixed(2); // 运行时报错：a.toFixed is not a function\n```\n```typescript\n// TS（静态类型，编译时发现错误）\nlet a: number = 1;\na = 'str'; // 编译报错：Type 'string' is not assignable to type 'number'\na.toFixed(2); // 编译通过，安全\n```\n\n### 总结\n- TS：**JS 的超集，增加静态类型，提升可维护性与开发效率**；\n- 区别：**静态 vs 动态类型、编译 vs 运行时、工程化 vs 脚本**。"
+    },
+    {
+        "id": "ts-interview-033",
+        "topic": "使用ts实现一个判断入参是否是数组类型的方法?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 实现方法\n使用 `Array.isArray()` 原生方法，并配合**类型谓词** `is any[]` 来缩小类型范围，保证类型安全。\n\n#### 完整代码\n```typescript\n/**\n * 判断参数是否为数组类型\n * @param value 待判断的值\n * @returns 是数组则返回 true，同时将类型缩小为 any[]\n */\nfunction isArray(value: unknown): value is any[] {\n  return Array.isArray(value);\n}\n\n// 使用示例\nconst arr = [1, 2, 3];\nconst obj = { name: '张三' };\n\nconsole.log(isArray(arr)); // true\nconsole.log(isArray(obj)); // false\n\nif (isArray(arr)) {\n  // TS 自动识别 arr 为数组类型，可调用数组方法\n  arr.push(4);\n  console.log(arr.length);\n}\n```\n\n#### 进阶：泛型版本\n```typescript\nfunction isArray<T>(value: unknown): value is T[] {\n  return Array.isArray(value);\n}\n\n// 调用时指定类型\nconst numArr = [1, 2, 3];\nif (isArray<number>(numArr)) {\n  // numArr 类型为 number[]\n  numArr.forEach(n => console.log(n));\n}\n```\n\n### 总结\n- 核心：`Array.isArray()` + 类型谓词 `is any[]`；\n- 作用：**判断数组类型并缩小类型范围**，编译时保证安全。"
+    },
+    {
+        "id": "ts-interview-034",
+        "topic": "tsconfig.json文件有什么用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### tsconfig.json 作用\n- **定义**：TypeScript 项目的**配置文件**，用于指定编译选项和项目结构；\n- **位置**：通常放在项目根目录；\n- **核心功能**：\n  1. 告诉 TS 编译器**如何编译代码**；\n  2. 定义**项目范围**（`include`/`exclude`/`files`）；\n  3. 配置**类型检查规则**（严格模式、严格空检查等）；\n  4. 配置**输出格式**（目标 JS 版本、模块系统等）。\n\n#### 核心配置项\n- `compilerOptions`：编译选项（目标版本、模块、严格模式等）；\n- `include`：指定需要编译的文件/目录；\n- `exclude`：指定不需要编译的文件/目录；\n- `extends`：继承其他配置文件（如 `tsconfig.base.json`）；\n- `files`：指定具体编译文件（较少用）。\n\n#### 示例配置\n```json\n{\n  \"compilerOptions\": {\n    \"target\": \"ES2016\",\n    \"module\": \"ESNext\",\n    \"strict\": true,\n    \"baseUrl\": \".\",\n    \"paths\": { \"@/*\": [\"src/*\"] }\n  },\n  \"include\": [\"src/**/*\"],\n  \"exclude\": [\"node_modules\", \"dist\"]\n}\n```\n\n### 总结\n- tsconfig.json：**TS 项目的配置中心**；\n- 作用：**控制编译行为、定义项目范围、配置类型检查规则**。"
+    },
+    {
+        "id": "ts-interview-035",
+        "topic": "TypeScript中的 Declare 关键字有什么用?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### declare 关键字作用\n- **定义**：用于**声明类型**，告诉 TS「某个变量/函数/模块已经存在」，但不需要生成 JS 代码；\n- **场景**：\n  1. 声明**全局变量/函数**（如浏览器全局对象、第三方库）；\n  2. 声明**模块类型**（如 `.d.ts` 文件中）；\n  3. 声明**环境类型**（如 Node.js 全局变量）。\n\n#### 场景 1：声明全局变量\n```typescript\n// 声明全局变量 $（jQuery）\ndeclare var $: (selector: string) => { html: (content: string) => void };\n\n// 使用时 TS 不会报错\n$('.box').html('hello');\n```\n\n#### 场景 2：声明模块类型（.d.ts）\n```typescript\n// types/my-lib.d.ts\ndeclare module 'my-lib' {\n  export function greet(name: string): string;\n}\n\n// 使用时 TS 识别类型\nimport { greet } from 'my-lib';\ngreet('张三');\n```\n\n#### 场景 3：声明环境类型\n```typescript\n// 声明 Node.js 全局变量 process\ndeclare var process: {\n  env: { NODE_ENV: string };\n};\n```\n\n### 总结\n- `declare`：**类型声明关键字**，用于告诉 TS 外部存在的类型，不生成 JS 代码；\n- 核心：**解决 JS 库/全局变量的类型问题**。"
+    },
+    {
+        "id": "ts-interview-036",
+        "topic": "TypeScript支持的访问修饰符有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 访问修饰符\n- 用于控制**类成员（属性/方法）的访问权限**，共 3 种：\n\n| 修饰符 | 作用 | 访问范围 |\n| :--- | :--- | :--- |\n| `public` | 公开（默认） | 类内部、子类、外部均可访问 |\n| `protected` | 受保护 | 类内部、子类可访问，外部不可访问 |\n| `private` | 私有 | 仅类内部可访问，子类/外部均不可访问 |\n\n#### 示例代码\n```typescript\nclass Person {\n  public name: string; // 公开\n  protected age: number; // 受保护\n  private id: number; // 私有\n\n  constructor(name: string, age: number, id: number) {\n    this.name = name;\n    this.age = age;\n    this.id = id;\n  }\n\n  public greet() {\n    console.log(`Hello ${this.name}`);\n  }\n}\n\nclass Student extends Person {\n  public getAge() {\n    return this.age; // 允许（protected 子类可访问）\n    // return this.id; // 报错（private 子类不可访问）\n  }\n}\n\nconst p = new Person('张三', 18, 1);\nconsole.log(p.name); // 允许\n// console.log(p.age); // 报错（protected 外部不可访问）\n// console.log(p.id); // 报错（private 外部不可访问）\n```\n\n#### 额外：`readonly` 只读修饰符\n- 不是访问修饰符，但用于限制**赋值**：\n```typescript\nclass User {\n  readonly id: number;\n  constructor(id: number) {\n    this.id = id;\n  }\n}\nconst u = new User(1);\n// u.id = 2; // 报错（readonly 不可修改）\n```\n\n### 总结\n- 访问修饰符：`public`（默认）、`protected`、`private`；\n- 只读修饰符：`readonly`（限制赋值）。"
+    },
+    {
+        "id": "ts-interview-037",
+        "topic": "TypeScript中有哪些声明变量的方式?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 变量声明方式\n- 继承 JS 的 `var`/`let`/`const`，并增加**类型注解**；\n\n#### 1. `var`（不推荐）\n- 函数作用域/全局作用域；\n- 存在变量提升；\n- 可重复声明；\n```typescript\nvar a: number = 1;\nvar a: string = 'str'; // 允许（重复声明）\n```\n\n#### 2. `let`（推荐，可变变量）\n- 块级作用域；\n- 无变量提升（暂时性死区）；\n- 不可重复声明；\n```typescript\nlet b: number = 2;\n// let b: string = 'str'; // 报错（不可重复声明）\nb = 3; // 允许（可修改）\n```\n\n#### 3. `const`（推荐，常量）\n- 块级作用域；\n- 必须初始化；\n- 不可修改引用（引用类型内部可改）；\n```typescript\nconst c: number = 3;\n// c = 4; // 报错（不可修改）\nconst obj = { name: '张三' };\nobj.name = '李四'; // 允许（内部属性可改）\n```\n\n#### 4. 类型注解与类型推断\n- 显式类型注解：\n```typescript\nlet d: string = 'hello';\n```\n- 类型推断（自动识别）：\n```typescript\nlet e = 'world'; // 自动推断为 string\n```\n\n### 总结\n- 推荐：**优先使用 `const`，其次 `let`，避免 `var`**；\n- 核心：**块级作用域 + 类型安全**。"
+    },
+    {
+        "id": "ts-interview-038",
+        "topic": "TypeScript 的主要特点是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 主要特点\n\n#### 1. 静态类型系统\n- 编译时类型检查，提前发现错误；\n- 支持类型注解、类型推断；\n- 提升代码可读性与可维护性。\n\n#### 2. 类型推断\n- 自动推断变量类型，无需显式注解；\n- 平衡类型安全与开发效率。\n\n#### 3. 面向对象特性\n- 类、接口、继承、泛型、访问修饰符；\n- 完整的 OOP 支持，适合大型项目。\n\n#### 4. 工具友好\n- 强大的 IDE 智能提示、自动补全、重构；\n- 配合 ESLint/Prettier 提升工程化体验。\n\n#### 5. 兼容性\n- 是 JavaScript 的超集，兼容所有 JS 代码；\n- 编译为任意版本 JS，可运行在任何环境。\n\n#### 6. 生态丰富\n- 大量第三方库类型声明（`@types/xxx`）；\n- 工具链完善（Webpack/Vite/TSC）。\n\n#### 7. 可扩展性\n- 支持泛型、条件类型、infer 等高级类型；\n- 可自定义工具类型，适配复杂场景。\n\n### 总结\n- 核心：**静态类型 + 类型推断 + 面向对象 + 工具友好**；\n- 价值：**提升大型项目的可维护性、开发效率与代码质量**。"
+    },
+    {
+        "id": "ts-interview-039",
+        "topic": "Typescript中never 和 void 的区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### never vs void\n\n| 特性 | `never` | `void` |\n| :--- | :--- | :--- |\n| **含义** | 永不存在的值 | 无返回值（可返回 undefined） |\n| **函数场景** | 函数永远不会返回（抛出错误/无限循环） | 函数无返回值（或返回 undefined） |\n| **赋值** | 任何类型都不能赋值给 `never` | `undefined` 可赋值给 `void` |\n| **子类型** | 是所有类型的子类型 | 是 `undefined` 的父类型 |\n\n#### 示例代码\n```typescript\n// never：永远不返回\nfunction throwError(): never {\n  throw new Error('error');\n}\n\nfunction loop(): never {\n  while (true) {}\n}\n\n// void：无返回值\nfunction log(): void {\n  console.log('hello');\n}\n\nlet v: void = undefined; // 允许\nlet n: never = undefined; // 报错\n```\n\n#### 关键区别\n- `never`：**函数永远不会结束**（抛出错误/死循环），没有返回值；\n- `void`：**函数执行结束，但没有返回值**（或返回 `undefined`）。\n\n### 总结\n- `never`：**永不存在的值**；\n- `void`：**无返回值（允许 undefined）**。"
+    },
+    {
+        "id": "ts-interview-040",
+        "topic": "Typescript中什么是类类型接口?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 类类型接口（Class Type Interface）\n- **定义**：用于**约束类的结构**，规定类必须实现哪些属性和方法；\n- 本质：接口描述类的**公共契约**，类通过 `implements` 关键字实现接口；\n- 区别于对象类型接口：对象类型接口描述「对象结构」，类类型接口描述「类结构」。\n\n#### 示例代码\n```typescript\n// 类类型接口：规定类必须实现的方法\ninterface Animal {\n  name: string;\n  eat(): void;\n}\n\n// 类实现接口\nclass Dog implements Animal {\n  name: string;\n  constructor(name: string) {\n    this.name = name;\n  }\n  eat() {\n    console.log(`${this.name} 吃骨头`);\n  }\n}\n\nconst dog = new Dog('旺财');\ndog.eat(); // 输出：旺财 吃骨头\n```\n\n#### 注意事项\n- 接口只描述**公共成员**，不描述私有/受保护成员；\n- 类必须实现接口中**所有**属性和方法；\n- 一个类可以实现多个接口（`class A implements I1, I2`）；\n- 接口可以继承其他接口（`interface I extends I1`）。\n\n### 总结\n- 类类型接口：**约束类的结构，定义公共契约**；\n- 实现：`implements` 关键字，类必须实现接口所有成员。"
+    },
+    {
+        "id": "ts-interview-041",
+        "topic": "TypeScript 和 JavaScript 的区别是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 与 JavaScript 的核心区别\n\n| 特性 | JavaScript | TypeScript |\n| :--- | :--- | :--- |\n| **类型系统** | 动态类型（运行时检查） | 静态类型（编译时检查） |\n| **类型注解** | 无 | 支持显式类型注解 + 自动类型推断 |\n| **编译** | 无需编译，直接运行 | 需编译为 JavaScript |\n| **面向对象** | 原型继承，语法松散 | 类、接口、继承、泛型等完整 OOP 特性 |\n| **工具支持** | 智能提示有限 | 强大的类型检查、智能提示、重构 |\n| **适用场景** | 小型脚本、快速开发 | 中大型项目、团队协作、工程化 |\n| **错误时机** | 运行时发现 | 编译时提前发现 |\n\n#### 示例对比\n```javascript\n// JS：动态类型，运行时才报错\nlet a = 1;\na = 'str';\na.toFixed(2); // 运行时报错：a.toFixed is not a function\n```\n```typescript\n// TS：静态类型，编译时报错\nlet a: number = 1;\na = 'str'; // 编译报错：Type 'string' is not assignable to type 'number'\na.toFixed(2); // 编译通过，安全\n```\n\n### 总结\n- TS 是 JS 的**超集**，在 JS 基础上增加了**静态类型系统**和**工程化能力**；\n- 核心差异：**静态 vs 动态类型、编译 vs 运行时、工程化 vs 脚本化**。"
+    },
+    {
+        "id": "ts-interview-042",
+        "topic": "TypeScript中的方法重写是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 方法重写（Method Overriding）\n- **定义**：子类重新实现父类中已有的方法，保持方法名、参数列表一致，改变内部逻辑；\n- 本质：**多态的体现**，子类可以提供更具体的实现；\n- 语法：子类中定义与父类同名、同参数的方法，自动覆盖父类方法。\n\n#### 示例代码\n```typescript\nclass Animal {\n  speak() {\n    console.log('动物叫');\n  }\n}\n\nclass Dog extends Animal {\n  // 重写父类 speak 方法\n  speak() {\n    console.log('汪汪汪');\n  }\n}\n\nclass Cat extends Animal {\n  // 重写父类 speak 方法\n  speak() {\n    console.log('喵喵喵');\n  }\n}\n\nconst dog = new Dog();\ndog.speak(); // 输出：汪汪汪\n\nconst cat = new Cat();\ncat.speak(); // 输出：喵喵喵\n```\n\n#### 注意事项\n- 方法名、参数列表必须与父类一致；\n- 子类方法可以通过 `super.method()` 调用父类原方法；\n- 访问修饰符不能比父类更严格（如父类 `public`，子类不能改为 `private`）。\n\n### 总结\n- 方法重写：**子类覆盖父类同名方法，实现多态**；\n- 核心：**保持接口一致，改变实现逻辑**。"
+    },
+    {
+        "id": "ts-interview-043",
+        "topic": "什么是TypeScript映射文件?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 映射文件（Source Map）\n- **定义**：后缀为 `.map` 的文件，记录**编译后 JS 代码与原 TS 代码的映射关系**；\n- **作用**：在浏览器/调试工具中，将压缩/编译后的 JS 代码映射回原 TS 代码，方便调试；\n- 本质：**调试辅助文件**，不影响代码运行。\n\n#### 配置方式\n在 `tsconfig.json` 中开启：\n```json\n{\n  \"compilerOptions\": {\n    \"sourceMap\": true // 生成 .map 文件\n  }\n}\n```\n\n#### 工作原理\n- 编译时，TS 生成 `.js` 和 `.js.map` 文件；\n- 浏览器加载 `.js` 时，会自动加载对应的 `.map` 文件；\n- 调试工具（Chrome DevTools）会根据映射关系，显示原 TS 代码行号，而非编译后的 JS 代码。\n\n### 总结\n- 映射文件：**TS → JS 的调试映射**，方便定位原代码；\n- 核心：**开发时开启，生产环境可关闭以减小体积**。"
+    },
+    {
+        "id": "ts-interview-044",
+        "topic": "TypeScript中的类型有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 类型体系\n\n#### 1. 原始类型（Primitive Types）\n- `boolean`：布尔值；\n- `number`：数字（整数/浮点数）；\n- `string`：字符串；\n- `null`：空值；\n- `undefined`：未定义；\n- `symbol`：唯一标识符；\n- `bigint`：大整数。\n\n#### 2. 引用类型（Reference Types）\n- `object`：对象（包括数组、函数、类实例等）；\n- `Array<T>` / `T[]`：数组；\n- `Function`：函数；\n- `class`：类实例。\n\n#### 3. 特殊类型\n- `any`：任意类型（关闭类型检查）；\n- `unknown`：未知类型（类型安全的 any）；\n- `void`：无返回值；\n- `never`：永不存在的值；\n- `enum`：枚举；\n- `tuple`：元组（固定长度/类型的数组）。\n\n#### 4. 高级类型\n- 联合类型 `T | U`；\n- 交叉类型 `T & U`；\n- 泛型 `T`；\n- 条件类型 `T extends U ? X : Y`；\n- 映射类型 `{ [K in keyof T]: T[K] }`；\n- 工具类型 `Partial<T>`/`Omit<T>` 等。\n\n### 总结\n- 基础：**原始类型 + 引用类型**；\n- 特殊：`any`/`unknown`/`void`/`never`/`enum`/`tuple`；\n- 高级：**联合/交叉/泛型/条件/映射类型**。"
+    },
+    {
+        "id": "ts-interview-045",
+        "topic": "如何检查TypeScript中的null和undefined ?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 检查 null/undefined 的方式\n\n#### 1. 严格相等检查（推荐）\n- 使用 `===`/`!==` 精确判断：\n```typescript\nlet x: string | null | undefined;\n\nif (x === null) {}\nif (x === undefined) {}\nif (x === null || x === undefined) {}\n```\n\n#### 2. 宽松相等检查（注意）\n- `== null` 等价于 `x === null || x === undefined`：\n```typescript\nif (x == null) { // 同时匹配 null 和 undefined\n  console.log('x 是 null 或 undefined');\n}\n```\n\n#### 3. 类型守卫（推荐，类型安全）\n- 自定义类型守卫缩小类型范围：\n```typescript\nfunction isNull(x: unknown): x is null {\n  return x === null;\n}\n\nfunction isUndefined(x: unknown): x is undefined {\n  return x === undefined;\n}\n\nif (isNull(x)) {\n  // x 类型为 null\n}\n```\n\n#### 4. 可选链（?.）与空值合并（??）\n- 避免空值报错：\n```typescript\n// 可选链：若 obj 为 null/undefined，返回 undefined\nobj?.name;\n\n// 空值合并：若 left 为 null/undefined，返回 right\nconst y = x ?? 'default';\n```\n\n### 总结\n- 精确检查：`=== null`/`=== undefined`；\n- 同时检查：`== null`；\n- 类型安全：**类型守卫 + 可选链/空值合并**。"
+    },
+    {
+        "id": "ts-interview-046",
+        "topic": "什么是TypeScript Declare关键字?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### declare 关键字\n- **定义**：用于**声明类型**，告诉 TypeScript「某个变量/函数/模块已经存在」，但**不会生成 JavaScript 代码**；\n- **核心场景**：\n  1. 声明**全局变量/函数**（如浏览器全局对象、第三方库）；\n  2. 声明**模块类型**（`.d.ts` 文件中）；\n  3. 声明**环境类型**（如 Node.js 全局变量）。\n\n#### 示例 1：声明全局变量\n```typescript\n// 声明 jQuery 全局变量\ndeclare var $: (selector: string) => { html: (content: string) => void };\n\n// 使用时 TS 不会报错\n$('.box').html('hello');\n```\n\n#### 示例 2：声明模块类型（.d.ts）\n```typescript\n// types/my-lib.d.ts\ndeclare module 'my-lib' {\n  export function greet(name: string): string;\n}\n\n// 使用时 TS 识别类型\nimport { greet } from 'my-lib';\ngreet('张三');\n```\n\n### 总结\n- `declare`：**类型声明关键字**，用于描述外部存在的类型；\n- 作用：**解决 JS 库/全局变量的类型问题，让 TS 识别类型**。"
+    },
+    {
+        "id": "ts-interview-047",
+        "topic": "如何在TypeScript中实现继承?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 继承实现\n- 使用 `extends` 关键字实现**类继承**，子类继承父类的属性和方法；\n- 子类通过 `super()` 调用父类构造函数；\n- 支持方法重写，实现多态。\n\n#### 示例代码\n```typescript\n// 父类\nclass Animal {\n  name: string;\n  constructor(name: string) {\n    this.name = name;\n  }\n  speak() {\n    console.log(`${this.name} 叫`);\n  }\n}\n\n// 子类继承父类\nclass Dog extends Animal {\n  constructor(name: string) {\n    super(name); // 调用父类构造函数\n  }\n  // 重写父类方法\n  speak() {\n    console.log(`${this.name} 汪汪汪`);\n  }\n}\n\nconst dog = new Dog('旺财');\ndog.speak(); // 输出：旺财 汪汪汪\n```\n\n#### 接口继承（implements）\n- 类可以实现多个接口，约束类的结构：\n```typescript\ninterface Runnable {\n  run(): void;\n}\n\nclass Person implements Runnable {\n  run() {\n    console.log('人在跑');\n  }\n}\n```\n\n### 总结\n- 类继承：`extends` + `super()`，继承父类属性/方法；\n- 接口实现：`implements`，约束类的公共契约；\n- 核心：**代码复用 + 多态**。"
+    },
+    {
+        "id": "ts-interview-048",
+        "topic": "什么是Typescript的方法重载?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 方法重载（Method Overloading）\n- **定义**：为同一个函数提供**多个类型签名**，描述不同的参数/返回值组合；\n- 本质：**类型层面的重载**，运行时只有一个实现函数；\n- 作用：让 TS 更精准地推断参数/返回值类型，提升类型安全。\n\n#### 示例代码\n```typescript\n// 重载签名（描述类型）\nfunction add(a: number, b: number): number;\nfunction add(a: string, b: string): string;\n\n// 实现签名（实际逻辑）\nfunction add(a: any, b: any): any {\n  return a + b;\n}\n\n// 使用\nadd(1, 2); // 类型推断为 number\nadd('a', 'b'); // 类型推断为 string\n// add(1, 'b'); // 编译报错（不匹配任何重载签名）\n```\n\n#### 注意事项\n- 必须先写**重载签名**，再写**实现签名**；\n- 实现签名必须兼容所有重载签名；\n- 运行时只有一个函数，类型层面区分不同调用方式；\n- 常用于处理不同参数类型/数量的场景。\n\n### 总结\n- 方法重载：**多个类型签名 + 一个实现函数**；\n- 作用：**提升类型推断精度，兼容不同调用场景**。"
+    },
+    {
+        "id": "ts-interview-049",
+        "topic": "解释一下TypeScript中的枚举。",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 枚举（Enum）\n- **定义**：用于定义**一组命名常量**，让代码更易读、更易维护；\n- 本质：将一组相关常量组织为一个类型，避免魔法数字/字符串。\n\n#### 1. 数字枚举（默认）\n- 自动递增赋值：\n```typescript\nenum Status {\n  Success = 200,\n  Error = 500,\n  NotFound = 404\n}\nconsole.log(Status.Success); // 200\nconsole.log(Status[200]); // 'Success'（反向映射）\n```\n\n#### 2. 字符串枚举\n- 显式赋值字符串：\n```typescript\nenum Direction {\n  Up = 'UP',\n  Down = 'DOWN',\n  Left = 'LEFT',\n  Right = 'RIGHT'\n}\nconsole.log(Direction.Up); // 'UP'\n```\n\n#### 3. 常量枚举（const enum）\n- 编译时被删除，直接内联值，性能更好：\n```typescript\nconst enum Status { Success = 200 }\nconsole.log(Status.Success); // 编译后直接为 200\n```\n\n#### 核心特性\n- 支持**反向映射**（数字枚举）：`Status[200] → 'Success'`；\n- 常量枚举无运行时开销，普通枚举会生成 JS 对象；\n- 场景：状态码、方向、类型标识等固定常量集合。\n\n### 总结\n- 枚举：**命名常量集合**，提升代码可读性；\n- 分类：数字枚举、字符串枚举、常量枚举。"
+    },
+    {
+        "id": "ts-interview-050",
+        "topic": "Typescript中 interface 和 type 的差别是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### interface vs type\n\n| 特性 | interface | type |\n| :--- | :--- | :--- |\n| **定义对象** | 专门用于定义对象/类结构 | 可定义对象/联合/交叉/元组等任意类型 |\n| **扩展** | 支持 `extends` 继承 | 支持交叉类型 `&` 扩展 |\n| **合并** | 同名接口自动合并 | 同名 type 报错，不可合并 |\n| **联合/交叉** | 不支持 | 支持 `T | U`/`T & U` |\n| **元组/数组** | 不支持 | 支持 `type Tuple = [number, string]` |\n| **类实现** | 类可通过 `implements` 实现 | 类不可直接实现 type（可间接） |\n\n#### 示例对比\n```typescript\n// interface：定义对象/类\ninterface User {\n  name: string;\n  age: number;\n}\ninterface Admin extends User {\n  role: string;\n}\n\n// type：定义任意类型\ntype Status = 'success' | 'error';\ntype User = { name: string; age: number };\ntype Admin = User & { role: string };\ntype Tuple = [number, string];\n```\n\n#### 适用场景\n- **interface**：定义**对象/类结构**、需要扩展/合并的场景；\n- **type**：定义**联合/交叉/元组**等复杂类型、工具类型。\n\n### 总结\n- interface：**专注对象/类，支持扩展/合并**；\n- type：**更灵活，支持所有类型组合**；\n- 推荐：**优先 interface，复杂场景用 type**。"
+    },
+    {
+        "id": "ts-interview-051",
+        "topic": "Typescript中泛型是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 泛型（Generic）\n- **定义**：在定义函数/类/接口时，不预先指定具体类型，而是在**使用时**动态指定类型的一种语法；\n- 本质：**类型的参数化**，让代码更通用、复用性更高，同时保留类型安全。\n\n#### 示例：泛型函数\n```typescript\n// 定义泛型函数，T 为类型参数\nfunction identity<T>(arg: T): T {\n  return arg;\n}\n\n// 使用时指定类型\nconst num = identity<number>(1); // num: number\nconst str = identity<string>('hello'); // str: string\n\n// 类型推断（自动识别）\nconst bool = identity(true); // bool: boolean\n```\n\n#### 泛型类\n```typescript\nclass Stack<T> {\n  private items: T[] = [];\n  push(item: T) { this.items.push(item); }\n  pop(): T | undefined { return this.items.pop(); }\n}\n\nconst numStack = new Stack<number>();\nnumStack.push(1);\nnumStack.push(2);\nconsole.log(numStack.pop()); // 2: number\n```\n\n#### 核心价值\n- **复用性**：一套代码支持多种类型；\n- **类型安全**：编译时检查，避免类型丢失；\n- **灵活性**：使用时指定类型，不限制具体类型。\n\n### 总结\n- 泛型：**类型参数化，实现通用且类型安全的代码**；\n- 场景：通用工具函数、数据结构、组件库。"
+    },
+    {
+        "id": "ts-interview-052",
+        "topic": "说一说TypeScript中的类及其特性。",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 类（Class）\n- **定义**：使用 `class` 关键字定义，是**面向对象编程的核心**，用于封装数据和行为；\n- 本质：JS 原型继承的语法糖，同时增加了类型系统和 OOP 特性。\n\n#### 核心特性\n1. **封装**：\n   - 访问修饰符：`public`（默认）、`protected`、`private`；\n   - 控制成员的访问权限，隐藏内部实现。\n2. **继承**：\n   - 使用 `extends` 继承父类；\n   - `super()` 调用父类构造函数；\n   - 方法重写实现多态。\n3. **多态**：\n   - 子类重写父类方法，不同子类表现不同行为。\n4. **抽象类**：\n   - 使用 `abstract` 定义，不能实例化；\n   - 包含抽象方法，子类必须实现。\n5. **访问器**：\n   - `get`/`set` 关键字，封装属性读写逻辑。\n\n#### 示例代码\n```typescript\nabstract class Animal {\n  protected name: string;\n  constructor(name: string) {\n    this.name = name;\n  }\n  abstract speak(): void; // 抽象方法\n}\n\nclass Dog extends Animal {\n  speak() {\n    console.log(`${this.name} 汪汪汪`);\n  }\n}\n\nconst dog = new Dog('旺财');\ndog.speak(); // 输出：旺财 汪汪汪\n```\n\n### 总结\n- 类：**封装数据与行为，实现 OOP**；\n- 特性：**封装、继承、多态、抽象类、访问器**。"
+    },
+    {
+        "id": "ts-interview-053",
+        "topic": "TypeScript中的变量以及如何声明?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 变量声明\n- 继承 JS 的 `var`/`let`/`const`，并增加**类型注解**和**类型推断**；\n\n#### 1. `var`（不推荐）\n- 函数/全局作用域；\n- 变量提升；\n- 可重复声明；\n```typescript\nvar a: number = 1;\nvar a: string = 'str'; // 允许重复声明\n```\n\n#### 2. `let`（推荐，可变变量）\n- 块级作用域；\n- 无变量提升（暂时性死区）；\n- 不可重复声明；\n```typescript\nlet b: number = 2;\n// let b: string = 'str'; // 报错：不可重复声明\nb = 3; // 允许修改\n```\n\n#### 3. `const`（推荐，常量）\n- 块级作用域；\n- 必须初始化；\n- 不可修改引用（引用类型内部可改）；\n```typescript\nconst c: number = 3;\n// c = 4; // 报错：不可修改\nconst obj = { name: '张三' };\nobj.name = '李四'; // 允许：内部属性可改\n```\n\n#### 4. 类型注解与推断\n- **显式注解**：手动指定类型；\n```typescript\nlet d: string = 'hello';\n```\n- **类型推断**：TS 自动识别类型；\n```typescript\nlet e = 'world'; // 自动推断为 string\n```\n\n### 总结\n- 推荐：**优先 `const`，其次 `let`，避免 `var`**；\n- 核心：**块级作用域 + 类型安全**。"
+    },
+    {
+        "id": "ts-interview-054",
+        "topic": "TypeScript 中的类是什么? 你如何定义它们?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 类（Class）\n- **定义**：使用 `class` 关键字，是**封装数据和行为的模板**，用于创建对象；\n- 本质：JS 原型继承的语法糖，增加了类型系统和 OOP 特性。\n\n#### 定义语法\n```typescript\nclass ClassName {\n  // 属性\n  property: Type;\n  // 构造函数\n  constructor(param: Type) {\n    this.property = param;\n  }\n  // 方法\n  method() {}\n}\n```\n\n#### 完整示例\n```typescript\nclass User {\n  // 私有属性\n  private id: number;\n  // 公共属性\n  public name: string;\n\n  constructor(id: number, name: string) {\n    this.id = id;\n    this.name = name;\n  }\n\n  // 公共方法\n  public greet() {\n    console.log(`Hello ${this.name}`);\n  }\n}\n\n// 创建实例\nconst user = new User(1, '张三');\nuser.greet(); // 输出：Hello 张三\n```\n\n#### 核心特性\n- **访问修饰符**：`public`/`protected`/`private`；\n- **继承**：`extends` + `super()`；\n- **抽象类**：`abstract` 定义，包含抽象方法；\n- **访问器**：`get`/`set` 封装属性读写。\n\n### 总结\n- 类：**对象的模板，封装数据与行为**；\n- 定义：`class` 关键字 + 构造函数 + 属性/方法。"
+    },
+    {
+        "id": "ts-interview-055",
+        "topic": "TypeScript 中的 getter/setter 是什么? 你如何使用它们?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### getter/setter（访问器）\n- **定义**：用于**封装属性的读写逻辑**，控制属性的访问和修改；\n- `get`：读取属性时触发；\n- `set`：修改属性时触发；\n- 本质：伪装成属性的方法，实现「读写拦截」。\n\n#### 示例代码\n```typescript\nclass User {\n  private _name: string;\n\n  constructor(name: string) {\n    this._name = name;\n  }\n\n  // getter：读取 name 时触发\n  get name(): string {\n    console.log('读取 name');\n    return this._name;\n  }\n\n  // setter：修改 name 时触发\n  set name(newName: string) {\n    console.log('修改 name');\n    this._name = newName.trim();\n  }\n}\n\nconst user = new User('张三');\nconsole.log(user.name); // 输出：读取 name → 张三\nuser.name = '  李四  '; // 输出：修改 name\nconsole.log(user.name); // 输出：读取 name → 李四\n```\n\n#### 核心作用\n- **封装逻辑**：在读写时添加验证/格式化；\n- **只读属性**：只定义 `get`，不定义 `set`；\n- **隐藏内部实现**：外部访问看似属性，内部是方法逻辑。\n\n### 总结\n- `get`/`set`：**封装属性读写逻辑**；\n- 场景：**属性验证、格式化、只读属性**。"
+    },
+    {
+        "id": "ts-interview-056",
+        "topic": "Typescript中什么是装饰器, 它们可以应用于什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 装饰器（Decorator）\n- **定义**：一种特殊的函数，用于**在不修改原代码的情况下，为类/方法/属性/参数添加额外功能**；\n- 语法：`@decoratorName` 放在目标上方；\n- 本质：AOP（面向切面编程）思想的实现。\n\n#### 可应用的目标\n1. **类装饰器**：作用于类；\n2. **方法装饰器**：作用于类方法；\n3. **属性装饰器**：作用于类属性；\n4. **参数装饰器**：作用于方法参数；\n5. **访问器装饰器**：作用于 `get`/`set`。\n\n#### 示例：日志装饰器\n```typescript\n// 方法装饰器\nfunction log(target: any, methodName: string, descriptor: PropertyDescriptor) {\n  const original = descriptor.value;\n  descriptor.value = function(...args: any[]) {\n    console.log(`调用 ${methodName}，参数：${args}`);\n    return original.apply(this, args);\n  };\n}\n\nclass MyClass {\n  @log\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\n\nconst c = new MyClass();\nc.add(1, 2); // 输出：调用 add，参数：1,2 → 返回 3\n```\n\n#### 注意事项\n- 装饰器是 ES 提案，需 Babel/TypeScript 编译；\n- 常用于：日志、权限验证、数据校验、依赖注入等。\n\n### 总结\n- 装饰器：**无侵入式增强类/方法/属性**；\n- 场景：**日志、权限、校验、DI**。"
+    },
+    {
+        "id": "ts-interview-057",
+        "topic": "解释如何使用 TypeScript mixin。",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### Mixin（混入）\n- **定义**：一种**多继承**的实现方式，将多个类的方法/属性合并到一个类中；\n- 本质：函数接收一个类，返回一个继承该类并混入新功能的新类。\n\n#### 实现方式\n```typescript\n// 定义可混入的功能\nfunction GreetMixin<T extends new (...args: any[]) => {}>(Base: T) {\n  return class extends Base {\n    greet() {\n      console.log(`Hello ${this.name}`);\n    }\n  };\n}\n\nfunction WalkMixin<T extends new (...args: any[]) => {}>(Base: T) {\n  return class extends Base {\n    walk() {\n      console.log(`${this.name} 正在走`);\n    }\n  };\n}\n\n// 基础类\nclass Person {\n  name: string;\n  constructor(name: string) {\n    this.name = name;\n  }\n}\n\n// 混入多个功能\nconst SuperPerson = GreetMixin(WalkMixin(Person));\n\nconst p = new SuperPerson('张三');\np.greet(); // 输出：Hello 张三\np.walk(); // 输出：张三 正在走\n```\n\n#### 核心价值\n- **多继承**：解决 TS 单继承限制；\n- **代码复用**：将通用功能封装为 Mixin，可混入多个类；\n- **类型安全**：保留类型推断。\n\n### 总结\n- Mixin：**函数式多继承，复用通用功能**；\n- 实现：**函数接收基类，返回扩展后的新类**。"
+    },
+    {
+        "id": "ts-interview-058",
+        "topic": "TypeScript 中的类型断言是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 类型断言（Type Assertion）\n- **定义**：手动告诉 TypeScript「我知道这个变量的类型是什么」，强制指定类型；\n- 语法：`value as Type` 或 `<Type>value`（JSX 中只能用 `as`）；\n- 本质：**编译时类型转换，不影响运行时**。\n\n#### 示例代码\n```typescript\nconst x: unknown = 'hello';\n\n// 断言为 string\nconst y = x as string;\nconsole.log(y.toUpperCase()); // 允许：y 类型为 string\n\n// 另一种语法（非 JSX 环境）\nconst z = <string>x;\n```\n\n#### 适用场景\n- 处理 `unknown` 类型；\n- 处理 DOM 元素（如 `document.getElementById('box') as HTMLDivElement`）；\n- 处理第三方库返回的 `any` 类型。\n\n#### 注意事项\n- 类型断言是**不安全**的，可能导致运行时错误；\n- 优先使用**类型守卫**，仅在确定类型时使用断言。\n\n### 总结\n- 类型断言：**手动指定类型，绕过 TS 类型检查**；\n- 语法：`as Type` 或 `<Type>value`；\n- 谨慎使用，优先类型守卫。"
+    },
+    {
+        "id": "ts-interview-059",
+        "topic": "TypeScript 中的模块是什么?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 模块（Module）\n- **定义**：基于 ES Module 标准，**每个文件是一个独立模块**，有自己的作用域；\n- 核心：通过 `import`/`export` 实现代码的导入导出，隔离作用域，避免全局污染。\n\n#### 核心语法\n- **导出**：\n  - 命名导出：`export const a = 1;`；\n  - 默认导出：`export default function fn() {}`；\n  - 重导出：`export * from './other'`。\n- **导入**：\n  - 命名导入：`import { a } from './module'`；\n  - 默认导入：`import fn from './module'`；\n  - 全量导入：`import * as mod from './module'`。\n\n#### 示例代码\n```typescript\n// utils.ts（模块）\nexport const format = (str: string) => str.trim();\nexport default const PI = 3.14;\n\n// main.ts（导入）\nimport { format } from './utils';\nimport PI from './utils';\n\nconsole.log(format(' hello ')); // 'hello'\nconsole.log(PI); // 3.14\n```\n\n#### 核心价值\n- **作用域隔离**：变量不污染全局；\n- **代码复用**：拆分文件，按需导入；\n- **工程化**：支持 Tree Shaking、代码分割。\n\n### 总结\n- 模块：**文件级别的代码隔离，基于 ES Module**；\n- 语法：`import`/`export`。"
+    },
+    {
+        "id": "ts-interview-060",
+        "topic": "TypeScript 的内置数据类型有哪些?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### TypeScript 内置数据类型\n\n#### 1. 原始类型（Primitive）\n- `boolean`：布尔值（`true`/`false`）；\n- `number`：数字（整数/浮点数/NaN/Infinity）；\n- `string`：字符串；\n- `null`：空值；\n- `undefined`：未定义；\n- `symbol`：唯一标识符；\n- `bigint`：大整数（`100n`）。\n\n#### 2. 引用类型（Reference）\n- `object`：对象（包括数组、函数、类实例等）；\n- `Array<T>` / `T[]`：数组；\n- `Function`：函数；\n- `class`：类实例。\n\n#### 3. 特殊类型\n- `any`：任意类型（关闭类型检查）；\n- `unknown`：未知类型（类型安全的 any）；\n- `void`：无返回值；\n- `never`：永不存在的值；\n- `enum`：枚举；\n- `tuple`：元组（固定长度/类型的数组，如 `[number, string]`）。\n\n#### 示例\n```typescript\nlet bool: boolean = true;\nlet num: number = 1;\nlet str: string = 'hello';\nlet arr: number[] = [1, 2, 3];\nlet tuple: [number, string] = [1, 'a'];\nlet anyVal: any = 1;\nlet unknownVal: unknown = 'str';\n```\n\n### 总结\n- 原始类型：`boolean`/`number`/`string`/`null`/`undefined`/`symbol`/`bigint`；\n- 引用类型：`object`/`Array`/`Function`/`class`；\n- 特殊类型：`any`/`unknown`/`void`/`never`/`enum`/`tuple`。"
+    },
+    {
+        "id": "ts-interview-061",
+        "topic": "为什么推荐使用 TypeScript?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify5"
+        ],
+        "tagList": [
+            "TS相关"
+        ],
+        "answerContent": "### 推荐使用 TypeScript 的核心原因\n\n#### 1. 静态类型检查，提前发现错误\n- 编译时进行类型检查，在开发阶段就能发现类型不匹配、空值、未定义等问题；\n- 避免运行时类型错误，提升代码稳定性与可靠性。\n\n#### 2. 更好的 IDE 支持与开发体验\n- 强大的智能提示、自动补全、代码重构、跳转定义；\n- 大幅提升开发效率，减少手动查找文档的时间。\n\n#### 3. 代码可读性与可维护性更强\n- 类型注解本身就是文档，清晰描述变量/函数/接口的用途；\n- 团队协作时，无需额外沟通即可理解代码意图，降低维护成本。\n\n#### 4. 面向对象与工程化能力\n- 完整支持类、接口、继承、泛型等 OOP 特性，适合大型项目；\n- 配合模块系统、工具链（Webpack/Vite）实现工程化、模块化开发。\n\n#### 5. 生态完善，兼容性好\n- 是 JavaScript 的超集，兼容所有 JS 代码；\n- 大量第三方库提供类型声明（`@types/xxx`），无缝接入现有生态。\n\n#### 6. 提升代码质量与团队协作效率\n- 强制规范代码结构，减少潜在 bug；\n- 降低新人上手成本，便于代码 review 与重构。\n\n### 总结\n- TypeScript 在**类型安全、开发效率、可维护性、工程化**等方面显著优于 JavaScript；\n- 特别适合**中大型项目、团队协作、长期维护**的场景，是现代前端开发的主流选择。"
+    }
+]
