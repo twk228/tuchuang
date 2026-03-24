@@ -28,5 +28,10 @@
         "id": "classify6",
         "name": "React相关",
         "icon": "https://picturbed.netlify.app/icon-react.png"
+    },
+    {
+        "id": "classify7",
+        "name": "AI相关",
+        "icon": "https://picturbed.netlify.app/icon-ai.png"
     }
 ]

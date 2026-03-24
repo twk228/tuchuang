@@ -1,0 +1,886 @@
+[
+    {
+        "id": "ai-interview-001",
+        "topic": "有了解 AI 的使用和一些前沿概念吗",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### AI 核心使用场景与前沿概念\n\n#### 1. **AI 核心使用场景**\n- **代码生成**：辅助编写业务代码、组件、工具函数，提升开发效率；\n- **代码审查**：自动检查 Bug、安全漏洞、代码规范，优化代码质量；\n- **性能优化**：分析页面性能瓶颈，给出优化建议（如懒加载、代码分割）；\n- **智能交互**：对话式 UI、智能客服、语音交互，提升产品体验；\n- **设计辅助**：生成 UI 稿、图标、配色，辅助前端视觉还原。\n\n#### 2. **前沿概念**\n- **LLM（大语言模型）**：如 GPT-4o、Claude 3、Gemini，理解自然语言并生成代码/文本；\n- **RAG（检索增强生成）**：结合私有知识库，让 AI 回答更精准、符合业务场景；\n- **Agent（智能体）**：能自主规划任务、调用工具（如 API、代码解释器）完成复杂需求；\n- **MCP（Model Context Protocol）**：Claude 推出的上下文协议，让 AI 更高效访问外部工具/数据；\n- **Sora（视频生成）**：文生视频模型，代表多模态生成的前沿方向；\n- **端侧 AI**：在设备本地运行轻量模型，保护隐私、降低延迟（如手机端离线语音识别）。\n\n### 总结\nAI 已从「辅助工具」向「协作伙伴」演进，核心是**提升效率、增强交互、赋能业务**，前沿方向围绕「多模态、智能体、隐私计算」展开。"
+    },
+    {
+        "id": "ai-interview-002",
+        "topic": "claude 中的 skills 和 mcp 有什么区别?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### Claude Skills vs MCP 核心区别\n\n| 维度 | **Skills（技能）** | **MCP（Model Context Protocol）** | | :--- | :--- | :--- | | **定位** | 封装好的「预设能力」，开箱即用 | 开放协议，让 Claude 连接外部工具/数据 | | **本质** | 预定义的 Prompt + 工具调用模板 | 标准化通信协议，定义「如何读/写外部资源」 | | **使用方式** | 直接开启/关闭，无需编码 | 需开发适配器（Adapter），对接工具/数据库/API | | **灵活性** | 低，只能用 Anthropic 提供的技能 | 高，可自定义对接任意外部系统 | | **场景** | 快速使用内置能力（如代码解释器、搜索） | 企业级场景：对接内部系统、私有知识库、业务工具 | | **示例** | 开启「代码解释器」技能 | 用 MCP 对接公司内部 API、数据库、文档库 |\n\n#### 核心差异\n- **Skills**：是「成品能力」，面向普通用户，简单易用；\n- **MCP**：是「基础设施」，面向开发者，用于扩展 Claude 的边界，让 AI 访问企业私有数据/工具。\n\n### 总结\nSkills 是「开箱即用的功能」，MCP 是「扩展 Claude 的桥梁」，MCP 让 Claude 从「通用 AI」变成「企业专属 AI」。"
+    },
+    {
+        "id": "ai-interview-003",
+        "topic": "如何利用AI辅助进行前端性能优化",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### AI 辅助前端性能优化的完整流程\n\n#### 1. **性能问题诊断**\n- **输入分析**：将 Lighthouse/Chrome DevTools 性能报告、页面代码、打包产物交给 AI；\n- **AI 分析**：AI 识别瓶颈（如长任务、未优化图片、冗余代码、未懒加载的组件）；\n- **生成报告**：输出优化优先级、问题根源、影响范围（如「首屏 LCP 超过 3s，原因是未压缩的 2MB 背景图」）。\n\n#### 2. **代码级优化**\n- **冗余代码清理**：AI 识别未使用的函数、组件、依赖，生成删除建议；\n- **渲染优化**：建议添加 `React.memo`/`useMemo`/`useCallback`，避免不必要重渲染；\n- **资源优化**：生成图片懒加载、代码分割、Tree Shaking 配置，推荐 WebP/AVIF 格式；\n- **长任务拆分**：将耗时逻辑拆分为 Web Worker，或用 `requestIdleCallback` 延迟执行。\n\n#### 3. **构建与部署优化**\n- **打包配置优化**：AI 优化 Webpack/Vite 配置（如开启 Gzip、代码分割、缓存）；\n- **CDN 策略**：建议静态资源 CDN 分发、缓存策略；\n- **SSR/SSG**：推荐 Next.js/Nuxt 服务端渲染，提升首屏性能。\n\n#### 4. **验证与监控**\n- AI 生成性能测试用例，验证优化效果；\n- 建议接入性能监控工具（如 Sentry、Web Vitals），持续跟踪性能指标。\n\n### 总结\nAI 是「性能诊断师 + 优化工程师」，能快速定位问题、生成可落地的优化方案，大幅提升前端性能优化效率。"
+    },
+    {
+        "id": "ai-interview-004",
+        "topic": "如果让你设计一个支持AI功能（如智能对话）的前端应用架构，你会考虑哪些方面?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 支持 AI 功能的前端应用架构设计\n\n#### 1. **核心分层**\n- **UI 层**：对话界面、输入框、消息气泡、加载状态，支持富文本/图片/代码渲染；\n- **交互层**：处理用户输入、消息发送/接收、流式输出（SSE/WebSocket）；\n- **AI 服务层**：对接大模型 API（如 OpenAI、Claude），封装请求/响应逻辑；\n- **数据层**：消息历史存储、上下文管理、用户偏好；\n- **基础设施层**：认证、日志、监控、错误处理。\n\n#### 2. **关键技术点**\n- **流式输出**：用 SSE（Server-Sent Events）或 WebSocket 实现打字机效果，提升体验；\n- **上下文管理**：维护对话上下文，避免重复传递历史消息，控制 token 消耗；\n- **错误处理**：网络异常、模型超时、token 超限的降级处理（如重试、提示用户）；\n- **性能优化**：消息虚拟滚动、懒加载历史、防抖输入；\n- **安全**：用户输入过滤、API Key 后端托管、敏感信息脱敏；\n- **扩展性**：支持切换模型、接入自定义插件（如代码解释器、搜索）。\n\n#### 3. **用户体验**\n- 加载状态、 typing 动画、消息已读/发送状态；\n- 支持消息编辑、重新生成、复制、分享；\n- 多端适配（响应式、移动端）。\n\n### 总结\n架构核心是「**稳定流畅的交互 + 可扩展的 AI 服务 + 安全可靠的基础设施**」，让用户获得高效、自然的智能对话体验。"
+    },
+    {
+        "id": "ai-interview-005",
+        "topic": "谈谈你遇到过AI生成代码的Bug，以及如何解决的。",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### AI 生成代码的常见 Bug 与解决方案\n\n#### 1. **语法/逻辑错误**\n- **表现**：变量未定义、语法报错、逻辑不符合预期（如循环条件错误）；\n- **原因**：AI 理解偏差、上下文截断、版本不兼容；\n- **解决**：\n  - 复制错误信息给 AI，让它定位修复；\n  - 简化 Prompt，明确技术栈版本（如「React 18 + TypeScript」）；\n  - 人工 review 关键逻辑，验证边界 case。\n\n#### 2. **依赖/版本不兼容**\n- **表现**：安装依赖失败、API 调用报错（如 React 旧版本语法）；\n- **原因**：AI 未感知项目依赖版本，使用了过时 API；\n- **解决**：\n  - 在 Prompt 中明确项目依赖版本；\n  - 让 AI 生成兼容版本的代码；\n  - 对比文档，修正 API 调用。\n\n#### 3. **业务逻辑不符**\n- **表现**：代码实现了功能，但不符合业务规则（如表单校验逻辑错误）；\n- **原因**：Prompt 描述不清晰，AI 遗漏业务细节；\n- **解决**：\n  - 补充业务场景、约束条件到 Prompt；\n  - 让 AI 重新生成逻辑；\n  - 编写单元测试验证业务逻辑。\n\n#### 4. **性能/安全问题**\n- **表现**：代码冗余、内存泄漏、XSS 漏洞；\n- **原因**：AI 优先实现功能，忽略性能/安全；\n- **解决**：\n  - 让 AI 优化性能/安全；\n  - 人工审计关键代码（如用户输入处理）；\n  - 接入 ESLint/安全扫描工具。\n\n### 总结\nAI 生成代码是「初稿」，需人工**校验语法、验证逻辑、兼容版本、审计安全**，核心是「AI 辅助，人工把关」。"
+    },
+    {
+        "id": "ai-interview-006",
+        "topic": "写一个 prompt，让AI手写一个符合Promise A+规范的Promise",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 精准 Prompt：让 AI 生成符合 Promise A+ 规范的实现\n\n```text\n你是一位资深 JavaScript 工程师，请手写一个**完全符合 Promise A+ 规范**的 Promise 实现，要求：\n1. 核心方法：\n   - 构造函数：接收 executor(resolve, reject)\n   - then(onFulfilled, onRejected)：返回新 Promise，支持链式调用\n   - catch(onRejected)：捕获错误\n   - 静态方法：Promise.resolve()、Promise.reject()\n2. 关键特性：\n   - 三种状态：pending → fulfilled/rejected，状态不可逆\n   - 异步执行：executor 中的 resolve/reject 异步触发\n   - 链式调用：then 返回新 Promise，处理值穿透/错误传递\n   - 微队列：使用 queueMicrotask 模拟微任务队列\n3. 代码要求：\n   - 用 ES5/ES6 语法，兼容浏览器\n   - 完整注释，解释关键逻辑\n   - 最后附上测试用例，验证核心功能（链式调用、错误捕获、异步执行）\n```\n\n### Prompt 设计思路\n- **明确目标**：「符合 Promise A+ 规范」，避免 AI 简化实现；\n- **约束细节**：列出核心方法、特性，让 AI 知道要实现什么；\n- **质量要求**：指定语法、注释、测试，保证代码质量；\n- **可验证**：要求附测试用例，方便验证正确性。\n\n> 这个 Prompt 能让 AI 生成**可运行、可测试、符合规范**的 Promise 实现，适合学习或面试场景。"
+    },
+    {
+        "id": "ai-interview-007",
+        "topic": "在 AI 可以自动生成 80% 基础代码的今天，你认为前端工程师的核心价值在于哪里?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 前端工程师的核心价值（AI 时代）\n\n#### 1. **业务理解与需求转化**\n- AI 只能实现「明确描述的需求」，而前端工程师能**理解复杂业务场景**，将模糊需求转化为可落地的技术方案（如交互流程、数据流转、用户体验）；\n- 这是「从 0 到 1」的创造力，AI 无法替代。\n\n#### 2. **架构设计与技术选型**\n- 负责前端架构设计（如组件化、状态管理、路由、性能优化），选择合适的技术栈（如 React/Vue/Next.js），保证系统可扩展、可维护；\n- AI 只能写「局部代码」，无法做「全局架构」。\n\n#### 3. **复杂问题解决**\n- 处理疑难 Bug（如跨端兼容、内存泄漏、性能瓶颈）、复杂交互（如可视化、实时通信）；\n- 这些需要**深度技术积累和调试经验**，AI 难以胜任。\n\n#### 4. **用户体验与质量保障**\n- 把控交互体验、视觉还原、性能指标（如 LCP、FID）；\n- 编写单元测试、E2E 测试，保证代码质量；\n- AI 只关注「功能实现」，忽略「体验与质量」。\n\n#### 5. **协作与工程化**\n- 推动前端工程化（如 CI/CD、代码规范、构建优化）；\n- 与产品/设计/后端协作，推动需求落地；\n- 这是「软技能 + 工程能力」，AI 无法替代。\n\n### 总结\nAI 是「高效的代码生成器」，前端工程师的核心价值是**「创造力、架构力、解决力、体验力」**—— 从「写代码」升级为「做产品」。"
+    },
+    {
+        "id": "ai-interview-008",
+        "topic": "如何优化前端AI模型的推理性能，避免界面卡顿?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 前端 AI 模型推理性能优化方案\n\n#### 1. **模型轻量化**\n- **量化压缩**：将模型从 FP32 量化为 FP16/INT8，减小模型体积，提升推理速度；\n- **蒸馏剪枝**：用小模型替代大模型，保留核心能力；\n- **选择轻量模型**：如 MobileBERT、MiniLM，适合端侧部署。\n\n#### 2. **推理异步化**\n- **Web Worker**：将模型推理放到 Worker 线程，避免阻塞主线程，保证 UI 流畅；\n- **流式输出**：用 SSE/WebSocket 逐步返回推理结果，避免等待完整响应；\n- **分块推理**：将长文本分块推理，逐步渲染，减少单次推理耗时。\n\n#### 3. **缓存与复用**\n- **结果缓存**：缓存相同输入的推理结果，避免重复计算；\n- **中间特征缓存**：缓存模型中间层特征，复用计算；\n- **预加载**：提前加载模型到内存，避免首次推理延迟。\n\n#### 4. **硬件加速**\n- **WebNN/WebGPU**：利用浏览器的硬件加速 API，提升推理速度；\n- **WASM**：用 WebAssembly 编译模型推理引擎，比 JavaScript 更快。\n\n#### 5. **UI 优化**\n- **骨架屏/加载状态**：展示加载动画，避免用户感知卡顿；\n- **虚拟滚动**：长列表消息用虚拟滚动，只渲染可视区域；\n- **防抖节流**：用户输入防抖，避免频繁触发推理。\n\n### 总结\n核心思路是「**异步化 + 轻量化 + 缓存 + 硬件加速**」，让模型推理在后台执行，不阻塞 UI，保证流畅体验。"
+    },
+    {
+        "id": "ai-interview-009",
+        "topic": "如何保证AI生成代码的质量和符合项目规范?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 保证 AI 生成代码质量与规范的方案\n\n#### 1. **Prompt 工程化**\n- **明确约束**：在 Prompt 中明确项目技术栈、版本、代码规范（如「React 18 + TypeScript + ESLint + Prettier」）；\n- **提供示例**：附上项目中符合规范的代码示例，让 AI 模仿风格；\n- **补充上下文**：提供项目目录结构、依赖配置、业务规则。\n\n#### 2. **自动化校验**\n- **代码格式化**：用 Prettier 自动格式化，统一风格；\n- **静态检查**：用 ESLint 检查语法错误、代码规范；\n- **类型检查**：用 TypeScript 编译，保证类型安全；\n- **单元测试**：让 AI 生成单元测试，验证功能正确性；\n- **安全扫描**：用工具检查 XSS、CSRF 等安全漏洞。\n\n#### 3. **人工 review**\n- **关键代码 review**：核心业务逻辑、性能敏感代码必须人工审核；\n- **逻辑验证**：验证边界 case、异常处理、业务逻辑是否符合预期；\n- **性能检查**：检查是否有冗余代码、性能问题。\n\n#### 4. **流程管控**\n- **代码合并**：AI 生成代码必须经过 PR 流程，由同事 review 后才能合并；\n- **版本控制**：用 Git 管理代码，方便回滚；\n- **文档同步**：更新代码文档，保证代码与文档一致。\n\n### 总结\n「**精准 Prompt + 自动化校验 + 人工 review + 流程管控**」是保证 AI 生成代码质量的核心手段，让 AI 成为「高效的初稿工具」，而非「代码的最终作者」。"
+    },
+    {
+        "id": "ai-interview-010",
+        "topic": "你平时使用哪些AI编程工具?",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 常用 AI 编程工具\n\n#### 1. **IDE 集成类**\n- **GitHub Copilot**：VS Code 插件，实时代码补全、函数生成，支持多语言；\n- **Cursor**：内置 AI 的代码编辑器，支持对话、重构、代码解释，适合快速开发；\n- **JetBrains AI Assistant**：IntelliJ 系列 IDE 内置 AI，支持代码生成、审查、重构。\n\n#### 2. **对话式 AI**\n- **Claude 3**：擅长长上下文、代码审查、复杂需求拆解，适合前端架构设计；\n- **GPT-4o**：代码生成能力强，支持多模态（图片转代码），适合快速实现功能；\n- **通义千问/文心一言**：国内大模型，适合中文场景、国内业务需求。\n\n#### 3. **专用工具**\n- **Codeium**：免费代码补全工具，支持多 IDE，功能接近 Copilot；\n- **Tabnine**：基于机器学习的代码补全，支持私有代码库；\n- **Sourcegraph Cody**：结合代码库上下文，生成更符合项目规范的代码。\n\n#### 4. **辅助工具**\n- **CodeGeeX**：国产 AI 代码助手，支持代码生成、翻译、解释；\n- **AskCodi**：专注于前端开发，支持 React/Vue/Angular 代码生成。\n\n### 总结\n日常开发中，我会用 **Copilot/Cursor** 做代码补全，用 **Claude/GPT-4o** 做复杂需求拆解、代码审查，用 **ESLint/Prettier** 保证代码质量，形成「AI 辅助 + 人工把关」的高效开发流程。"
+    },
+    {
+        "id": "ai-interview-011",
+        "topic": "Prompt是什么，比如要实现一个搜索表单页面，你会用什么样的 Prompt？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 1. 什么是 Prompt？\nPrompt 是**向 AI 模型发出的指令/提问/描述**，用于明确告诉 AI「你需要做什么、怎么做、输出什么格式」，是和大模型交互的核心入口。\n\n好的 Prompt 通常包含：\n- **角色定义**：你希望 AI 扮演的身份（如「资深前端工程师」）；\n- **任务目标**：清晰描述要完成的功能；\n- **约束条件**：技术栈、版本、规范、格式；\n- **示例/上下文**：参考代码或需求细节。\n\n---\n\n### 2. 实现搜索表单的示例 Prompt\n```text\n你是一位资深 React + TypeScript 前端工程师，请实现一个符合现代 UI 规范的搜索表单页面，要求：\n\n1. 技术栈：\n   - React 18 + TypeScript + Vite\n   - UI 组件库：Ant Design v5\n   - 样式：CSS Modules\n\n2. 功能需求：\n   - 搜索输入框（支持 placeholder、清空按钮）\n   - 搜索类型下拉选择（如「标题」「内容」「作者」）\n   - 时间范围选择器（开始时间/结束时间）\n   - 「搜索」「重置」按钮\n   - 表单校验：输入框不能为空，结束时间不能早于开始时间\n   - 搜索后触发表单提交，打印表单数据到控制台（后续可对接接口）\n\n3. UI 要求：\n   - 响应式布局，适配移动端\n   - 表单间距、圆角符合 Ant Design 规范\n   - 加载状态：点击搜索后按钮显示 loading\n\n4. 输出要求：\n   - 完整可运行的组件代码\n   - 必要的注释\n   - 说明如何使用该组件\n```\n\n---\n\n### 3. Prompt 设计思路\n- **角色+技术栈**：让 AI 知道用什么技术实现；\n- **功能拆解**：把复杂需求拆成可执行的小功能；\n- **约束明确**：校验、UI、格式都写清楚；\n- **可落地**：要求「完整可运行代码」，避免 AI 只给片段。"
+    },
+    {
+        "id": "ai-interview-012",
+        "topic": "大家常提到的 Transformer 架构是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### Transformer 架构核心解析\n\nTransformer 是 2017 年 Google 提出的**序列建模架构**，是当前大语言模型（LLM）的基础，核心是「**自注意力机制（Self-Attention）**」，替代了 RNN 的循环结构，支持并行计算。\n\n#### 1. 核心组成\n- **编码器（Encoder）**：处理输入序列，提取上下文信息（如 BERT 只用 Encoder）；\n- **解码器（Decoder）**：生成输出序列（如 GPT 只用 Decoder）；\n- **多头注意力（Multi-Head Attention）**：让模型同时关注序列中多个位置的信息；\n- **位置编码（Positional Encoding）**：给 token 加入位置信息，让模型理解序列顺序；\n- **残差连接 + 层归一化**：保证模型训练稳定，避免梯度消失。\n\n#### 2. 核心优势\n- **并行计算**：不像 RNN 必须逐词计算，Transformer 可同时处理整个序列，训练更快；\n- **长距离依赖**：自注意力机制能直接捕捉序列中任意两个 token 的关系，解决 RNN 长序列遗忘问题；\n- **灵活适配**：Encoder 适合理解类任务（如文本分类），Decoder 适合生成类任务（如对话、代码）。\n\n#### 3. 与 LLM 的关系\n- GPT 系列：Decoder-only 架构，擅长文本生成；\n- BERT 系列：Encoder-only 架构，擅长文本理解；\n- T5/LLaMA：Encoder-Decoder 或 Decoder-only，兼顾理解与生成。\n\n> Transformer 是「大模型的基石」，没有它就没有现在的 ChatGPT、Claude 等产品。"
+    },
+    {
+        "id": "ai-interview-013",
+        "topic": "你清楚 AI、AGI、AIGC、NLP、LLM 分别是什么吗？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 核心概念对比\n\n| 概念 | 全称 | 核心定义 |\n| :--- | :--- | :--- |\n| **AI** | Artificial Intelligence | 人工智能：让机器模拟人类智能的技术总称（如视觉、语音、自然语言处理） |\n| **AGI** | Artificial General Intelligence | 通用人工智能：具备人类级别的通用智能，能完成任意智力任务（当前还未实现） |\n| **AIGC** | AI Generated Content | 生成式 AI：用 AI 自动生成内容（文本、图片、音频、视频、代码等） |\n| **NLP** | Natural Language Processing | 自然语言处理：让机器理解、处理、生成人类语言的技术（如翻译、对话、摘要） |\n| **LLM** | Large Language Model | 大语言模型：参数规模巨大的语言模型，能理解和生成自然语言（如 GPT、Claude、LLaMA） |\n\n#### 1. 层级关系\n- **AI** 是最大的范畴，包含 NLP、CV、机器人等；\n- **NLP** 是 AI 的一个子领域，专注于语言处理；\n- **LLM** 是 NLP 的前沿技术，是实现对话、生成的核心；\n- **AIGC** 是基于 LLM 等模型的应用方向，专注内容生成；\n- **AGI** 是 AI 的终极目标，目前还在探索阶段。\n\n#### 2. 通俗理解\n- AI：「让机器变聪明」；\n- NLP：「让机器听懂/说人话」；\n- LLM：「会说话的超级大脑」；\n- AIGC：「用 AI 写文章、画画、写代码」；\n- AGI：「和人一样聪明的机器人」。"
+    },
+    {
+        "id": "ai-interview-014",
+        "topic": "AI 工具中，经常提到的 mcp 是什么，有哪些与前端方向结合的场景？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 1. MCP 是什么？\nMCP 是 **Model Context Protocol（模型上下文协议）**，由 Anthropic（Claude 团队）推出，是一套**标准化协议**，用于让 AI 模型安全、高效地访问**外部工具、数据、系统**。\n\n简单说：MCP 是「AI 连接外部世界的桥梁」，让 Claude 等模型能调用你的 API、数据库、文件系统、业务系统等。\n\n---\n\n### 2. 与前端结合的场景\n#### 场景 1：**前端项目智能助手**\n- MCP 对接前端项目代码库、文档、构建系统；\n- AI 能直接读取项目代码、依赖配置、组件文档，生成更符合项目规范的代码；\n- 比如：「帮我在当前项目中新增一个用户列表页面」，AI 能直接读取路由、组件规范，生成可合并的代码。\n\n#### 场景 2：**设计稿转代码自动化**\n- MCP 对接 Figma/Figma API；\n- AI 能直接读取设计稿图层、样式、颜色，自动生成 React/Vue 组件代码，还原视觉稿；\n- 前端工程师只需做少量调整，大幅提升开发效率。\n\n#### 场景 3：**前端性能诊断与优化**\n- MCP 对接 Lighthouse、Chrome DevTools、构建产物；\n- AI 能直接分析性能报告、打包体积，生成优化建议（如代码分割、图片压缩）；\n- 甚至能直接修改代码，提交优化 PR。\n\n#### 场景 4：**低代码/无代码平台**\n- MCP 对接低代码平台的组件库、数据源；\n- 用户用自然语言描述需求（如「做一个电商商品列表页」），AI 自动生成页面配置、组件代码，甚至直接发布页面。\n\n> MCP 让前端开发从「AI 辅助写代码」升级为「AI 直接操作项目」，是未来前端智能化的核心方向。"
+    },
+    {
+        "id": "ai-interview-015",
+        "topic": "请设计一个面向设计师的 \"AI 助手\" 前端界面，可以生成文本、图像并自动插入到设计稿中",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 面向设计师的 AI 助手前端界面设计\n\n#### 1. 核心功能定位\n- 设计师在 Figma/FigJam 中直接调用 AI，生成文本、图像，自动插入到当前设计稿；\n- 无需切换工具，一站式完成「需求 → 生成 → 插入」。\n\n---\n\n#### 2. 界面结构\n- **侧边栏面板**：固定在设计工具右侧，不遮挡画布；\n- **功能 Tab**：\n  1. **文本生成**：输入需求（如「电商商品标题，简洁有力」），选择风格（如「科技风」「文艺风」），生成后一键插入到选中的文本图层；\n  2. **图像生成**：输入 prompt（如「蓝色渐变背景，科技感」），选择尺寸（如「1920×1080」），生成后一键插入为图片图层；\n  3. **风格迁移**：上传参考图，让 AI 模仿风格生成新图；\n  4. **历史记录**：查看之前生成的内容，方便复用。\n- **操作栏**：\n  - 生成按钮、取消按钮；\n  - 加载状态（进度条、提示）；\n  - 设置（模型选择、风格预设）。\n\n---\n\n#### 3. 核心交互流程\n1. 设计师在画布中选中目标图层（文本/图片）；\n2. 打开 AI 助手面板，输入生成需求；\n3. 点击「生成」，AI 调用模型生成内容；\n4. 生成完成后，预览效果，确认后「插入到设计稿」；\n5. 自动替换选中图层的内容，无需手动粘贴。\n\n---\n\n#### 4. 技术实现关键点\n- **Figma Plugin 开发**：用 Figma Plugin API 实现面板、选中元素监听、图层插入；\n- **AI 接口对接**：调用文生图/文生文 API（如 DALL-E、MidJourney、OpenAI）；\n- **流式输出**：生成过程中实时预览，提升体验；\n- **错误处理**：生成失败时友好提示，支持重试；\n- **权限控制**：用户需登录，控制 API 调用次数。\n\n> 核心是「**嵌入设计师工作流**」，让 AI 成为设计工具的一部分，而非额外工具。"
+    },
+    {
+        "id": "ai-interview-016",
+        "topic": "如何保障前端调用 AI 接口时的安全性与权限控制？你是否考虑过代理服务或签名机制？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 前端调用 AI 接口的安全与权限方案\n\n#### 1. **核心风险**\n- API Key 泄露：前端代码中暴露 API Key，会被恶意盗用；\n- 越权访问：用户调用未授权的模型/接口；\n- 内容安全：用户输入恶意内容（如 XSS、敏感信息）；\n- 流量滥用：恶意请求耗尽接口配额。\n\n---\n\n#### 2. **安全方案：代理服务 + 签名机制**\n##### （1）代理服务（必选）\n- **原理**：前端不直接调用 AI 接口，而是调用**后端代理服务**，由后端转发请求到 AI 接口；\n- **作用**：\n  - 隐藏 API Key：API Key 存在后端，前端永远看不到；\n  - 权限控制：后端校验用户权限（如是否付费、调用次数）；\n  - 内容过滤：后端过滤敏感内容、恶意输入；\n  - 流量控制：限流、防刷，避免滥用；\n  - 日志审计：记录所有请求，便于排查问题。\n- **示例流程**：\n  `前端 → 代理服务（校验权限/过滤） → AI 接口`\n\n##### （2）签名机制（增强安全）\n- **原理**：前端请求代理服务时，携带签名，后端验证签名合法性；\n- **实现**：\n  1. 前端用 `appId + timestamp + 随机数 + appSecret` 生成签名（HMAC-SHA256）；\n  2. 请求时携带 `appId`、`timestamp`、`nonce`、`signature`；\n  3. 后端用相同规则生成签名，对比是否一致；\n- **作用**：防止请求被篡改、重放攻击。\n\n---\n\n#### 3. **其他安全措施**\n- **HTTPS**：所有请求必须用 HTTPS，防止明文传输；\n- **用户认证**：前端用户必须登录（JWT/SESSION），后端校验用户身份；\n- **接口限流**：按用户/IP 限流，防止 DDoS；\n- **内容审核**：对输入/输出内容做敏感词过滤、内容安全审核；\n- **日志监控**：监控接口调用量、异常请求，及时发现风险。\n\n> 总结：**代理服务是基础，签名机制是增强，用户认证+限流+审核是保障**，全方位保证前端调用 AI 接口的安全。"
+    },
+    {
+        "id": "ai-interview-017",
+        "topic": "假设要做一个 AI 语音生成工具（TTS），如何处理音频播放、缓存与断点续播？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### AI 语音生成工具（TTS）前端技术方案\n\n#### 1. **音频播放**\n- **原生 Audio API**：用 `new Audio()` 或 `` 标签播放音频；\n- **流式播放**：TTS 生成音频是流式的，用 `MediaSource Extensions (MSE)` 或 `Web Audio API` 实现边生成边播放，无需等待完整音频；\n- **播放控制**：\n  - 播放/暂停/停止；\n  - 进度条拖拽；\n  - 音量调节；\n  - 播放速度（0.5x~2x）。\n\n#### 2. **缓存策略**\n- **内存缓存**：播放过的音频片段缓存到内存，避免重复请求；\n- **本地存储缓存**：用 `IndexedDB` 缓存完整音频，下次播放直接读取；\n- **缓存淘汰**：按「最近最少使用（LRU）」淘汰旧缓存，控制存储大小；\n- **缓存标识**：用「用户 ID + 文本内容 + 音色」作为缓存 key，保证唯一性。\n\n#### 3. **断点续播**\n- **进度记录**：播放时实时记录当前播放时间（`currentTime`），保存到 `localStorage`/IndexedDB；\n- **恢复播放**：下次打开时，读取记录的时间，调用 `audio.currentTime = savedTime`，从断点继续播放；\n- **流式场景**：\n  - 记录已生成的音频片段索引；\n  - 续播时从断点后的片段开始生成，拼接音频流。\n\n#### 4. **关键技术难点**\n- **流式播放延迟**：优化 MSE 缓冲区大小，减少首帧播放延迟；\n- **缓存一致性**：文本/音色变化时，清除旧缓存；\n- **跨端兼容**：不同浏览器对 MSE/Web Audio 的支持差异，需做兼容处理；\n- **内存占用**：长文本生成时，避免内存泄漏，及时释放不再使用的音频数据。\n\n> 核心是「**流式播放 + 多级缓存 + 进度持久化**」，让用户获得流畅、可恢复的语音播放体验。"
+    },
+    {
+        "id": "ai-interview-018",
+        "topic": "如何封装一个 AI 图片生成组件，支持选择模型、输入 prompt、展示图像并支持本地保存？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### AI 图片生成组件封装方案\n\n#### 1. 组件结构\n```jsx\n<AIImageGenerator\n  models={[/* 模型列表：{ id, name, description } */]}\n  onGenerate={(params) => Promise<ImageData>} // 生成图片的回调\n  onSave={(imageUrl) => void} // 保存图片的回调\n/>\n```\n\n#### 2. 核心功能模块\n- **模型选择**：下拉选择器，展示可用模型（如 DALL-E 3、MidJourney、Stable Diffusion）；\n- **Prompt 输入**：\n  - 多行文本框，支持 placeholder、字数限制；\n  - 快捷提示（如「高清、4K、卡通风格」）；\n  - 负面 prompt（排除不需要的元素）；\n- **参数配置**：\n  - 图片尺寸选择（如 512×512、1024×1024）；\n  - 生成数量（1~4 张）；\n  - 风格预设（如「写实」「动漫」「复古」）；\n- **生成控制**：\n  - 「生成」按钮，点击后触发 `onGenerate`；\n  - 加载状态（进度条、提示）；\n  - 「取消」按钮，中断生成请求；\n- **结果展示**：\n  - 网格布局展示生成的图片；\n  - 图片预览（点击放大）；\n  - 「保存」按钮，触发 `onSave`，下载到本地；\n  - 「重新生成」按钮，基于当前 prompt 重新生成。\n\n#### 3. 技术实现关键点\n- **状态管理**：用 `useState`/`useReducer` 管理模型、prompt、加载状态、生成结果；\n- **接口调用**：\n  - 调用后端代理服务（避免暴露 API Key）；\n  - 处理流式/异步生成，轮询或 SSE 获取生成进度；\n- **图片保存**：\n  - 用 `canvas.toBlob()` 或 `a` 标签 `download` 属性下载图片；\n  - 支持 PNG/JPEG 格式选择；\n- **错误处理**：\n  - 生成失败时友好提示（如「网络错误，请重试」）；\n  - 表单校验（prompt 不能为空）；\n- **响应式**：适配移动端，小屏幕下折叠参数配置。\n\n> 组件核心是「**简洁的输入 + 清晰的反馈 + 便捷的操作**」，让用户快速生成并保存图片。"
+    },
+    {
+        "id": "ai-interview-019",
+        "topic": "如何在富文本中插入可控组件，如 \"可编辑 AI 卡片\"、\"模型输入块\" 等？会有哪些技术难点？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 富文本插入可控组件方案\n\n#### 1. 实现思路\n富文本编辑器（如 Slate、TipTap、Quill）支持「**自定义节点/插件**」，可以将可控组件（如 AI 卡片）封装为自定义节点，插入到富文本中。\n\n##### 以 Slate 为例：\n1. **定义自定义节点**：\n   ```jsx\n   const AI_CARD_NODE = 'ai_card';\n   const aiCardNode = {\n     type: AI_CARD_NODE,\n     isVoid: true, // 不可编辑，由组件渲染\n     component: AICardComponent, // 渲染组件\n   };\n   ```\n2. **注册插件**：在 Slate 中注册该节点，让编辑器识别；\n3. **插入节点**：调用 `Transforms.insertNodes(editor, { type: AI_CARD_NODE, data: {/* 卡片数据 */} })`；\n4. **渲染组件**：Slate 渲染时，用 `AICardComponent` 渲染该节点，支持编辑数据、交互。\n\n---\n\n#### 2. 技术难点\n##### （1）**编辑器与组件的状态同步**\n- 问题：组件内部状态（如 AI 卡片的 prompt、生成结果）需要同步到富文本的节点数据中；\n- 解决：用 `useEditor` 获取编辑器实例，组件内部修改后调用 `Transforms.setNodes` 更新节点数据。\n\n##### （2）**序列化/反序列化**\n- 问题：富文本需要导出为 JSON/HTML，自定义组件需要能被序列化；\n- 解决：实现 `serialize`/`deserialize` 方法，将节点数据转换为可存储格式（如 JSON）。\n\n##### （3）**光标与选区处理**\n- 问题：插入组件后，光标位置、选区范围需要正确处理；\n- 解决：用 `Slate` 的 `Range`/`Selection` API，控制光标在组件前后的位置。\n\n##### （4）**性能问题**\n- 问题：大量复杂组件会导致编辑器渲染卡顿；\n- 解决：\n  - 用 `React.memo` 优化组件渲染；\n  - 虚拟滚动只渲染可视区域的组件；\n  - 延迟渲染不可见的组件。\n\n##### （5）**跨编辑器兼容**\n- 问题：不同富文本编辑器的自定义节点 API 不同；\n- 解决：封装适配器层，统一接口，适配不同编辑器。\n\n> 核心是「**自定义节点 + 状态同步 + 序列化兼容**」，让可控组件成为富文本的「一等公民」。"
+    },
+    {
+        "id": "ai-interview-020",
+        "topic": "如何基于现有富文本编辑器（如 Slate、TipTap、Monaco）扩展支持 AIGC 插件？比如一键生成段落或续写？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 富文本编辑器扩展 AIGC 插件方案\n\n#### 1. 核心思路\n基于编辑器的「**插件机制**」，封装 AIGC 能力（如生成段落、续写、润色），让用户在编辑器中直接调用 AI。\n\n---\n\n#### 2. 以 TipTap（基于 ProseMirror）为例：实现「续写」插件\n##### （1）插件结构\n```jsx\nimport { Extension } from '@tiptap/core';\n\nconst AIContinueExtension = Extension.create({\n  name: 'aiContinue',\n  addCommands() {\n    return {\n      aiContinue: () => ({ editor }) => {\n        // 1. 获取当前选区的文本\n        const { from, to } = editor.state.selection;\n        const text = editor.state.doc.textBetween(from, to);\n        \n        // 2. 调用 AI 接口续写\n        fetch('/api/ai/continue', {\n          method: 'POST',\n          body: JSON.stringify({ text }),\n        })\n        .then(res => res.json())\n        .then(data => {\n          // 3. 将续写内容插入到编辑器\n          editor.commands.insertContent(data.continuedText);\n        });\n        \n        return true;\n      },\n    };\n  },\n  addKeyboardShortcuts() {\n    return {\n      'Mod-Shift-C': () => this.editor.commands.aiContinue(), // 快捷键触发\n    };\n  },\n  addMenuItems() {\n    return [\n      {\n        title: 'AI 续写',\n        onClick: () => this.editor.commands.aiContinue(),\n      },\n    ];\n  },\n});\n```\n\n##### （2）功能扩展点\n- **命令（Commands）**：定义 AI 操作（如续写、生成段落、润色）；\n- **快捷键**：绑定快捷键，快速调用；\n- **菜单/工具栏**：在编辑器工具栏添加 AI 按钮；\n- **悬浮菜单**：选中文本后，弹出 AI 操作菜单；\n- **上下文菜单**：右键菜单中加入 AI 选项。\n\n---\n\n#### 3. 通用扩展步骤（Slate/TipTap/Monaco）\n1. **监听编辑器状态**：获取当前选区、文本内容；\n2. **封装 AI 调用**：调用后端代理服务，传入上下文文本；\n3. **处理 AI 响应**：将生成的内容插入到编辑器（替换/追加/插入）；\n4. **绑定交互**：快捷键、菜单、悬浮按钮等触发方式；\n5. **状态反馈**：加载状态、错误提示、成功提示。\n\n---\n\n#### 4. 技术难点\n- **上下文传递**：需要将编辑器的完整上下文（前后文本、选区）传给 AI，保证生成内容连贯；\n- **内容合并**：AI 生成的内容需要和原有内容自然合并，避免格式混乱；\n- **性能优化**：避免频繁调用 AI，做防抖处理；\n- **撤销/重做**：AI 生成操作需要支持撤销/重做，符合编辑器的操作历史。\n\n> 核心是「**利用编辑器插件机制，将 AI 能力封装为编辑器的原生操作**」，让用户在熟悉的界面中使用 AIGC。"
+    },
+    {
+        "id": "ai-interview-021",
+        "topic": "当前主流大模型 API (如 OpenAI、Claude、文心一言) 在前端调用时需要注意哪些问题？如何做统一封装？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 一、前端调用大模型 API 注意事项\n\n1. **安全问题**\n   - **禁止暴露 API Key**：前端绝不能直接存储/传输 API Key，必须通过**后端代理**转发请求；\n   - **请求签名/鉴权**：前端请求后端代理时，需携带签名（如 JWT、HMAC）防止篡改；\n   - **内容安全**：对用户输入做敏感词过滤，避免违规内容调用模型。\n\n2. **跨域与代理**\n   - 大模型 API 通常有跨域限制，前端必须通过**后端代理服务**访问；\n   - 代理服务负责：隐藏 Key、权限校验、限流、日志、错误处理。\n\n3. **流式响应处理**\n   - 多数模型支持 SSE/WebSocket 流式输出，前端需用 `EventSource` 或 WebSocket 处理逐字返回；\n   - 避免等待完整响应，提升用户体验。\n\n4. **错误与异常**\n   - 处理模型超时、token 超限、配额耗尽等错误；\n   - 友好提示用户，支持重试。\n\n5. **性能与限流**\n   - 前端做防抖（如输入框 300ms 防抖），避免频繁请求；\n   - 感知加载状态，避免重复提交。\n\n---\n\n### 二、统一封装方案\n\n#### 1. 分层结构\n```\nsrc/\n├── api/\n│   ├── ai/\n│   │   ├── client.ts       # 通用请求客户端（封装 fetch/EventSource）\n│   │   ├── openai.ts       # OpenAI 专属实现\n│   │   ├── claude.ts       # Claude 专属实现\n│   │   ├── wenxin.ts        # 文心一言专属实现\n│   │   └── index.ts         # 统一导出入口\n├── hooks/\n│   └── useAI.ts            # React Hook 封装（状态管理、加载、错误）\n└── types/\n    └── ai.ts               # 统一类型定义（请求/响应/模型枚举）\n```\n\n#### 2. 核心封装逻辑\n- **统一接口**：定义 `AIClient` 接口，包含 `chat()`、`streamChat()`、`imageGenerate()` 等方法；\n- **适配器模式**：不同模型实现该接口，屏蔽底层差异；\n- **流式处理**：封装 `EventSource`，返回异步迭代器，逐字消费响应；\n- **状态管理**：`useAI` Hook 管理 `loading`/`error`/`result` 状态；\n- **错误兜底**：统一捕获错误，返回标准化错误结构。\n\n#### 3. 示例代码（简化版）\n```typescript\n// ai/client.ts\nexport abstract class AIClient {\n  abstract chat(params: ChatParams): Promise<ChatResponse>;\n  abstract streamChat(params: ChatParams): AsyncIterable<string>;\n}\n\n// ai/openai.ts\nexport class OpenAIClient extends AIClient {\n  async chat(params: ChatParams): Promise<ChatResponse> {\n    const res = await fetch('/api/openai/chat', {\n      method: 'POST',\n      body: JSON.stringify(params),\n    });\n    return res.json();\n  }\n\n  async *streamChat(params: ChatParams): AsyncIterable<string> {\n    const eventSource = new EventSource('/api/openai/stream', {\n      method: 'POST',\n      body: JSON.stringify(params),\n    });\n    for await (const event of eventSource) {\n      yield event.data;\n    }\n  }\n}\n\n// hooks/useAI.ts\nexport function useAI(model: ModelType) {\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState<Error | null>(null);\n  const [result, setResult] = useState('');\n\n  const client = getClient(model); // 根据模型获取对应实现\n\n  const send = async (params: ChatParams) => {\n    setLoading(true);\n    setError(null);\n    try {\n      const stream = client.streamChat(params);\n      let content = '';\n      for await (const chunk of stream) {\n        content += chunk;\n        setResult(content);\n      }\n    } catch (err) {\n      setError(err as Error);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  return { loading, error, result, send };\n}\n```\n\n---\n\n### 三、优势\n- **可扩展性**：新增模型只需实现 `AIClient` 接口，无需修改上层代码；\n- **一致性**：上层调用统一，无需关心底层模型差异；\n- **可维护性**：集中处理请求、流式、错误逻辑，便于调试。"
+    },
+    {
+        "id": "ai-interview-022",
+        "topic": "你知道什么是 AIGC 吗，是否有参与过相关工具的研发？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是 AIGC？\nAIGC（AI Generated Content）即**人工智能生成内容**，指利用 AI 技术自动生成文本、图像、音频、视频、代码等各类内容的技术与应用。\n\n核心场景包括：\n- **文本生成**：文章、文案、代码、对话；\n- **图像生成**：文生图、图生图、风格迁移；\n- **音视频生成**：语音合成（TTS）、数字人、短视频；\n- **多模态生成**：图文混合、跨模态理解与生成。\n\n---\n\n### 二、参与过的 AIGC 工具研发（示例回答）\n我曾参与开发过 **「AI 代码助手」** 和 **「富文本 AIGC 插件」** 两个工具：\n\n#### 1. AI 代码助手（VS Code 插件）\n- **功能**：基于 VS Code API，支持选代码后「解释代码」「重构代码」「生成单元测试」；\n- **技术栈**：TypeScript + VS Code Extension API + OpenAI API；\n- **核心工作**：\n  - 封装 OpenAI 流式接口，实现逐字输出；\n  - 实现代码上下文收集（选中代码 + 依赖分析）；\n  - 开发 UI 面板，展示生成结果，支持一键替换代码；\n  - 接入后端代理，隐藏 API Key，做权限控制。\n\n#### 2. 富文本 AIGC 插件（基于 TipTap）\n- **功能**：在富文本编辑器中支持「AI 续写」「生成段落」「润色文本」；\n- **技术栈**：React + TypeScript + TipTap + SSE；\n- **核心工作**：\n  - 开发 TipTap 扩展，注册 AI 命令、快捷键、工具栏按钮；\n  - 封装 SSE 流式请求，实现打字机效果；\n  - 实现上下文传递（编辑器选区文本 + 前后文）；\n  - 支持撤销/重做，保证编辑器操作历史一致。\n\n---\n\n### 三、总结\nAIGC 是当前 AI 落地最广泛的方向之一，核心是「**用 AI 提升内容生产效率**」。我在研发中主要负责**前端交互、接口封装、流式处理、安全代理**，积累了从「需求 → 设计 → 开发 → 上线」的完整经验。"
+    },
+    {
+        "id": "ai-interview-023",
+        "topic": "请设计一个能自动生成产品文案的前端小工具，简述如何设计 UI，以及与后端 AI 服务的交互流程。",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 一、UI 设计\n\n#### 1. 页面结构\n- **顶部导航**：工具名称、用户信息、设置（模型选择、风格预设）；\n- **左侧输入区**：\n  - 产品信息输入框：\n    - 产品名称、品类、核心卖点、目标人群、使用场景；\n    - 多行文本框，支持 placeholder 引导输入；\n  - 文案风格选择：下拉选择（如「活泼」「专业」「文艺」「简洁」）；\n  - 文案类型选择：下拉选择（如「标题」「详情页」「广告语」「小红书笔记」）；\n  - 「生成」按钮：点击后触发生成；\n- **右侧结果区**：\n  - 文案展示区：支持多版本文案展示，卡片布局；\n  - 操作按钮：「复制」「重新生成」「保存到草稿」；\n  - 加载状态：生成中显示进度条/动画；\n  - 错误提示：生成失败时显示友好提示。\n\n#### 2. 交互细节\n- 输入区与结果区左右分栏，响应式布局（移动端上下堆叠）；\n- 生成按钮禁用状态：必填项为空时禁用；\n- 流式输出：生成文案逐字显示，提升体验；\n- 文案复制：点击复制后提示「已复制」。\n\n---\n\n### 二、与后端 AI 服务的交互流程\n\n#### 1. 前端请求流程\n1. 用户填写产品信息、选择风格/类型；\n2. 前端校验必填项，校验通过后禁用「生成」按钮，显示加载状态；\n3. 前端调用**后端代理 API**（如 `POST /api/ai/generate-copy`），传递参数：\n   ```json\n   {\n     \"productName\": \"XX 耳机\",\n     \"features\": \"降噪、续航 30h、无线\",\n     \"target\": \"年轻人\",\n     \"scene\": \"通勤\",\n     \"style\": \"活泼\",\n     \"type\": \"广告语\"\n   }\n   ```\n4. 前端监听 SSE 流式响应，逐字渲染文案到结果区；\n5. 生成完成后，启用「重新生成」「复制」按钮；\n6. 若失败，显示错误提示，启用「重试」按钮。\n\n#### 2. 后端处理流程\n1. 接收前端请求，校验用户权限（登录状态、调用次数）；\n2. 组装 Prompt：\n   ```text\n   你是专业的文案策划，请根据以下信息生成产品文案：\n   产品名称：{productName}\n   核心卖点：{features}\n   目标人群：{target}\n   使用场景：{scene}\n   风格：{style}\n   类型：{type}\n   要求：简洁有力，符合目标人群喜好。\n   ```\n3. 调用大模型 API（如 OpenAI），流式返回结果；\n4. 后端将模型流式响应转发给前端（SSE）；\n5. 记录请求日志，更新用户调用次数。\n\n---\n\n### 三、核心技术点\n- **流式输出**：SSE 实现打字机效果；\n- **权限控制**：后端代理做登录/限流/日志；\n- **响应式 UI**：适配 PC/移动端；\n- **错误处理**：友好提示，支持重试。"
+    },
+    {
+        "id": "ai-interview-024",
+        "topic": "你了解哪些 AI 前端工具或库？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 一、AI 代码生成/辅助工具\n- **GitHub Copilot**：VS Code 插件，实时代码补全、函数生成、解释代码；\n- **Cursor**：内置 AI 的代码编辑器，支持对话、重构、代码解释，适合快速开发；\n- **Codeium**：免费代码补全工具，支持多 IDE，功能接近 Copilot；\n- **Tabnine**：基于机器学习的代码补全，支持私有代码库；\n- **JetBrains AI Assistant**：IntelliJ 系列 IDE 内置 AI，支持代码生成、审查、重构。\n\n### 二、对话/聊天 UI 库\n- **ChatUI**（阿里）：开源聊天 UI 组件库，支持消息气泡、输入框、流式输出；\n- **react-chatbot-kit**：React 聊天机器人组件库，可定制 UI；\n- **stream-chat-react**：Stream 出品的 React 聊天组件，支持实时消息；\n- **langui**：面向 LLM 应用的 React UI 组件库，包含聊天、提示框、历史记录。\n\n### 三、富文本 AIGC 插件\n- **TipTap AI Extensions**：基于 TipTap 的 AIGC 插件，支持续写、生成、润色；\n- **Slate AI Plugins**：Slate 富文本编辑器的 AI 插件；\n- **@blocknote/core**：BlockNote 编辑器内置 AIGC 能力，支持 AI 生成块。\n\n### 四、AI 可视化/设计工具\n- **Figma AI**：Figma 内置 AI，支持生成图像、文案、组件；\n- **MidJourney**：文生图工具，可通过 API 集成到前端；\n- **DALL-E 3**：OpenAI 文生图 API，适合前端图片生成场景；\n- **Runway ML**：视频/图像编辑 AI 工具。\n\n### 五、框架/工具库\n- **LangChain**：LLM 应用开发框架，支持前端/后端集成；\n- **LlamaIndex**：知识库检索框架，用于 RAG 应用；\n- **Vercel AI SDK**：Vercel 推出的 AI 前端 SDK，封装流式请求、状态管理，支持 React/Next.js；\n- **AI UI React**（Vercel）：聊天 UI 组件 + 流式请求封装，快速开发 ChatGPT 类应用。\n\n---\n\n### 总结\n我日常使用 **Copilot/Cursor** 做代码辅助，用 **Vercel AI SDK** 开发聊天应用，用 **TipTap 插件** 做富文本 AIGC，熟悉主流 AI 前端工具的使用与集成。"
+    },
+    {
+        "id": "ai-interview-025",
+        "topic": "如何在前端安全地使用大语言模型 API，比如调用 OpenAI 接口进行文本生成？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 一、核心安全原则：**前端绝不直接调用模型 API**\n所有请求必须通过**后端代理服务**转发，避免暴露 API Key 和敏感信息。\n\n---\n\n### 二、安全方案详解\n\n#### 1. **后端代理服务（必选）**\n- **作用**：\n  - 隐藏 API Key：API Key 存储在后端环境变量中，前端永远无法获取；\n  - 权限校验：校验用户登录状态、角色、调用次数；\n  - 内容过滤：对用户输入/输出做敏感词过滤、内容安全审核；\n  - 限流防刷：按用户/IP 限流，防止 DDoS、滥用；\n  - 日志审计：记录所有请求，便于排查问题、审计。\n- **请求流程**：\n  `前端 → 后端代理（校验/过滤/限流） → 模型 API`\n\n#### 2. **前端请求安全**\n- **用户认证**：前端用户必须登录（JWT/SESSION），请求携带 token；\n- **请求签名**：\n  - 前端用 `appId + timestamp + nonce + appSecret` 生成 HMAC-SHA256 签名；\n  - 请求时携带 `appId`、`timestamp`、`nonce`、`signature`；\n  - 后端验证签名，防止请求篡改、重放攻击；\n- **HTTPS**：所有请求必须用 HTTPS，防止明文传输；\n- **输入过滤**：前端对用户输入做初步过滤（如长度限制、敏感词），避免无效请求。\n\n#### 3. **数据安全**\n- **敏感信息脱敏**：对用户输入中的手机号、邮箱、身份证等敏感信息脱敏后再传给模型；\n- **输出过滤**：对模型返回的内容做敏感词过滤，避免违规内容返回给用户；\n- **数据留存**：不存储用户输入/模型输出的敏感数据，必要时加密存储。\n\n#### 4. **错误与异常处理**\n- **不暴露底层错误**：后端将模型 API 错误（如「API Key 无效」）转换为通用错误（如「服务暂时不可用」）返回给前端；\n- **友好提示**：前端显示用户友好的错误信息，避免技术细节泄露。\n\n#### 5. **监控与告警**\n- 监控接口调用量、错误率、响应时间；\n- 异常流量告警（如突然大量请求）；\n- 定期审计日志，发现安全风险。\n\n---\n\n### 三、示例流程\n1. 用户登录，获取 JWT token；\n2. 前端输入文本，调用后端代理接口，携带 JWT + 签名；\n3. 后端验证 JWT、签名、权限；\n4. 后端对输入做敏感词过滤；\n5. 后端调用 OpenAI API，传递脱敏后的输入；\n6. 后端将 OpenAI 流式响应转发给前端；\n7. 前端接收流式响应，渲染结果；\n8. 后端记录请求日志，更新用户调用次数。\n\n---\n\n### 四、总结\n安全的核心是「**隔离前端与模型 API，所有请求走后端代理**」，通过「认证 + 签名 + 过滤 + 限流 + 审计」多层保障，避免 API Key 泄露、内容违规、流量滥用。"
+    },
+    {
+        "id": "ai-interview-026",
+        "topic": "假如要做一个类似 ChatGPT 的聊天 UI，前端如何处理流式响应？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 一、流式响应核心技术：SSE / WebSocket\n主流方案是 **Server-Sent Events (SSE)** 或 WebSocket，实现「打字机效果」，逐字渲染模型返回的内容。\n\n---\n\n### 二、SSE 方案实现（推荐）\n\n#### 1. 前端封装 SSE 请求\n```typescript\n// hooks/useChatStream.ts\nexport async function* streamChat(message: string): AsyncIterable<string> {\n  const eventSource = new EventSource('/api/chat/stream', {\n    method: 'POST',\n    body: JSON.stringify({ message }),\n    headers: {\n      'Content-Type': 'application/json',\n      Authorization: `Bearer ${token}`,\n    },\n  });\n\n  try {\n    for await (const event of eventSource) {\n      if (event.data === '[DONE]') break;\n      yield JSON.parse(event.data).content;\n    }\n  } finally {\n    eventSource.close();\n  }\n}\n```\n\n#### 2. React 状态管理\n```tsx\n// ChatMessage.tsx\nexport function ChatMessage() {\n  const [messages, setMessages] = useState<Message[]>([]);\n  const [loading, setLoading] = useState(false);\n\n  const sendMessage = async (content: string) => {\n    // 先添加用户消息\n    setMessages(prev => [...prev, { role: 'user', content }]);\n    setLoading(true);\n\n    // 初始化 AI 消息占位\n    const aiMessageId = Date.now();\n    setMessages(prev => [...prev, { role: 'assistant', content: '', id: aiMessageId }]);\n\n    try {\n      // 消费流式响应\n      let aiContent = '';\n      for await (const chunk of streamChat(content)) {\n        aiContent += chunk;\n        // 逐字更新 AI 消息\n        setMessages(prev => \n          prev.map(msg => \n            msg.id === aiMessageId ? { ...msg, content: aiContent } : msg\n          )\n        );\n      }\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  return (\n    <div className=\"chat-container\">\n      {messages.map(msg => (\n        <div key={msg.id} className={`message ${msg.role}`}>\n          {msg.content}\n        </div>\n      ))}\n      {loading && <div className=\"typing-indicator\">AI 正在输入...</div>}\n    </div>\n  );\n}\n```\n\n#### 3. 关键细节\n- **占位消息**：先添加空的 AI 消息，流式更新其 `content`，避免频繁插入新节点；\n- **流式更新**：每次收到 chunk 就更新消息内容，实现打字机效果；\n- **资源清理**：`finally` 中关闭 `EventSource`，避免内存泄漏；\n- **错误处理**：捕获 `error` 事件，显示错误提示，支持重试。\n\n---\n\n### 三、WebSocket 方案（适合双向通信）\n- 建立 WebSocket 连接，前端发送消息，后端逐字返回 chunk；\n- 前端监听 `message` 事件，更新消息内容；\n- 适合需要实时双向通信的场景（如语音对话）。\n\n---\n\n### 四、优化点\n- **防抖**：避免用户快速输入时频繁请求；\n- **中断**：支持用户点击「停止生成」，关闭 SSE/WebSocket；\n- **恢复**：断网后支持重连，从断点继续生成；\n- **性能**：大量消息时用虚拟滚动，只渲染可视区域。\n\n---\n\n### 五、总结\n核心是 **「异步迭代器 + 状态增量更新」**，用 SSE/WebSocket 消费流式响应，逐字渲染消息，实现流畅的打字机效果。"
+    },
+    {
+        "id": "ai-interview-027",
+        "topic": "如何在前端项目中集成 AI 能力，例如实现智能对话、图像识别或推荐系统？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试"
+        ],
+        "answerContent": "### 一、通用集成思路：**前端交互 + 后端代理 + 模型服务**\n所有 AI 能力都遵循「前端发起请求 → 后端代理 → 模型服务 → 前端渲染结果」的流程，核心是**隔离前端与模型 API，保证安全与可维护**。\n\n---\n\n### 二、不同场景集成方案\n\n#### 1. 智能对话（如 ChatGPT）\n- **技术栈**：React/Vue + SSE/WebSocket + 大模型 API；\n- **核心步骤**：\n  1. 前端：聊天 UI（消息列表、输入框）、流式请求封装；\n  2. 后端：代理服务（隐藏 Key、权限校验、流式转发）；\n  3. 模型：对话大模型（如 GPT-4o、Claude）；\n- **关键实现**：\n  - 用 SSE 实现打字机效果；\n  - 管理对话上下文（历史消息）；\n  - 支持中断、重试、消息编辑。\n\n#### 2. 图像识别（如 OCR、物体识别）\n- **技术栈**：React/Vue + FormData + 视觉模型 API；\n- **核心步骤**：\n  1. 前端：图片上传组件、预览、结果展示；\n  2. 后端：接收图片，调用视觉模型 API（如 Google Vision、百度 AI）；\n  3. 模型：视觉识别模型；\n- **关键实现**：\n  - 图片压缩/格式转换（如转 WebP）；\n  - 结果可视化（如框选识别区域）；\n  - 错误处理（如图片过大、格式不支持）。\n\n#### 3. 推荐系统（如商品推荐、内容推荐）\n- **技术栈**：React/Vue + REST API + 推荐模型/算法；\n- **核心步骤**：\n  1. 前端：推荐列表 UI、埋点（点击/曝光）；\n  2. 后端：接收用户 ID/行为数据，调用推荐服务；\n  3. 模型：协同过滤、深度学习推荐模型；\n- **关键实现**：\n  - 埋点上报用户行为，用于模型训练；\n  - 分页加载推荐结果；\n  - 支持刷新、换一批推荐。\n\n---\n\n### 三、通用集成原则\n1. **安全优先**：所有请求走后端代理，绝不暴露 API Key；\n2. **用户体验**：\n   - 加载状态：清晰展示加载/识别/生成中；\n   - 错误处理：友好提示，支持重试；\n   - 性能优化：防抖、懒加载、虚拟滚动；\n3. **可扩展性**：\n   - 封装统一接口，方便切换模型/服务；\n   - 插件化设计，新增 AI 能力无需修改核心代码；\n4. **可观测性**：\n   - 监控接口调用量、错误率、响应时间；\n   - 日志记录用户行为、AI 结果。\n\n---\n\n### 四、示例：集成智能对话\n```tsx\n// 1. 前端发起请求\nconst sendMessage = async (content: string) => {\n  const res = await fetch('/api/chat', {\n    method: 'POST',\n    body: JSON.stringify({ message: content }),\n  });\n  const data = await res.json();\n  setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);\n};\n\n// 2. 后端代理（Node.js）\napp.post('/api/chat', async (req, res) => {\n  const { message } = req.body;\n  const openaiRes = await openai.chat.completions.create({\n    model: 'gpt-3.5-turbo',\n    messages: [{ role: 'user', content: message }],\n  });\n  res.json({ reply: openaiRes.choices[0].message.content });\n});\n```\n\n---\n\n### 五、总结\n集成 AI 能力的核心是 **「前后端分离 + 安全代理 + 体验优化」**，根据场景选择合适的模型与通信方式（SSE/REST/WebSocket），保证功能可用、体验流畅、安全可靠。"
+    },
+    {
+        "id": "ai-interview-028",
+        "topic": "最近 OpenClaw 这么火，你知道它的原理吗？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### OpenClaw 核心原理\n\nOpenClaw 是一个**开源的检索增强生成（RAG）应用框架**，主打「轻量、可扩展、开箱即用」，核心是让开发者快速搭建基于私有知识库的问答系统。\n\n#### 1. 核心架构\n- **数据处理层**：\n  - 文档加载：支持 PDF/Word/Markdown/网页等格式；\n  - 文本分块：按语义/固定长度拆分文档，避免上下文过长；\n  - 向量化：用 Embedding 模型（如 BGE、text-embedding-ada-002）将文本转为向量；\n  - 向量存储：存入向量数据库（如 Milvus、FAISS、Chroma）。\n- **检索层**：\n  - 向量检索：根据用户问题的向量，在库中召回相似文本；\n  - 关键词检索（可选）：混合 BM25 检索，提升召回率；\n  - 重排序（Rerank）：用交叉编码器对召回结果排序，提升精度。\n- **生成层**：\n  - 将检索到的上下文 + 用户问题拼接成 Prompt；\n  - 调用大模型（如 Llama 2、Qwen、GPT）生成回答；\n  - 支持流式输出、引用溯源。\n\n#### 2. 核心优势\n- **开源免费**：无商业限制，可二次开发；\n- **轻量部署**：支持 Docker 一键部署，门槛低；\n- **模型无关**：可对接任意 Embedding 模型和大模型；\n- **可扩展**：支持自定义分块、检索、重排序策略。\n\n#### 3. 典型场景\n- 企业内部知识库问答；\n- 客服机器人；\n- 文档助手（如 API 文档、产品手册）。\n\n> 本质：OpenClaw 是「**RAG 流水线的封装框架**」，帮你省去从 0 搭 RAG 的繁琐步骤，快速落地知识库问答。"
+    },
+    {
+        "id": "ai-interview-029",
+        "topic": "什么是 RAG？RAG 的主要流程是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是 RAG？\nRAG（Retrieval-Augmented Generation）即**检索增强生成**，是一种让大模型「**先检索外部知识库，再生成回答**」的技术，解决大模型「知识陈旧、幻觉、隐私数据」问题。\n\n核心思想：\n- 不修改大模型本身，而是在生成回答前，从外部知识库中检索相关信息；\n- 将检索到的信息作为上下文注入 Prompt，让大模型基于事实回答。\n\n---\n\n### 二、RAG 主要流程\n\n#### 1. 离线阶段（知识库构建）\n1. **文档加载**：读取各类文档（PDF/Word/Markdown/网页）；\n2. **数据清洗**：去除噪声（如页眉页脚、广告、乱码），格式化文本；\n3. **文本分块**：将长文档拆分为合适大小的块（如 512 字符），保留语义完整性；\n4. **向量化**：用 Embedding 模型将每个文本块转为固定维度的向量；\n5. **入库存储**：将向量 + 原文存入向量数据库（如 Milvus、FAISS、Pinecone）。\n\n#### 2. 在线阶段（问答生成）\n1. **问题处理**：对用户问题做预处理（如纠错、扩展、意图识别）；\n2. **向量检索**：将用户问题转为向量，在向量库中召回 Top-K 相似文本块；\n3. **结果排序（可选）**：用 Rerank 模型对召回结果重排序，提升精度；\n4. **Prompt 拼接**：将「检索到的上下文 + 用户问题」按模板拼接成 Prompt；\n5. **生成回答**：调用大模型，基于上下文生成回答；\n6. **后处理**：对回答做清洗、引用溯源、格式美化。\n\n---\n\n### 三、核心价值\n- **事实准确**：回答基于检索到的知识库内容，减少幻觉；\n- **知识更新**：只需更新知识库，无需重新训练大模型；\n- **隐私安全**：数据存在私有库，不泄露给大模型；\n- **成本更低**：比微调大模型更便宜、高效。"
+    },
+    {
+        "id": "ai-interview-030",
+        "topic": "什么是 RAG 中的 Rerank？具体需要怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是 Rerank？\nRerank（重排序）是 RAG 检索阶段的**优化步骤**：在向量检索召回一批候选文档后，用更精准的模型对候选文档重新排序，把「**最相关的文档排到前面**」，提升最终 Prompt 的质量。\n\n#### 为什么需要 Rerank？\n- 向量检索是「**粗排**」：基于余弦相似度，速度快但精度有限；\n- Rerank 是「**精排**」：用交叉编码器（Cross-Encoder）直接计算「问题-文档」的相关性，精度更高；\n- 解决：向量检索可能把表面相似但语义无关的文档排前面，Rerank 能过滤噪声。\n\n---\n\n### 二、Rerank 具体怎么做？\n\n#### 1. 流程\n1. **向量检索**：先召回 Top-50 ~ Top-100 候选文档（保证召回率）；\n2. **Rerank 模型推理**：将「用户问题 + 每个候选文档」成对输入 Rerank 模型，得到相关性分数；\n3. **按分数排序**：按相关性从高到低排序，取 Top-3 ~ Top-10 进入最终 Prompt；\n4. **过滤噪声**：可设置分数阈值，过滤掉相关性低的文档。\n\n#### 2. 常用 Rerank 模型\n- **开源模型**：\n  - BGE Reranker（如 `BAAI/bge-reranker-v2-m3`）；\n  - Cohere Reranker；\n  - CrossEncoder（如 `cross-encoder/ms-marco-MiniLM-L-6-v2`）；\n- **商用 API**：Cohere Rerank API、阿里云 Rerank API。\n\n#### 3. 代码示例（简化版）\n```python\nfrom sentence_transformers import CrossEncoder\n\n# 加载 Rerank 模型\nmodel = CrossEncoder('BAAI/bge-reranker-v2-m3')\n\n# 用户问题 + 候选文档\nquestion = \"什么是 RAG？\"\ncandidates = [\n  \"RAG 是检索增强生成...\",\n  \"大模型幻觉的解决方法...\",\n  \"向量数据库的使用场景...\"\n]\n\n# 计算相关性分数\npairs = [[question, doc] for doc in candidates]\nscores = model.predict(pairs)\n\n# 按分数排序\nsorted_docs = [doc for _, doc in sorted(zip(scores, candidates), reverse=True)]\n\n# 取 Top-K\ntop_docs = sorted_docs[:3]\n```\n\n---\n\n### 三、注意事项\n- **性能 trade-off**：Rerank 会增加延迟，通常只对 Top-50 候选做 Rerank；\n- **模型选择**：轻量模型（如 MiniLM）适合线上，大模型（如 LLM）精度更高但慢；\n- **阈值控制**：分数过低的文档直接丢弃，避免给大模型喂噪声。\n\n> Rerank 是「**用少量延迟换精度**」的关键步骤，是提升 RAG 效果的核心手段之一。"
+    },
+    {
+        "id": "ai-interview-031",
+        "topic": "A2A 协议有哪五大设计原则？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 协议",
+            "分布式",
+            "面试"
+        ],
+        "answerContent": "### A2A 协议五大设计原则\n\nA2A（Agent-to-Agent）协议是**智能体之间通信的标准协议**，用于多智能体系统中实现安全、高效、可互操作的协作。其五大设计原则如下：\n\n#### 1. **去中心化（Decentralization）**\n- 无中心节点，智能体对等通信；\n- 避免单点故障，提升系统容错性；\n- 支持任意智能体之间直接通信，无需中转。\n\n#### 2. **互操作性（Interoperability）**\n- 统一消息格式与语义，不同厂商/框架的智能体可互通；\n- 支持多种通信方式（HTTP/WS/gRPC）；\n- 兼容不同智能体的能力描述（如「能做代码生成」「能做数据分析」）。\n\n#### 3. **安全性（Security）**\n- 身份认证：智能体之间需验证身份（如数字签名）；\n- 权限控制：细粒度控制智能体可访问的资源/能力；\n- 数据加密：通信内容加密，防止窃听/篡改；\n- 审计日志：记录所有通信行为，便于追溯。\n\n#### 4. **可扩展性（Scalability）**\n- 支持海量智能体接入，水平扩展；\n- 消息路由高效，支持动态拓扑变化；\n- 模块化设计，可扩展新的消息类型/能力。\n\n#### 5. **上下文感知（Context Awareness）**\n- 智能体可感知协作上下文（如当前任务、历史对话）；\n- 支持上下文传递，保证协作连贯性；\n- 可根据上下文调整通信策略（如紧急任务优先）。\n\n---\n\n### 总结\nA2A 协议的核心是「**让智能体像人一样协作**」，通过去中心化、互操作、安全、可扩展、上下文感知五大原则，构建开放、可靠的多智能体生态。"
+    },
+    {
+        "id": "ai-interview-032",
+        "topic": "什么混合检索？在基于大模型的应用开发中，混合检索主要解决什么问题？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是混合检索？\n混合检索（Hybrid Retrieval）是**同时使用多种检索方式**，将它们的结果融合，得到更全面、更精准的候选文档集合。\n\n常见组合：\n- **向量检索 + 关键词检索（BM25）**：最主流组合；\n- 向量检索 + 图检索；\n- 向量检索 + 知识图谱检索。\n\n#### 核心思想\n- 向量检索：擅长**语义相似**（如「RAG 是什么」→ 匹配「检索增强生成」）；\n- 关键词检索：擅长**字面匹配**（如「包含『OpenClaw』的文档」）；\n- 混合后：兼顾「语义」和「字面」，提升召回率和精度。\n\n---\n\n### 二、混合检索解决的问题\n\n#### 1. 解决单一检索的局限性\n- **纯向量检索**：\n  - 缺点：对字面匹配弱（如用户输入错别字、专有名词），容易漏检；\n  - 优点：语义理解强；\n- **纯关键词检索（BM25）**：\n  - 缺点：语义理解弱（如「RAG」→ 匹配不到「检索增强生成」）；\n  - 优点：字面匹配强，速度快；\n- 混合检索：取长补短，既保证语义召回，又保证字面召回。\n\n#### 2. 提升 RAG 系统的鲁棒性\n- 应对用户输入多样性：错别字、口语化、缩写、专有名词；\n- 应对知识库多样性：文档类型多（如代码、表格、纯文本）；\n- 提升最终回答质量：更多相关上下文 → 大模型更少幻觉，回答更准确。\n\n#### 3. 典型场景\n- 企业知识库：包含大量专有名词、代码片段；\n- 法律/医疗文档：术语严谨，需要字面 + 语义双重匹配；\n- 多语言文档：混合检索可更好处理跨语言语义。\n\n---\n\n### 三、混合检索实现方式\n1. **先分别检索**：\n   - 向量检索召回 Top-K；\n   - 关键词检索召回 Top-M；\n2. **结果融合**：\n   - 加权求和：`score = α * vector_score + (1-α) * keyword_score`；\n   - 交集/并集：取两者交集（高精度）或并集（高召回）；\n3. **Rerank 精排**：对融合结果再做 Rerank，得到最终 Top-N。\n\n> 混合检索是「**高召回 + 高精度**」的保障，是工业级 RAG 系统的标配。"
+    },
+    {
+        "id": "ai-interview-033",
+        "topic": "什么是 Google ADK？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 框架",
+            "Google",
+            "面试"
+        ],
+        "answerContent": "### Google ADK 简介\n\nGoogle ADK（Agent Development Kit）是 Google 推出的**智能体开发工具包**，用于快速构建、部署和管理 AI 智能体（Agent），主打「**开箱即用、可扩展、与 Google 生态深度集成**」。\n\n#### 1. 核心定位\n- 面向开发者：提供构建智能体的全链路工具；\n- 与 Google 生态集成：\n  - 大模型：Gemini 系列；\n  - 工具：Google Search、Calendar、Maps、Drive 等；\n  - 部署：Google Cloud、Vertex AI。\n\n#### 2. 核心组件\n- **智能体核心**：\n  - 推理引擎：支持工具调用、规划、记忆管理；\n  - 工具库：内置 Google 服务工具，也支持自定义工具；\n  - 记忆系统：管理对话历史、长期记忆；\n- **开发工具**：\n  - SDK：Python/TypeScript SDK，快速开发智能体；\n  - 调试面板：可视化调试智能体的推理过程；\n  - 测试框架：自动化测试智能体的能力；\n- **部署与运维**：\n  - 一键部署到 Google Cloud；\n  - 监控告警：监控智能体的调用量、延迟、错误率；\n  - 权限控制：细粒度控制智能体的工具访问权限。\n\n#### 3. 典型场景\n- 个人助理：日程管理、邮件处理、信息查询；\n- 企业客服：对接企业知识库、工单系统；\n- 开发助手：代码生成、调试、文档查询；\n- 行业智能体：医疗、法律、教育等垂直领域。\n\n#### 4. 优势\n- **生态强大**：直接调用 Google 搜索、地图等服务，信息实时性强；\n- **开箱即用**：无需从零搭建智能体框架，快速上线；\n- **可扩展**：支持自定义工具、自定义推理逻辑；\n- **安全可靠**：Google 级别的安全与隐私保护。\n\n> 本质：Google ADK 是「**Gemini + Google 服务 + 开发工具**」的组合包，让开发者快速构建能调用真实世界工具的智能体。"
+    },
+    {
+        "id": "ai-interview-034",
+        "topic": "RAG 的完整流程是怎么样的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### RAG 完整流程：离线构建 + 在线问答\n\n---\n\n#### 一、离线阶段：知识库构建\n1. **文档采集**\n   - 来源：本地文件（PDF/Word/Markdown）、网页、API、数据库；\n   - 工具：爬虫、文件读取器、数据库连接器。\n\n2. **数据清洗**\n   - 去噪：去除页眉页脚、广告、乱码、重复内容；\n   - 格式化：统一编码、换行、标点，修复排版；\n   - 过滤：过滤掉无关文档、太短/太长的文本块。\n\n3. **文本分块（Chunking）**\n   - 策略：按语义（句子/段落）、固定长度（如 512 字符）、递归分块；\n   - 目标：保证块内语义完整，同时适合 Embedding 模型处理。\n\n4. **向量化（Embedding）**\n   - 模型：选择 Embedding 模型（如 BGE、text-embedding-ada-002）；\n   - 处理：将每个文本块转为固定维度的向量；\n   - 批量处理：高效处理大批量文档。\n\n5. **向量入库**\n   - 存储：将「向量 + 原文 + 元数据（来源/标题/时间）」存入向量数据库；\n   - 数据库：Milvus、FAISS、Pinecone、Chroma、Weaviate。\n\n---\n\n#### 二、在线阶段：问答生成\n1. **用户请求**\n   - 接收用户问题；\n   - 预处理：纠错、分词、意图识别、问题扩展（如补全上下文）。\n\n2. **检索阶段**\n   - **向量检索**：将用户问题转为向量，召回 Top-K 相似文档；\n   - **混合检索（可选）**：叠加关键词检索（BM25），提升召回率；\n   - **重排序（Rerank）**：用 Rerank 模型对候选文档重新排序，过滤噪声，提升精度；\n   - **过滤**：按相关性阈值过滤掉低质文档，保留 Top-N 进入下一步。\n\n3. **Prompt 构建**\n   - 模板拼接：将「检索到的上下文 + 用户问题 + 系统提示」按固定模板组装；\n   - 长度控制：截断过长的上下文，保证不超过模型 token 限制；\n   - 引用标记：给每个文档块加编号，便于后续溯源。\n\n4. **生成回答**\n   - 调用大模型（如 Gemini、Claude、Llama 2）；\n   - 流式输出：逐字返回结果，提升用户体验；\n   - 约束生成：要求模型只基于上下文回答，避免幻觉。\n\n5. **后处理**\n   - 清洗：去除多余格式、重复内容；\n   - 溯源：标注回答中引用的文档来源；\n   - 格式美化：适配前端展示（如 Markdown、富文本）。\n\n6. **结果返回**\n   - 返回回答 + 引用来源；\n   - 记录日志：用户问题、检索结果、模型回答、耗时等，用于后续优化。\n\n---\n\n#### 三、优化与迭代\n- **效果评估**：人工/自动化评估回答准确率、召回率、幻觉率；\n- **参数调优**：调整分块大小、Embedding 模型、检索 Top-K、Rerank 阈值；\n- **数据迭代**：补充新文档，清洗旧数据，提升知识库质量；\n- **监控告警**：监控接口延迟、错误率、用户反馈，及时发现问题。\n\n> 完整 RAG 是「**离线构建知识库 + 在线检索生成 + 持续迭代优化**」的闭环系统。"
+    },
+    {
+        "id": "ai-interview-035",
+        "topic": "A2A 协议的工作原理是怎样的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 协议",
+            "分布式",
+            "面试"
+        ],
+        "answerContent": "### A2A 协议工作原理\n\nA2A（Agent-to-Agent）协议是**智能体之间的通信协议**，核心是「**标准化消息 + 能力发现 + 安全路由**」，让不同智能体可高效协作。\n\n---\n\n#### 1. 核心角色\n- **发起方 Agent**：发起协作请求的智能体；\n- **接收方 Agent**：处理请求、提供能力的智能体；\n- **目录服务（Directory Service）**：注册/发现智能体的能力；\n- **路由服务（Routing Service）**：转发消息，负责负载均衡、容错。\n\n---\n\n#### 2. 工作流程\n1. **能力注册**\n   - Agent 启动后，向目录服务注册自身能力（如「能做代码生成」「能做数据分析」「支持 RAG 问答」）；\n   - 目录服务维护「Agent ID → 能力描述 → 地址」的映射。\n\n2. **能力发现**\n   - 发起方 Agent 向目录服务查询：「谁能处理『生成产品文案』的任务？」；\n   - 目录服务返回符合条件的 Agent 列表及地址。\n\n3. **安全握手**\n   - 发起方与接收方建立连接，验证身份（如数字签名）；\n   - 协商加密算法，建立安全通信通道；\n   - 交换权限信息，确认可访问的能力范围。\n\n4. **消息交互**\n   - **请求消息**：发起方发送任务请求（包含任务描述、上下文、参数）；\n   - **响应消息**：接收方处理任务，返回结果（成功/失败、数据、进度）；\n   - **流式消息**：支持进度上报、中间结果推送（如「已完成 50%」）；\n   - **错误消息**：处理失败时返回错误码、原因。\n\n5. **上下文传递**\n   - 协作过程中，Agent 之间传递上下文（如对话历史、任务状态）；\n   - 保证协作连贯性，避免重复询问用户。\n\n6. **连接释放**\n   - 任务完成后，双方关闭连接；\n   - 清理临时上下文、会话数据；\n   - 记录通信日志，用于审计。\n\n---\n\n#### 3. 核心机制\n- **消息标准化**：统一消息格式（如 JSON-LD/Protobuf），定义「请求/响应/错误/进度」等类型；\n- **能力描述**：用 schema 描述 Agent 能做什么、需要什么参数、返回什么数据；\n- **安全机制**：身份认证、权限控制、加密传输、审计日志；\n- **路由容错**：支持多副本、故障转移，保证高可用。\n\n> 本质：A2A 协议是「**智能体版的 HTTP + 服务发现 + 安全框架**」，让智能体之间像微服务一样可发现、可通信、可协作。"
+    },
+    {
+        "id": "ai-interview-036",
+        "topic": "在 RAG 应用中为了优化检索精度，其中的数据清洗和预处理怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### RAG 数据清洗与预处理：提升检索精度的核心\n\n---\n\n#### 1. 文档加载与格式统一\n- **格式转换**：\n  - PDF/Word/Excel/图片 → 纯文本/Markdown；\n  - 网页 → 提取正文（去除 HTML 标签、广告、导航栏）；\n  - 工具：PyPDF2、python-docx、BeautifulSoup、Unstructured；\n- **编码统一**：统一为 UTF-8，避免乱码；\n- **语言检测**：过滤非目标语言文档（如只保留中文）。\n\n#### 2. 噪声清洗\n- **去除冗余**：\n  - 页眉页脚、页码、水印、广告；\n  - 重复段落、重复句子（如文档末尾的版权声明）；\n  - 无意义字符（如 `---`、`===`、`++++`）；\n- **过滤短文本**：过滤掉太短的块（如 < 50 字符），避免噪声；\n- **过滤长文本**：过长的文档先分块再清洗，避免语义分散；\n- **敏感信息脱敏**：\n  - 手机号、邮箱、身份证、地址等替换为占位符；\n  - 避免泄露隐私，同时不影响语义。\n\n#### 3. 文本规范化\n- **大小写统一**：英文统一为小写（或保留原大小写，根据模型）；\n- **标点规范化**：统一为中文/英文标点，去除多余空格、换行；\n- **特殊字符清理**：去除 emoji、控制字符、不可见字符；\n- **纠错**：\n  - 拼写纠错（英文）；\n  - 错别字纠正（中文，用工具如 pycorrector）；\n- **停用词过滤（可选）**：去除无意义的停用词（如「的」「了」「is」「the」），但需注意不影响语义。\n\n#### 4. 分块策略优化\n- **语义分块优先**：\n  - 按段落/章节/语义边界分块，避免把一句话拆到两个块；\n  - 工具：LangChain RecursiveCharacterTextSplitter、Unstructured 语义分块；\n- **块大小控制**：\n  - 通常 256~1024 字符（根据 Embedding 模型限制）；\n  - 过小：语义不完整；过大：信息冗余，影响检索精度；\n- **重叠（Overlap）**：块之间保留 10%~20% 重叠，保证上下文连贯性。\n\n#### 5. 元数据增强\n- **添加元数据**：\n  - 文档来源、标题、作者、发布时间、标签；\n  - 块在原文档中的位置（页码/段落号）；\n- **作用**：\n  - 检索时可按元数据过滤（如「只查 2024 年的文档」）；\n  - 回答时可溯源，告诉用户「信息来自哪篇文档」。\n\n#### 6. 质量校验\n- **自动化校验**：\n  - 检查块长度是否合规；\n  - 检查是否包含敏感信息；\n  - 检查是否有乱码/空块；\n- **抽样人工校验**：随机抽取部分文档，检查清洗效果；\n- **版本管理**：记录每次数据清洗的版本，便于回滚。\n\n---\n\n### 总结\n数据清洗与预处理的目标是：**「去噪、规范、完整、可溯源」**，让后续的 Embedding 和检索能更精准地匹配用户问题，是 RAG 系统效果的基础。"
+    },
+    {
+        "id": "ai-interview-037",
+        "topic": "A2A 协议的工作流程是怎样的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 协议",
+            "分布式",
+            "面试"
+        ],
+        "answerContent": "### A2A 协议完整工作流程\n\nA2A（Agent-to-Agent）协议的工作流程是「**注册 → 发现 → 握手 → 交互 → 结束**」的完整闭环，保证智能体之间安全、高效地协作。\n\n---\n\n#### 1. 阶段一：能力注册\n- **Agent 启动**：智能体实例启动，加载自身能力配置；\n- **注册请求**：向「目录服务（Directory Service）」发送注册请求，包含：\n  - Agent ID（唯一标识）；\n  - 能力描述（如「能生成产品文案」「能做数据分析」）；\n  - 通信地址（IP/域名/端口）；\n  - 公钥（用于身份认证）；\n- **目录服务响应**：验证 Agent 身份，将信息存入注册表，返回注册成功/失败。\n\n#### 2. 阶段二：能力发现\n- **发起方请求**：发起方 Agent 向目录服务发送「能力查询请求」，描述需要的能力（如「谁能处理『生成电商文案』的任务？」）；\n- **目录服务匹配**：根据能力描述，从注册表中匹配符合条件的 Agent，返回「候选 Agent 列表」（包含 ID、地址、能力评分）；\n- **发起方选择**：发起方根据负载、延迟、能力评分选择一个或多个接收方 Agent。\n\n#### 3. 阶段三：安全握手\n- **连接建立**：发起方与接收方建立网络连接（如 WebSocket/gRPC）；\n- **身份认证**：\n  - 双方交换数字证书/公钥，验证身份；\n  - 防止冒充、中间人攻击；\n- **密钥协商**：协商会话密钥，加密后续通信内容；\n- **权限校验**：\n  - 接收方校验发起方是否有权限使用该能力；\n  - 发起方校验接收方是否具备承诺的能力；\n- **握手完成**：双方确认安全通道建立，准备通信。\n\n#### 4. 阶段四：任务交互\n- **任务请求**：发起方发送「任务请求消息」，包含：\n  - 任务 ID（唯一标识）；\n  - 任务描述（自然语言/结构化参数）；\n  - 上下文（对话历史、之前的任务结果）；\n  - 超时时间、优先级；\n- **任务处理**：接收方处理任务，可：\n  - 发送「进度消息」：告知发起方当前处理进度（如「已完成 30%」）；\n  - 发送「中间结果」：逐步返回部分结果；\n  - 发送「请求补充信息」：向发起方/用户询问缺失信息；\n- **结果响应**：处理完成后，发送「任务响应消息」，包含：\n  - 状态（成功/失败/部分成功）；\n  - 结果数据（如生成的文案、分析报告）；\n  - 耗时、日志；\n- **错误处理**：处理失败时，发送「错误消息」，包含错误码、原因、重试建议。\n\n#### 5. 阶段五：结束与审计\n- **连接释放**：任务完成/超时/取消后，双方关闭连接；\n- **上下文清理**：清理临时会话数据、上下文；\n- **日志审计**：\n  - 记录完整通信日志（请求/响应/时间/参与方）；\n  - 用于问题排查、合规审计、计费；\n- **反馈更新**（可选）：\n  - 发起方向目录服务反馈接收方的服务质量；\n  - 目录服务更新 Agent 能力评分，用于后续发现。\n\n---\n\n### 核心特点\n- **异步非阻塞**：支持长时间运行的任务，通过进度消息同步状态；\n- **安全可靠**：全链路身份认证、加密、审计；\n- **可扩展**：支持动态加入/退出 Agent，支持多跳协作（Agent 之间再调用其他 Agent）；\n- **上下文感知**：传递协作上下文，保证任务连贯性。\n\n> 这个流程让智能体之间像「微服务调用」一样，可发现、可信任、可协作，是构建多智能体系统的基础。"
+    },
+    {
+        "id": "ai-interview-038",
+        "topic": "什么查询扩展？为什么在RAG应用中需要查询扩展？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是查询扩展？\n查询扩展（Query Expansion）是在**不改变用户原始查询语义**的前提下，通过增补同义词、相关表述、子问题或上下文信息，生成多个语义相近的查询，以缩小用户问题与知识库文档之间语义鸿沟的技术。\n\n例如：\n- 用户问：「高血压怎么调理？」\n- 扩展后：「高血压饮食调理」「高血压运动建议」「高血压生活方式干预」\n\n---\n\n### 二、为什么 RAG 需要查询扩展？\n1. **解决语义鸿沟**：用户查询与文档术语可能不一致（如「高血压」vs「血压升高」），扩展后能覆盖更多表述，提升召回率；\n2. **弥补信息不足**：用户输入通常简短、模糊或口语化，扩展后补充语义信息，让检索更全面；\n3. **覆盖多维度意图**：生成子问题并行检索，避免遗漏关键信息（如「调理」可拆为饮食、运动、作息等维度）；\n4. **提升长尾查询效果**：专业领域/小众问题，扩展后更容易匹配到相关文档；\n5. **增强答案完整性**：更多相关上下文 → 大模型生成的答案更全面、准确。"
+    },
+    {
+        "id": "ai-interview-039",
+        "topic": "A2A协议与MCP协议的关系是怎样的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 协议",
+            "分布式",
+            "面试"
+        ],
+        "answerContent": "### A2A 与 MCP 协议：互补协作关系\n\nA2A（Agent-to-Agent）与 MCP（Model Context Protocol）是**分层互补**的关系，共同构成智能体应用的完整技术栈：\n\n#### 1. 定位差异\n- **A2A 协议**：解决「**Agent ↔ Agent**」的协作通信与任务编排问题，让多个智能体能跨系统协同完成复杂流程（如「先查数据 → 再生成报告 → 最后发送邮件」）；\n- **MCP 协议**：解决「**Agent ↔ 工具/数据**」的接入问题，让智能体能调用数据库、API、知识库、文件系统等外部资源。\n\n#### 2. 协同方式\n典型部署是「**上层 A2A，下层 MCP**」：\n- 对外：用 A2A 串联多个 Agent，实现复杂任务协作；\n- 对内：每个 Agent 内部用 MCP 调用工具、访问数据，完成具体执行步骤。\n\n#### 3. 价值互补\n- 仅有 A2A：智能体只能「空对空」对话，缺乏实际执行能力，无法落地业务；\n- 仅有 MCP：智能体只能调用工具，无法实现跨 Agent 的复杂任务编排与协作；\n- 结合后：既能实现多 Agent 协作，又能让每个 Agent 具备调用外部资源的能力，构建完整的智能体应用。\n\n> 类比：A2A 是「微服务之间的通信协议」，MCP 是「微服务内部调用数据库/API 的协议」。"
+    },
+    {
+        "id": "ai-interview-040",
+        "topic": "什么自查询？为什么在RAG中需要自查询？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是自查询？\n自查询（Self-Query）是指 RAG 系统通过 LLM 自动解析用户查询中的**隐含约束、元数据条件**（如时间、领域、场景），将自然语言查询拆解为「**语义检索条件 + 结构化过滤条件**」，实现更精准检索的技术。\n\n例如：\n- 用户问：「2024 年发布的 AI 政策有哪些？」\n- 自查询解析：\n  - 语义条件：「AI 政策」\n  - 结构化条件：`publish_time >= '2024-01-01'`\n\n---\n\n### 二、为什么 RAG 需要自查询？\n1. **处理隐含约束**：用户查询常包含未明说的约束（如「最近半年」「公司内部文档」），传统检索会忽略，自查询能识别并转化为过滤条件；\n2. **避免语义干扰**：用户查询中的辅助关键词（如「2024 年」）可能干扰语义检索，自查询能将其分离为结构化过滤；\n3. **提升检索精度**：同时满足「语义相似 + 元数据匹配」，避免召回不相关文档（如 2023 年的 AI 政策）；\n4. **适配元数据场景**：带元数据的知识库（如文档来源、发布时间、作者），自查询能实现细粒度检索控制；\n5. **优化用户体验**：无需用户手动输入结构化查询，自然语言即可精准检索。"
+    },
+    {
+        "id": "ai-interview-041",
+        "topic": "什么提示压缩？为什么在RAG中需要提示压缩？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是提示压缩？\n提示压缩（Prompt Compression）是在将检索到的上下文输入 LLM 之前，通过技术手段**剔除冗余信息、保留核心语义**，缩短提示长度的技术。\n\n常见方式：\n- 摘要压缩：用 LLM 对检索文档做摘要，保留核心信息；\n- 关键词提取：只保留与用户问题相关的关键词/句子；\n- 选择性过滤：过滤掉与问题无关的段落/句子；\n- 结构化压缩：将文档转为结构化数据（如表格、列表）。\n\n---\n\n### 二、为什么 RAG 需要提示压缩？\n1. **突破上下文限制**：LLM 有 Token 上限（如 GPT-3.5 是 4k/16k），检索文档过长会导致输入超限；\n2. **过滤噪声干扰**：检索结果常包含无关/冗余信息，压缩后能让 LLM 更聚焦核心内容，减少幻觉；\n3. **降低成本与延迟**：Token 数减少 → 推理成本降低、响应速度加快；\n4. **避免信息稀释**：长上下文会导致信息分散，压缩后核心信息更突出，提升答案准确性；\n5. **提升生成质量**：精简的上下文让 LLM 更容易理解，生成的答案更简洁、准确。"
+    },
+    {
+        "id": "ai-interview-042",
+        "topic": "如何进行RAG调优后的效果评估？请给出真实应用场景中采用的效果评估标准与方法",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### RAG 效果评估：三维度 + 离线/在线结合\n\n#### 一、核心评估标准\n| 维度 | 指标 | 定义 | 目标值（示例） |\n| :--- | :--- | :--- | :--- |\n| **检索层** | Recall@k | 前 k 个检索结果中包含正确答案的比例 | > 0.8 |\n| | Precision@k | 前 k 个结果中与问题相关的比例 | > 0.7 |\n| | MRR | 正确答案在检索结果中的平均倒数排名 | > 0.6 |\n| **生成层** | 忠实度（Faithfulness） | 答案是否完全基于检索上下文，无幻觉 | > 0.9 |\n| | 相关性（Relevance） | 答案是否精准回答用户问题 | > 0.85 |\n| | 完整性（Completeness） | 是否覆盖问题所有方面 | > 0.8 |\n| | 流畅度（Fluency） | 语言是否通顺自然 | > 0.9 |\n| **业务层** | 解决率 | 客服场景：用户问题被解决的比例 | > 90% |\n| | 满意度 | 用户对答案的评分 | > 4.5/5 |\n| | 合规率 | 金融/医疗场景：答案符合行业规范的比例 | 100% |\n| | 延迟 | 接口响应时间 | < 2s |\n\n---\n\n#### 二、评估方法\n##### 1. 离线评估\n- **参考基准法**：用标注数据集（如人工标注的「问题-正确答案-相关文档」）对比 RAG 输出与标准答案；\n- **LLM 自动打分**：用大模型（如 GPT-4o）对生成答案的忠实度、相关性打分（如 RAGAS 框架）；\n- **组件隔离测试**：分别测试检索模块（Recall@k）与生成模块（忠实度），定位瓶颈。\n\n##### 2. 在线评估\n- **A/B 测试**：将用户分为两组，一组用旧版 RAG，一组用调优后版本，对比业务指标（解决率、满意度）；\n- **用户反馈**：收集真实用户的「点赞/点踩」「反馈意见」；\n- **监控告警**：实时监控幻觉率、延迟、错误率等指标。\n\n---\n\n#### 三、真实场景示例（金融客服）\n- **标准**：\n  - 检索层：Recall@5 > 0.85；\n  - 生成层：忠实度 100%（无幻觉）、合规率 100%（无违规术语）；\n  - 业务层：用户解决率 > 92%、响应延迟 < 1.5s；\n- **方法**：\n  - 离线：用 1000 条标注金融问答集测试，对比调优前后 Recall@k；\n  - 在线：A/B 测试 2 周，对比两组用户解决率与满意度；\n  - 监控：实时监控合规违规告警、PII 泄露情况。"
+    },
+    {
+        "id": "ai-interview-043",
+        "topic": "什么是RAG中的分块？为什么需要分块？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是 RAG 分块？\nRAG 中的分块（Chunking）是指在生成 Embedding 前，将**长文档**（如 PDF、书籍、网页）拆分成更小、语义连贯的文本片段（Chunk）的过程，是 RAG 流程的核心预处理步骤。\n\n例如：一本 100 页的书 → 拆成 500 字/段的 Chunk，每个 Chunk 包含一个完整语义单元。\n\n---\n\n### 二、为什么需要分块？\n1. **适配模型限制**：LLM 与 Embedding 模型有上下文窗口限制（如 512/1024 Token），无法直接处理超长文本；\n2. **提升检索相关性**：每个 Chunk 聚焦单一主题，避免大段文本导致向量语义模糊，让检索更精准；\n3. **优化效率与成本**：小 Chunk 的向量化与检索计算量更小，降低延迟与成本；\n4. **保障生成质量**：为 LLM 提供精准、聚焦的上下文，避免信息割裂或冗余干扰；\n5. **平衡完整性与聚焦性**：既保留语义完整性（不把一句话拆成两段），又避免信息过载，让检索与生成更高效。"
+    },
+    {
+        "id": "ai-interview-044",
+        "topic": "在RAG中，常见的分块策略有哪些？分别有什么区别？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### RAG 常见分块策略对比\n\n| 分块策略 | 核心原理 | 优点 | 缺点 | 适用场景 |\n| :--- | :--- | :--- | :--- | :--- |\n| **固定大小分块** | 按固定 Token/字符数切分，可设置重叠 | 实现简单、计算开销小、易于标准化 | 易在语义中间截断，导致语义断裂 | 通用场景、快速原型开发 |\n| **基于句子/标点分块** | 按完整句子、段落或标点切分 | 语义完整性好、无截断问题 | 块大小不均、可能过小导致信息碎片化 | 文本结构清晰、短句为主的场景 |\n| **语义分块** | 基于 Embedding 余弦相似度切分，将语义相近的内容合并为块 | 语义连贯性强、精准匹配检索需求 | 计算开销大、依赖 Embedding 模型质量 | 长文本、专业领域文档 |\n| **递归分块** | 先按文档结构（标题、章节）分层，再对每层按大小/语义切分 | 保留文档逻辑、兼顾完整性与聚焦性 | 实现复杂、需解析文档结构 | 结构化文档（Markdown、PDF 带目录） |\n| **基于 LLM 的分块** | 让 LLM 自动判断语义边界，生成分块结果 | 语义理解最精准、适配复杂场景 | 成本高、延迟大、依赖 LLM 能力 | 高价值、复杂语义的专业文档 |\n| **基于文档结构分块** | 完全按文档原生结构（标题、段落、列表、代码块）切分 | 完美保留文档逻辑、便于追溯来源 | 块大小差异大、可能出现过大/过小块 | 格式规范的结构化文档（如技术文档） |\n\n---\n\n### 核心区别总结\n- **固定大小**：简单粗暴，适合快速上手；\n- **语义/递归分块**：追求精度，适合复杂场景；\n- **文档结构分块**：追求逻辑完整性，适合结构化文档；\n- **LLM 分块**：精度最高，但成本最高，适合高价值场景。"
+    },
+    {
+        "id": "ai-interview-045",
+        "topic": "在RAG中的Embedding嵌入是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 一、什么是 Embedding 嵌入？\n在 RAG 中，Embedding（嵌入）是指通过专门的**嵌入模型**，将文本（或图像、音频等非结构化数据）映射为**固定长度的高维密集向量**的过程，生成的向量称为「嵌入向量」。\n\n#### 核心特性\n1. **语义捕捉**：向量空间中，**语义相近的文本距离更近**（如余弦相似度更高），让计算机能通过向量相似度实现语义检索；\n2. **结构化转换**：将非结构化文本（如「RAG 是什么」）转换为计算机可处理的结构化数据（如 `[0.1, 0.3, 0.5, ...]`）；\n3. **检索基础**：RAG 中，用户查询与文档 Chunk 都会被转为 Embedding 向量，通过向量相似度匹配找到最相关的文档片段。\n\n#### 通俗理解\nEmbedding 就是给文本生成「**数字指纹**」，让机器能理解并比较文本的语义含义——就像两个人长得像，指纹也相似。\n\n#### 示例\n- 文本：「RAG 是检索增强生成」\n- Embedding 向量：`[0.02, 0.15, -0.08, 0.33, ...]`（通常 512/768/1024 维）"
+    },
+    {
+        "id": "ai-interview-046",
+        "topic": "在RAG中，你知道有哪些Embedding Model嵌入模型？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### RAG 常用 Embedding 模型分类\n\n#### 一、商业 API 模型\n- **OpenAI 系列**：\n  - `text-embedding-3-small`（轻量、性价比高）\n  - `text-embedding-3-large`（高精度）\n  - `text-embedding-ada-002`（经典款，多语言）\n- **Cohere 系列**：\n  - `embed-english-v3.0`（英文优化）\n  - `embed-multilingual-v3.0`（多语言）\n- **Google 系列**：\n  - `text-embedding-gecko`（适配 Google 生态）\n- **国内大厂 API**：\n  - 阿里云 DashScope Embeddings\n  - 百度 Ernie Embeddings\n  - 腾讯混元 Embeddings（中文优化、合规性高）\n\n#### 二、开源模型\n- **BGE 系列**（智源研究院）：\n  - `BGE-M3`（多模态、多语言，检索性能领先）\n  - `BGE-large-zh-v1.5`（中文优化，国内首选）\n- **Sentence Transformers**：\n  - `all-MiniLM-L6-v2`（轻量高效，适合部署）\n  - `all-mpnet-base-v2`（高精度）\n- **Jina Embeddings**：\n  - `jina-embeddings-v3`（支持长上下文 8192 Token，检索效率高）\n- **其他**：\n  - `GTE`（阿里，多语言）\n  - `Nomic Embed`（领域适配）\n  - `Instructor`（可指令微调）\n  - `CLIP`（多模态，支持图文）\n\n---\n\n### 选型建议\n- 中文场景：优先 `BGE-large-zh-v1.5`、国内大厂 API；\n- 多语言场景：`BGE-M3`、`text-embedding-3` 系列；\n- 轻量部署：`all-MiniLM-L6-v2`；\n- 高精度：`BGE-M3`、`text-embedding-3-large`。"
+    },
+    {
+        "id": "ai-interview-047",
+        "topic": "在RAG中，你如何选择Embedding Model嵌入模型，需要考虑哪些因素？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### 选择 Embedding 模型的核心因素\n\n#### 1. **语言支持**\n- **纯中文场景**：优先选中文优化模型（如 `BGE-large-zh-v1.5`、`GTE-large-zh`、国内大厂 API），中文语义理解更好；\n- **多语言场景**：选多语言模型（如 `BGE-M3`、`text-embedding-3` 系列、Cohere multilingual）。\n\n#### 2. **性能与成本**\n- **高精度需求**：选 large 型号（如 `BGE-M3`、`text-embedding-3-large`），但成本更高、延迟更长；\n- **高并发/低延迟**：选轻量模型（如 `all-MiniLM-L6-v2`、`text-embedding-3-small`），推理更快、成本更低；\n- **成本敏感**：优先开源自托管模型（如 BGE、Sentence Transformers），避免 API 调用费用。\n\n#### 3. **领域适配性**\n- **通用场景**：选通用模型（如 `BGE-M3`、OpenAI 系列）；\n- **专业领域**（医疗、法律、代码）：选领域微调模型（如 `Nomic Embed`、领域专属 BGE），或对通用模型做微调；\n- 验证：用领域数据集测试 Recall@k，选择表现最好的模型。\n\n#### 4. **上下文长度**\n- **长文档处理**：选支持 8192+ Token 的模型（如 `jina-embeddings-v3`、`text-embedding-3-large`），避免截断长文本；\n- **短文本场景**：普通上下文长度模型（如 512/1024 Token）即可满足。\n\n#### 5. **部署与兼容性**\n- **云原生场景**：优先商业 API，无需维护模型，快速上线；\n- **私有化部署**：选开源模型（如 BGE、Sentence Transformers），兼容 Hugging Face 生态；\n- **边缘设备**：选轻量模型（如 `DistilBERT`、`MiniLM`），减少资源占用。\n\n#### 6. **向量维度**\n- 通用场景：768–1536 维，平衡精度与效率；\n- 高精度检索：2000+ 维；\n- 资源受限：512 维以下。\n\n---\n\n### 选型流程\n1. 明确业务场景（语言、领域、部署环境）；\n2. 从 MTEB 榜单的 Retrieval 子任务筛选候选模型；\n3. 用业务数据集测试 Recall@k、延迟、成本；\n4. 选择综合表现最优的模型。"
+    },
+    {
+        "id": "ai-interview-048",
+        "topic": "在RAG中，索引流程中的文档解析你们怎么做的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### RAG 文档解析：分层处理 + 格式适配\n\n文档解析是 RAG 索引流程的第一步，目标是将各类格式文档转为干净的文本/结构化数据。\n\n#### 1. 核心流程\n1. **格式识别**：自动识别文档类型（PDF/Word/Excel/PPT/图片/网页/Markdown）；\n2. **内容提取**：\n   - 纯文本类（Markdown/Text）：直接读取；\n   - 办公文档（Word/Excel/PPT）：用 `python-docx`/`openpyxl`/`python-pptx` 提取文本；\n   - PDF：\n     - 文本型 PDF：用 `PyPDF2`/`pdfplumber` 提取文本；\n     - 扫描型 PDF：先 OCR（如 `pytesseract`/百度 OCR API）转文本；\n   - 图片：OCR 提取文本；\n   - 网页：用 `BeautifulSoup`/`Trafilatura` 提取正文，去除 HTML 标签、广告、导航栏；\n3. **结构化解析**（可选）：\n   - 提取标题、章节、段落、列表、表格、代码块等结构；\n   - 保留元数据（文件名、作者、创建时间、来源 URL）；\n4. **清洗与格式化**：\n   - 去噪：去除页眉页脚、水印、乱码、重复内容；\n   - 格式化：统一编码、换行、标点，修复排版；\n   - 敏感信息脱敏：替换手机号、邮箱、身份证等；\n5. **输出**：生成干净的文本块 + 结构化元数据，供后续分块、向量化。\n\n#### 2. 工具选型\n- 通用解析：`Unstructured`（一站式解析多格式，支持 OCR/表格提取）；\n- PDF 解析：`pdfplumber`（精准提取文本/表格）、`PyMuPDF`（高性能）；\n- 网页解析：`Trafilatura`（专注提取正文，效果优于 BeautifulSoup）；\n- OCR：`pytesseract`（开源）、百度 OCR API（商用，准确率高）；\n- 表格提取：`Camelot`（PDF 表格）、`openpyxl`（Excel）。\n\n#### 3. 关键注意点\n- 处理扫描型 PDF：必须先 OCR，否则无法提取文本；\n- 处理复杂排版：避免文本顺序错乱（如多栏布局）；\n- 大文件：分片解析，避免内存溢出；\n- 质量校验：抽样检查解析结果，确保内容完整、无乱码。"
+    },
+    {
+        "id": "ai-interview-049",
+        "topic": "在RAG应用的过程中，关于提示工程的设计有什么心得和技巧吗？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### RAG 提示工程设计心得与技巧\n\n#### 1. **明确角色与约束**\n- 开头定义角色：「你是专业的客服助手，只基于提供的上下文回答用户问题」；\n- 明确约束：\n  - 「禁止编造信息，若上下文无答案，请说『未找到相关信息』」；\n  - 「禁止使用 Markdown 格式，用纯文本回答」；\n  - 「回答限制在 300 字以内」。\n\n#### 2. **结构化上下文注入**\n- 用清晰分隔符包裹上下文：\n  ```text\n  上下文信息：\n  --- \n  {context}\n  --- \n  用户问题：{question}\n  ```\n- 给上下文编号：\n  ```text\n  上下文1：...\n  上下文2：...\n  ```\n- 便于模型定位信息，也便于后续溯源。\n\n#### 3. **引导模型基于上下文回答**\n- 用指令强化：\n  - 「请仅根据提供的上下文回答，不要使用外部知识」；\n  - 「若上下文无相关信息，请明确告知用户，不要猜测」；\n  - 「引用上下文编号说明信息来源」。\n\n#### 4. **控制输出格式**\n- 要求结构化输出：\n  - 「回答分点列出」；\n  - 「用 JSON 格式返回，包含 answer 和 source 字段」；\n- 便于前端渲染和后续处理。\n\n#### 5. **优化上下文长度**\n- 优先保留与问题最相关的上下文；\n- 对冗余上下文做压缩（摘要/关键词提取）；\n- 避免超过模型 Token 限制。\n\n#### 6. **多轮对话处理**\n- 保留对话历史，让模型理解上下文连贯性；\n- 用指令提醒模型：「结合之前的对话内容回答」；\n- 避免重复提问。\n\n#### 7. **测试与迭代**\n- 用不同场景测试 Prompt（如简单问题、复杂问题、无答案问题）；\n- 观察模型是否遵守约束、是否产生幻觉；\n- 逐步优化指令，提升效果。\n\n#### 8. **示例：RAG 提示模板**\n```text\n你是专业的产品客服，负责回答用户关于我们产品的问题。\n\n规则：\n1. 只基于提供的上下文回答，禁止编造信息；\n2. 若上下文无相关答案，请回复「抱歉，未找到相关信息」；\n3. 回答简洁明了，不超过 300 字；\n4. 引用上下文编号说明信息来源（如「根据上下文1」）。\n\n上下文信息：\n---\n{context}\n---\n\n用户问题：{question}\n\n请回答：\n```"
+    },
+    {
+        "id": "ai-interview-050",
+        "topic": "什么是Advanced RAG？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### Advanced RAG：进阶检索增强生成\n\nAdvanced RAG（高级 RAG）是在**基础 RAG** 之上，通过**多阶段优化、智能路由、动态调整**等技术，解决基础 RAG 召回率低、精度差、幻觉多、适应性弱等问题的进阶方案。\n\n#### 1. 核心优化方向\n- **预处理优化**：\n  - 智能分块：语义分块、递归分块，提升块质量；\n  - 数据清洗：去噪、脱敏、格式化，提升数据质量；\n- **检索优化**：\n  - 混合检索：向量检索 + 关键词检索（BM25），提升召回率；\n  - 自查询：解析用户查询中的元数据约束，提升精度；\n  - 查询扩展：生成多版本查询，覆盖语义角度；\n  - Rerank：精排检索结果，过滤噪声；\n- **生成优化**：\n  - 提示压缩：精简上下文，避免信息稀释；\n  - 多路径生成：并行生成多个答案，择优选择；\n  - 引用溯源：标注答案来源，提升可信度；\n- **路由与自适应**：\n  - 智能路由：根据问题类型选择不同检索/生成策略；\n  - 动态调整：根据上下文长度、问题复杂度调整参数；\n  - 回退机制：检索无结果时，回退到通用回答或引导用户补充信息。\n\n#### 2. 与基础 RAG 的区别\n| 维度 | 基础 RAG | Advanced RAG |\n| :--- | :--- | :--- |\n| 检索方式 | 单一向量检索 | 混合检索 + 自查询 + Rerank |\n| 分块策略 | 固定大小 | 语义/递归/结构化分块 |\n| 查询处理 | 直接检索 | 查询扩展 + 自查询 |\n| 生成控制 | 简单提示 | 提示压缩 + 结构化输出 + 幻觉控制 |\n| 适应性 | 固定流程 | 智能路由 + 动态调整 |\n\n#### 3. 典型场景\n- 企业知识库问答；\n- 法律/医疗等专业领域问答；\n- 长文档/多文档检索；\n- 对准确性要求极高的场景（如金融客服）。\n\n> Advanced RAG 是「**基础 RAG + 全链路优化**」，核心是提升召回率、精度和鲁棒性，减少幻觉，让 RAG 更适合工业级场景。"
+    },
+    {
+        "id": "ai-interview-051",
+        "topic": "什么是Modular RAG？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 后端",
+            "RAG",
+            "面试"
+        ],
+        "answerContent": "### Modular RAG：模块化检索增强生成\n\nModular RAG（模块化 RAG）是将 RAG 系统拆分为**独立、可替换、可组合**的模块，通过「**组件化 + 编排**」的方式构建 RAG 应用，核心是「**解耦、复用、灵活扩展**」。\n\n#### 1. 核心模块划分\n- **数据处理模块**：文档加载、解析、清洗、分块、向量化；\n- **检索模块**：向量检索、关键词检索、混合检索、Rerank；\n- **查询处理模块**：查询扩展、自查询、意图识别；\n- **生成模块**：提示工程、LLM 调用、流式输出、后处理；\n- **路由模块**：根据问题类型选择模块组合（如「简单问题 → 基础检索」「复杂问题 → 混合检索 + Rerank」）；\n- **监控与评估模块**：效果评估、日志、告警。\n\n#### 2. 核心优势\n- **解耦**：模块之间独立，修改一个模块不影响其他模块（如更换 Embedding 模型不影响检索逻辑）；\n- **复用**：模块可在不同 RAG 应用中复用（如同一分块模块可用于多个知识库）；\n- **灵活扩展**：新增模块（如新增一种检索方式）无需重构整个系统；\n- **可观测性**：每个模块可独立监控，便于定位问题；\n- **适配场景**：通过编排不同模块组合，适配不同业务场景（如「轻量场景」「高精度场景」「长文档场景」）。\n\n#### 3. 实现方式\n- 框架层面：LangChain、LlamaIndex 等框架天然支持模块化，可通过「链（Chain）」「代理（Agent）」编排模块；\n- 代码层面：用接口抽象模块，不同实现可替换（如定义 `Retriever` 接口，支持向量检索、BM25 检索等实现）；\n- 部署层面：模块可独立部署为微服务，弹性扩缩容。\n\n#### 4. 示例：Modular RAG 流程\n```\n用户查询 → 查询处理模块（自查询 + 扩展） → 检索模块（混合检索 + Rerank） → 生成模块（提示压缩 + LLM 调用） → 后处理模块 → 返回结果\n```\n\n> Modular RAG 是「**RAG 系统的微服务架构**」，让 RAG 开发更高效、维护更简单、扩展更灵活。"
+    },
+    {
+        "id": "ai-interview-052",
+        "topic": "什么是护栏技术？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 安全",
+            "面试"
+        ],
+        "answerContent": "### 护栏技术（Guardrails）：AI 安全与合规的「防护栏」\n\n护栏技术（Guardrails）是指在 AI 系统中，通过**技术手段限制模型行为、保障输出安全、合规、符合预期**的技术总称，核心是「**给 AI 装上护栏，防止它「乱跑」**」。\n\n#### 1. 核心目标\n- **安全**：防止生成有害内容（如暴力、色情、仇恨言论）；\n- **合规**：符合法律法规、行业规范（如金融/医疗场景的合规要求）；\n- **可控**：让模型输出符合业务预期（如「只回答知识库内容」「不编造信息」）；\n- **隐私**：防止泄露敏感信息（如 PII、企业机密）。\n\n#### 2. 常见护栏技术\n- **输入护栏**：\n  - 敏感词过滤：过滤用户输入中的敏感词（如脏话、违规术语）；\n  - 意图识别：识别恶意意图（如「越狱」「诱导生成违规内容」），拒绝处理；\n  - 输入校验：验证输入格式、长度，防止注入攻击。\n- **输出护栏**：\n  - 内容审核：检查模型输出是否包含有害/违规内容；\n  - 事实校验：验证输出是否基于事实（如 RAG 中验证是否来自上下文）；\n  - 格式校验：确保输出符合指定格式（如 JSON、纯文本）；\n  - 敏感信息脱敏：替换输出中的 PII 信息。\n- **流程护栏**：\n  - 权限控制：限制模型可访问的资源（如 RAG 中限制知识库范围）；\n  - 操作审计：记录所有输入/输出，便于追溯；\n  - 熔断机制：检测到异常行为（如连续生成违规内容），暂停服务。\n\n#### 3. 实现方式\n- **规则引擎**：基于关键词、正则表达式的简单护栏（适合简单场景）；\n- **模型驱动**：用小模型/分类器检测有害内容（如 OpenAI Moderation API）；\n- **提示工程**：在 Prompt 中明确约束（如「禁止编造信息」）；\n- **工具集成**：用 Guardrails AI、NeMo Guardrails 等框架实现复杂护栏。\n\n#### 4. 典型场景\n- 聊天机器人：防止生成有害内容；\n- RAG 系统：防止幻觉、泄露敏感信息；\n- 金融/医疗 AI：确保输出合规、准确；\n- 代码生成 AI：防止生成恶意代码。\n\n> 护栏技术是 AI 落地的「安全底线」，没有护栏的 AI 无法在真实业务中使用。"
+    },
+    {
+        "id": "ai-interview-053",
+        "topic": "什么是GPTCache？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 性能",
+            "缓存",
+            "面试"
+        ],
+        "answerContent": "### GPTCache：大模型请求缓存框架\n\nGPTCache 是一个开源的**大模型请求缓存框架**，核心是「**缓存相似的 LLM 请求，避免重复计算，降低成本、提升响应速度**」。\n\n#### 1. 核心原理\n- 对用户请求做**语义哈希**：将相似的请求映射到同一个缓存键（如「RAG 是什么」和「什么是 RAG」会被视为同一请求）；\n- 缓存 LLM 响应：第一次请求时，将响应存入缓存；\n- 后续相似请求直接返回缓存结果，无需调用 LLM。\n\n#### 2. 核心特性\n- **语义缓存**：基于 Embedding 相似度匹配，而非精确字符串匹配；\n- **多模型支持**：支持 OpenAI、Claude、Llama 等主流 LLM；\n- **多存储后端**：支持 Redis、SQLite、MongoDB 等缓存存储；\n- **可配置策略**：\n  - 相似度阈值：控制「相似」的定义（如余弦相似度 > 0.9 视为同一请求）；\n  - 过期时间：缓存自动过期，避免数据陈旧；\n  - 缓存淘汰：LRU/LFU 等策略，控制缓存大小。\n- **轻量集成**：以中间件形式嵌入 LLM 调用流程，无需修改业务代码。\n\n#### 3. 价值\n- **降低成本**：减少 LLM API 调用次数，大幅降低 Token 费用；\n- **提升速度**：缓存响应时间 < 100ms，远快于 LLM 推理（通常 1~5s）；\n- **减轻负载**：减少 LLM 服务压力，提升系统吞吐量；\n- **提升体验**：用户获得更快的响应速度。\n\n#### 4. 适用场景\n- 高频重复请求场景（如客服机器人、FAQ 问答）；\n- 对响应速度要求高的场景；\n- 成本敏感的场景；\n- RAG 系统：缓存相似的查询与检索结果。\n\n#### 5. 示例流程\n```\n用户请求 → GPTCache → 计算 Embedding → 匹配缓存 → 命中 → 返回缓存结果\n                          ↓ 未命中\n                          → 调用 LLM → 缓存响应 → 返回结果\n```\n\n> GPTCache 是「**大模型的 CDN**」，用缓存换成本与速度，是 LLM 应用性能优化的核心手段。"
+    },
+    {
+        "id": "ai-interview-054",
+        "topic": "大模型的结构化输出指的是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 生成",
+            "结构化输出",
+            "面试"
+        ],
+        "answerContent": "### 大模型结构化输出：让 AI 输出「机器可读」的格式\n\n大模型的结构化输出是指**让模型输出符合预定义格式的结构化数据**（如 JSON、XML、Markdown 列表、表格），而非自由文本，核心是「**让 AI 输出的内容能被程序直接解析和使用**」。\n\n#### 1. 常见结构化格式\n- **JSON**：最常用，适合键值对、嵌套结构（如 `{\"answer\": \"...\", \"source\": [1, 2]}`）；\n- **Markdown**：适合列表、标题、表格（如 `- 点1\n- 点2`）；\n- **XML**：适合复杂层级结构；\n- **YAML**：适合配置文件；\n- **代码块**：如 SQL、Python 代码。\n\n#### 2. 核心价值\n- **程序可解析**：输出可直接被后端/前端代码解析，无需人工处理；\n- **格式可控**：避免模型输出杂乱无章的文本；\n- **信息提取高效**：无需做 NLP 解析即可提取关键信息；\n- **提升生成质量**：格式约束能引导模型更清晰地组织内容。\n\n#### 3. 实现方式\n- **提示工程**：在 Prompt 中明确要求输出格式，如：\n  ```text\n  请用 JSON 格式回答，包含 answer 和 source 两个字段：\n  {\"answer\": \"...\", \"source\": [上下文编号列表]}\n  ```\n- **函数调用（Function Calling）**：用模型的函数调用能力，直接输出函数参数（如 OpenAI Function Calling）；\n- **结构化输出 API**：部分模型提供原生结构化输出能力（如 GPT Structured Outputs）；\n- **后处理**：对模型输出做解析、校验，确保格式正确。\n\n#### 4. 典型场景\n- RAG 系统：输出「答案 + 引用来源」的 JSON；\n- 代码生成：输出可直接运行的代码；\n- 信息抽取：输出结构化数据（如从文本中提取人物、时间、地点）；\n- 对话系统：输出可渲染的富文本格式；\n- 数据分析：输出表格/图表数据。\n\n#### 5. 示例\n- 自由文本输出：\n  ```text\n  RAG 是检索增强生成，根据上下文1和上下文2...\n  ```\n- 结构化输出（JSON）：\n  ```json\n  {\n    \"answer\": \"RAG 是检索增强生成，通过检索知识库内容辅助大模型生成回答。\",\n    \"source\": [1, 2]\n  }\n  ```\n\n> 结构化输出是「**让 AI 从「聊天机器人」变成「工具助手」**」的关键，让 AI 输出能直接融入业务流程。"
+    },
+    {
+        "id": "ai-interview-055",
+        "topic": "什么是GPT Structured Outputs？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 生成",
+            "OpenAI",
+            "面试"
+        ],
+        "answerContent": "### GPT Structured Outputs：OpenAI 原生结构化输出能力\n\nGPT Structured Outputs 是 OpenAI 推出的**原生结构化输出功能**，让 GPT 模型（如 GPT-4o、GPT-4o mini）能**严格按照预定义的 JSON Schema 输出 JSON 格式**，保证输出格式 100% 符合要求，无需担心格式错误。\n\n#### 1. 核心特性\n- **Schema 约束**：通过 JSON Schema 定义输出结构（如字段类型、必填项、枚举值、正则校验），模型严格遵守；\n- **格式保证**：输出一定是有效的 JSON，不会出现语法错误、缺失字段；\n- **类型安全**：支持字符串、数字、布尔、数组、对象等类型，可嵌套；\n- **兼容 Function Calling**：可与函数调用结合，直接输出函数参数；\n- **支持流式输出**：可逐字输出结构化 JSON，提升体验。\n\n#### 2. 与传统提示工程的区别\n| 方式 | 传统提示工程 | GPT Structured Outputs |\n| :--- | :--- | :--- |\n| 格式保证 | 可能出现格式错误（如少括号、引号不匹配） | 100% 有效 JSON |\n| 约束能力 | 弱，模型可能忽略格式要求 | 强，严格遵守 JSON Schema |\n| 校验成本 | 需后处理校验 | 无需校验，直接使用 |\n| 开发效率 | 低，需反复调试 Prompt | 高，直接定义 Schema |\n\n#### 3. 示例：定义 JSON Schema\n```json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"answer\": { \"type\": \"string\" },\n    \"source\": { \n      \"type\": \"array\",\n      \"items\": { \"type\": \"integer\" }\n    },\n    \"confidence\": { \"type\": \"number\", \"minimum\": 0, \"maximum\": 1 }\n  },\n  \"required\": [\"answer\", \"source\"]\n}\n```\n\n模型输出示例：\n```json\n{\n  \"answer\": \"RAG 是检索增强生成，通过检索知识库内容辅助大模型生成回答。\",\n  \"source\": [1, 2],\n  \"confidence\": 0.95\n}\n```\n\n#### 4. 适用场景\n- RAG 系统：输出「答案 + 引用来源 + 置信度」；\n- 信息抽取：从文本中提取结构化数据；\n- 代码生成：输出可解析的代码结构；\n- 表单生成：输出符合表单格式的数据；\n- 任何需要程序解析 AI 输出的场景。\n\n#### 5. 优势\n- **可靠**：格式永远正确，无需担心解析失败；\n- **高效**：减少后处理代码，提升开发效率；\n- **清晰**：Schema 清晰定义输出结构，便于协作；\n- **可扩展**：支持复杂嵌套结构。\n\n> GPT Structured Outputs 是「**让 AI 输出真正工程化**」的关键，解决了传统结构化输出「格式不稳定」的痛点。"
+    },
+    {
+        "id": "ai-interview-056",
+        "topic": "什么是LangChain？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 框架",
+            "LangChain",
+            "面试"
+        ],
+        "answerContent": "### LangChain：大模型应用开发框架\n\nLangChain 是一个开源的**大模型应用开发框架**，核心是「**简化大模型应用的开发，让开发者快速构建复杂的 AI 应用**」（如 RAG、智能体、对话系统）。\n\n#### 1. 核心定位\n- 「**胶水层**」：连接大模型（LLM）、外部工具（API/数据库/知识库）、数据存储等组件；\n- 「**编排层**」：提供组件编排能力，让开发者用「搭积木」的方式构建应用。\n\n#### 2. 核心价值\n- **简化开发**：封装了 LLM 调用、数据加载、检索、提示工程等常见功能；\n- **组件复用**：提供大量可复用的组件（如文档加载器、向量数据库、工具）；\n- **灵活扩展**：支持自定义组件，适配不同业务场景；\n- **生态丰富**：集成了主流 LLM、向量数据库、工具（如 OpenAI、Pinecone、SerpAPI）；\n- **可观测性**：提供调试、日志、监控能力，便于排查问题。\n\n#### 3. 典型应用场景\n- **RAG 系统**：知识库问答、文档助手；\n- **智能体（Agent）**：能调用工具完成复杂任务（如「查天气 → 生成出行建议」）；\n- **对话系统**：聊天机器人、客服助手；\n- **代码生成**：代码助手、代码解释器；\n- **信息抽取**：从文本/文档中提取结构化数据。\n\n#### 4. 核心概念\n- **组件（Component）**：最小功能单元（如 LLM、Retriever、Prompt Template）；\n- **链（Chain）**：将多个组件串联起来，完成一个完整任务（如「检索 → 提示 → 生成」）；\n- **代理（Agent）**：能自主决策、调用工具的智能体；\n- **记忆（Memory）**：存储对话历史/长期记忆，保持上下文连贯性；\n- **向量存储（Vector Store）**：存储 Embedding 向量，用于检索。\n\n#### 5. 示例：简单 RAG 链\n```python\nfrom langchain.chains import RetrievalQA\nfrom langchain.llms import OpenAI\nfrom langchain.vectorstores import Chroma\nfrom langchain.embeddings import OpenAIEmbeddings\n\n# 加载文档 → 向量化 → 存入向量库\nembeddings = OpenAIEmbeddings()\ndb = Chroma.from_documents(docs, embeddings)\n\n# 构建 RAG 链\nqa_chain = RetrievalQA.from_chain_type(\n    llm=OpenAI(),\n    chain_type=\"stuff\",\n    retriever=db.as_retriever()\n)\n\n# 运行查询\nresult = qa_chain.run(\"什么是 RAG？\")\n```\n\n> LangChain 是「**大模型应用的 Spring Boot**」，让开发者从「从零写 LLM 调用」升级为「快速构建复杂 AI 应用」。"
+    },
+    {
+        "id": "ai-interview-057",
+        "topic": "LangChain的核心组件有哪些？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 框架",
+            "LangChain",
+            "面试"
+        ],
+        "answerContent": "### LangChain 核心组件详解\n\n#### 1. **模型 I/O 组件**\n- **LLM**：封装大模型调用（如 OpenAI、Claude、Llama），统一接口；\n- **Chat Models**：封装对话模型（如 GPT-4o），支持消息格式；\n- **Prompt Templates**：提示模板，动态生成 Prompt（如 `{question}` 占位符）；\n- **Output Parsers**：输出解析器，将模型输出转为结构化数据（如 JSON、Pydantic）。\n\n#### 2. **数据连接组件**\n- **Document Loaders**：文档加载器，加载各类文档（PDF/Word/网页）；\n- **Text Splitters**：文本分块器，将长文档拆分为小块；\n- **Embeddings**：嵌入模型封装，将文本转为向量；\n- **Vector Stores**：向量数据库封装（如 Chroma、Pinecone、Milvus），用于存储和检索向量；\n- **Retrievers**：检索器，从向量库/知识库中检索相关文档（支持向量检索、混合检索）。\n\n#### 3. **编排组件**\n- **Chains**：链，将多个组件串联为一个完整流程（如 `RetrievalQA` 链）；\n- **Agents**：代理，能自主决策、调用工具完成复杂任务（如 `OpenAIAgent`）；\n- **Tools**：工具，封装外部能力（如搜索、计算器、API 调用）；\n- **Toolkits**：工具包，一组相关工具（如 `GoogleSearchToolkit`）。\n\n#### 4. **记忆组件**\n- **Memory**：记忆接口，存储对话历史/长期记忆；\n- **Conversation Buffer Memory**：简单缓冲记忆，存储完整对话历史；\n- **Conversation Summary Memory**：摘要记忆，存储对话摘要；\n- **Vector Store Retriever Memory**：向量记忆，用检索方式存储长期记忆。\n\n#### 5. **回调与可观测性组件**\n- **Callbacks**：回调钩子，监听组件执行过程（如日志、监控）；\n- **LangSmith**：LangChain 官方调试平台，用于调试、监控、评估 LLM 应用；\n- **Tracing**：链路追踪，记录组件调用链路，便于排查问题。\n\n#### 6. **其他组件**\n- **Document Transformers**：文档转换器（如清洗、格式化、元数据添加）；\n- **Output Fixing**：输出修复，自动修复格式错误的模型输出；\n- **Guardrails**：护栏组件，控制模型输出安全、合规。\n\n---\n\n### 核心组件关系\n```\n用户输入 → Prompt Template → LLM → Output Parser → 输出结果\n          ↓（RAG 场景）\n          → Retriever（依赖 Vector Store/Embeddings/Document Loaders） → 注入上下文 → Prompt Template\n```\n\n> LangChain 核心是「**组件化 + 编排**」，通过这些组件，开发者能快速构建从简单到复杂的大模型应用。"
+    }
+]
