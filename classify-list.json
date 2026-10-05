@@ -3,13 +3,13 @@
         "id": "classify1",
         "name": "全部",
         "icon": "https://picturbed.netlify.app/icon-all.png",
-        "total": 858
+        "total": 1071
     },
     {
         "id": "classify7",
         "name": "AI相关",
         "icon": "https://picturbed.netlify.app/icon-ai.png",
-        "total": 57
+        "total": 270
     },
     {
         "id": "classify4",

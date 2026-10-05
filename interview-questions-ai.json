@@ -882,5 +882,3413 @@
             "面试"
         ],
         "answerContent": "### LangChain 核心组件详解\n\n#### 1. **模型 I/O 组件**\n- **LLM**：封装大模型调用（如 OpenAI、Claude、Llama），统一接口；\n- **Chat Models**：封装对话模型（如 GPT-4o），支持消息格式；\n- **Prompt Templates**：提示模板，动态生成 Prompt（如 `{question}` 占位符）；\n- **Output Parsers**：输出解析器，将模型输出转为结构化数据（如 JSON、Pydantic）。\n\n#### 2. **数据连接组件**\n- **Document Loaders**：文档加载器，加载各类文档（PDF/Word/网页）；\n- **Text Splitters**：文本分块器，将长文档拆分为小块；\n- **Embeddings**：嵌入模型封装，将文本转为向量；\n- **Vector Stores**：向量数据库封装（如 Chroma、Pinecone、Milvus），用于存储和检索向量；\n- **Retrievers**：检索器，从向量库/知识库中检索相关文档（支持向量检索、混合检索）。\n\n#### 3. **编排组件**\n- **Chains**：链，将多个组件串联为一个完整流程（如 `RetrievalQA` 链）；\n- **Agents**：代理，能自主决策、调用工具完成复杂任务（如 `OpenAIAgent`）；\n- **Tools**：工具，封装外部能力（如搜索、计算器、API 调用）；\n- **Toolkits**：工具包，一组相关工具（如 `GoogleSearchToolkit`）。\n\n#### 4. **记忆组件**\n- **Memory**：记忆接口，存储对话历史/长期记忆；\n- **Conversation Buffer Memory**：简单缓冲记忆，存储完整对话历史；\n- **Conversation Summary Memory**：摘要记忆，存储对话摘要；\n- **Vector Store Retriever Memory**：向量记忆，用检索方式存储长期记忆。\n\n#### 5. **回调与可观测性组件**\n- **Callbacks**：回调钩子，监听组件执行过程（如日志、监控）；\n- **LangSmith**：LangChain 官方调试平台，用于调试、监控、评估 LLM 应用；\n- **Tracing**：链路追踪，记录组件调用链路，便于排查问题。\n\n#### 6. **其他组件**\n- **Document Transformers**：文档转换器（如清洗、格式化、元数据添加）；\n- **Output Fixing**：输出修复，自动修复格式错误的模型输出；\n- **Guardrails**：护栏组件，控制模型输出安全、合规。\n\n---\n\n### 核心组件关系\n```\n用户输入 → Prompt Template → LLM → Output Parser → 输出结果\n          ↓（RAG 场景）\n          → Retriever（依赖 Vector Store/Embeddings/Document Loaders） → 注入上下文 → Prompt Template\n```\n\n> LangChain 核心是「**组件化 + 编排**」，通过这些组件，开发者能快速构建从简单到复杂的大模型应用。"
+    },
+    {
+        "id": "ai-interview-058",
+        "topic": "RAG知识库 PDF 等文档是怎么进行入库的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 解析层：PDF 按页/章节解析，扫描件走 OCR（PaddleOCR），表格转 Markdown 结构化，保留标题层级；**②** 分块层：按语义切块（标题+段落），设 10% 重叠，块大小对齐 embedding 模型窗口；**③** 入库层：embedding 后带 metadata（来源/租户/权限/时间）写入向量库，批量入库加失败重试。**话术**：\"我们搭了一套入库 pipeline，抽样式 PDF 召回率比整页塞入提升约 20%。\""
+    },
+    {
+        "id": "ai-interview-059",
+        "topic": "怎么保证 chunk 分割？怎么切的？分块策略是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 策略：先按文档结构切（标题/段落），再按字符数截断，块大小 300-500 token，重叠 10%-15%；**②** 保证：同一语义段落不跨块，代码/表格整块保留；**③** 验证：抽样标注\"切块是否完整表达一个结论\"，回测召回效果再调参。**话术**：\"我们对比了固定 512 字符和语义切块，语义切块的召回率高出 12%。\""
+    },
+    {
+        "id": "ai-interview-060",
+        "topic": "metadata 元数据里面一般放什么东西？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 定位信息：文档 ID、来源文件名、章节路径、页码——用于答案溯源；**②** 权限信息：租户 ID、权限级别——多租户隔离的关键；**③** 业务信息：文档类型、更新时间、版本号——便于过滤和版本管理。**话术**：\"metadata 里带 tenant_id，检索时先过滤再向量搜索，这是数据隔离的第一道闸。\""
+    },
+    {
+        "id": "ai-interview-061",
+        "topic": "RAG 召回率低，怎么调优？完整的调优过程是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 建评测闭环：先建 100-200 条\"问题-期望文档\"标注集，量化召回率，避免瞎调；**②** 检索侧：混合检索（BM25+向量）、加 rerank、换/微调 embedding、查询改写（同义词扩展）；**③** 数据侧：优化切块、补 metadata 过滤；**④** 生成侧：prompt 引导、多路召回融合。**话术**：\"我们按这个流程把召回率从 60% 提到 85%，关键是先有评测集。\""
+    },
+    {
+        "id": "ai-interview-062",
+        "topic": "稠密检索、稀疏检索、混合检索各自作用？为什么用混合检索？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 稠密（向量）：理解语义，适合同义改写，但精确词/专名弱；**②** 稀疏（BM25/SPLADE）：精确关键词匹配，适合 ID、型号、人名；**③** 混合：两路召回后用 RRF（倒数排名融合）合并，兼顾语义和精确。**话术**：\"业务里有大量卡牌名、房间号这种精确词，纯向量经常召回错，混检后 Top-5 命中率提升 15%。\""
+    },
+    {
+        "id": "ai-interview-063",
+        "topic": "ES 和向量检索的分工与流程是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** ES 负责精确检索+业务过滤（租户、状态、标签）和关键词召回；**②** 向量库负责语义召回；**③** 流程：先 ES 过滤缩小范围 → 两路召回 → RRF 融合 → rerank → 送 LLM。**话术**：\"ES 在前置过滤能大幅减少向量库无效扫描，查询 p95 从 300ms 降到 120ms。\""
+    },
+    {
+        "id": "ai-interview-064",
+        "topic": "ES 没召回数据时的兜底机制有哪些？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 降级到纯向量检索（放宽关键词限制）；**②** 放宽过滤条件（去掉状态/类型过滤重试）；**③** 兜底话术：告知\"未找到相关文档\"并引导换问法；**④** 热榜/常用问答缓存兜底。**话术**：\"ES 召回为空时我们自动降级向量检索+宽松过滤，用户无感，兜底命中率约 30%。\""
+    },
+    {
+        "id": "ai-interview-065",
+        "topic": "Chunk 重叠度为什么需要？重叠设置太大有什么坏处？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 作用：避免关键句被切在块边界导致语义断裂；**②** 坏处：存储膨胀、检索重复、噪声增多、token 成本上升；**③** 建议：10%-15% 重叠，与块大小联动。**话术**：\"我们 overlap 从 20% 调到 10% 后，存储降了 8%，准确率没掉。\""
+    },
+    {
+        "id": "ai-interview-066",
+        "topic": "embedding 维度对项目有什么影响？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 高维精度通常更高，但存储、内存、检索耗时都涨；**②** 维度影响向量索引参数（HNSW 内存约 = 维度×4 字节×向量数）；**③** 选型按数据量权衡：百万级以下 768/1024 维足够。**话术**：\"我们 100 万向量用 1024 维，内存占用约 4GB，换 768 维能省 25%。\""
+    },
+    {
+        "id": "ai-interview-067",
+        "topic": "RAG 会遇到哪些常见问题，怎么解决？（幻觉、召回不足、上下文溢出等）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 幻觉：强制引源（回答必须带出处 chunk）、检索置信度低于阈值直接拒答；**②** 召回不足：混合检索+rerank+查询改写；**③** 上下文溢出：压缩检索片段、只取 Top-K 最相关、对话历史做摘要。**话术**：\"引入引源机制后幻觉类客诉降了 70%。\""
+    },
+    {
+        "id": "ai-interview-068",
+        "topic": "向量库用的哪一个？为什么选它？踩过什么坑？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 选型：Qdrant（过滤能力强、易部署、内存可控），对比过 Milvus/FAISS/pgvector；**②** 理由：多租户过滤是刚需，Qdrant payload 过滤性能好；**③** 坑：大批量导入内存飙升——改成分批+限流；HNSW 参数没调导致召回慢。**话术**：\"踩过批量导入 OOM 的坑，后来 1000 条/批异步导入就稳了。\""
+    },
+    {
+        "id": "ai-interview-069",
+        "topic": "向量库存储的格式是什么？为什么转成结论语句？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 存储格式：文本块+向量+metadata（JSON payload）；**②** 转结论语句：把段落拆成\"结论+证据\"结构，检索命中可直接引用，减少模型二次加工导致的幻觉；**③** 效果：回答更精准、引用更可溯源。**话术**：\"规则类文档我们预切成结论句，问答准确率提升明显。\""
+    },
+    {
+        "id": "ai-interview-070",
+        "topic": "文档去重怎么做的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 粗去重：MD5 文件级去重；**②** 语义去重：SimHash/embedding 相似度，阈值 0.9 以上判重；**③** 同源文档（PDF+Word 双份）按标题+来源归并。**话术**：\"我们 SimHash 相似度>0.95 的块直接丢弃，库容量降了约 15%。\""
+    },
+    {
+        "id": "ai-interview-071",
+        "topic": "向量库大批量导入文档，如何保证性能稳定性？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 批量 embedding + 分批写入（如 1000 条/批），加限流和背压；**②** 异步任务队列（Celery）导入，失败自动重试；**③** 导入期间不阻塞线上查询（读写分离/临时集合切换）；**④** 监控导入速率和内存。**话术**：\"10 万文档导入从 2 小时优化到 40 分钟，全程线上无感知。\""
+    },
+    {
+        "id": "ai-interview-072",
+        "topic": "KG 知识图谱和纯 RAG 两套方案的区别？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 纯 RAG：文档语义检索，适合开放问答，构建快；**②** KG：实体+关系结构化，适合多跳推理、一致性校验（如\"A 的上级的上级是谁\"）；**③** 成本：KG 构建/维护成本高，需人工/LLM 抽取实体关系。**话术**：\"我们知识库以 RAG 为主，只在需要多跳关系的运营规则上用 KG 补充。\""
+    },
+    {
+        "id": "ai-interview-073",
+        "topic": "Graph-RAG 什么场景适合，什么场景不适合？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 适合：全局性问题（\"整个文档讲了哪几类规则\"）、实体关系密集、需要跨文档聚合；**②** 不适合：简单 FAQ、单点知识问答——构建成本高收益低；**③** 建议：先评估问题分布，Graph-RAG 只做增强不是替代。**话术**：\"我们只对运营规则类文档启用，问答命中提升但构建耗时是普通 RAG 的 5 倍，所以按文档类型分流。\""
+    },
+    {
+        "id": "ai-interview-074",
+        "topic": "Agentic-RAG 是什么？项目有没有使用？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 定义：检索不再是固定一步，而是由 Agent 自主决策（是否检索、检索哪类库、多轮检索）；**②** 优势：复杂问题可分步检索、判断信息是否充足再决定下一步；**③** 项目：用了轻量版——先判断意图，复杂问题走多步检索，简单问题一步召回。**话术**：\"引入后复杂运营规则问题的完整率提升明显，但延迟+0.5s，所以我们做了分层路由。\""
+    },
+    {
+        "id": "ai-interview-075",
+        "topic": "Embedding 模型选型，踩过哪些坑？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 选型：中文业务场景对比 bge-large-zh、m3e、text-embedding，最终选 bge 系列（中文效果好、可本地部署）；**②** 坑：通用模型对领域术语（棋牌术语）不敏感——用业务语料微调/加同义词扩展；**③** 坑：维度不一致导致换模型要全量重embedding——提前锁定维度。**话术**：\"换 bge-large 后领域问句召回提升 10% 以上。\""
+    },
+    {
+        "id": "ai-interview-076",
+        "topic": "如何评估 RAG 系统整体效果？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 指标：RAGAS 三件套——忠实度（答案是否忠于检索内容）、答案相关性、上下文相关性；**②** 落地：建业务标注集（100-200 条真实问题+期望答案），离线跑分+线上抽样人工评审；**③** 上线前把评测做成回归，每次改切块/换模型都跑一遍。**话术**：\"我们每两周跑一次评测回归，忠实度从 0.82 提升到 0.91 才敢上线新策略。\""
+    },
+    {
+        "id": "ai-interview-077",
+        "topic": "LangGraph 的流程是什么样的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 核心：StateGraph（状态图），节点=函数/模型/工具调用，边=流转，条件边=路由；**②** 流程：用户输入进 State → 节点依次执行（意图识别→检索/调工具→生成）→ 条件边决定分支/循环；**③** 项目用法：把\"意图识别→工具调用→结果校验\"做成三个节点，中间用条件边跳转。**话术**：\"我们 Agent 主流程 5 个节点，靠条件边实现重试和降级，比硬编码循环好维护。\""
+    },
+    {
+        "id": "ai-interview-078",
+        "topic": "Agent 是怎么传递上下文的？全局 State 里关注哪些字段？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 全局 State 是共享字典，节点读改写；**②** 关键字段：messages（对话历史）、current_task（当前任务）、tool_results（工具结果）、retrieved_chunks（检索上下文）、user_info（租户/权限）；**③** 风险：State 膨胀吃 token——历史要裁剪、中间结果用完即清。**话术**：\"我们给 State 里的 messages 设了 20 轮上限，超了就摘要压缩，否则 token 成本翻倍。\""
+    },
+    {
+        "id": "ai-interview-079",
+        "topic": "LangGraph StateGraph 状态共享、状态合并、条件边怎么实现的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 状态共享：所有节点读写同一个 State 对象；**②** 状态合并：用 Reducer 定义合并逻辑，messages 用 add_messages 追加；**③** 条件边：add_conditional_edges 传路由函数，返回下一节点名。**话术**：\"我们用 Reducer 把工具结果按 key 合并，条件边做'检索是否充足→继续检索 or 生成'的判断。\""
+    },
+    {
+        "id": "ai-interview-080",
+        "topic": "一个工具调用失败之后会怎么办？容错怎么设计？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 分层容错：工具自身重试（2 次）→ 换备用工具/降级 → 错误信息回传模型让它换参数或换方案；**②** 超时熔断：单工具超时阈值（如 5s），连续失败熔断；**③** 兜底：告知用户\"暂时不可用\"并转人工/客服。**话术**：\"订单查询工具挂了我们自动降级到缓存快照，用户无感，兜底成功率 95%。\""
+    },
+    {
+        "id": "ai-interview-081",
+        "topic": "LangGraph 和普通 LangChain 链式调用的区别？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** LangChain 链是线性管道，适合固定流程；**②** LangGraph 是图编排，支持分支、循环、条件路由、持久化状态；**③** 生产上 Agent 需要动态决策，图更合适；简单 RAG 用链就够了。**话术**：\"我们简单问答走 LCEL 链，复杂 Agent 任务走 LangGraph，各取所长。\""
+    },
+    {
+        "id": "ai-interview-082",
+        "topic": "LangGraph 线上生产遇到过什么坑？（State膨胀、死循环、异常快照等）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** State 膨胀：工具返回大文本堆进 State，token 暴涨——限制工具返回长度、只存摘要；**②** 死循环：条件边判断失误导致无限循环——设最大步数（如 10 步）强制终止；**③** 异常快照：checkpointer 存了脏状态，恢复后继续跑——校验状态合法性。**话术**：\"线上死循环就是靠 MAX_STEPS=10 兜住的，报错率从 5% 降到 0.1%。\""
+    },
+    {
+        "id": "ai-interview-083",
+        "topic": "Tool-Calling 失败有哪些情况，如何处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 参数校验失败：模型生成参数不合 schema——用 pydantic 校验，失败把错误信息回传模型重生成；**②** 工具执行异常：捕获异常，重试或降级；**③** 工具不存在/越权：拦截并提示模型换工具；**④** 超时：单独超时控制。**话术**：\"参数校验失败重试 1 次后仍失败就放弃调用并明确告知用户，避免反复烧 token。\""
+    },
+    {
+        "id": "ai-interview-084",
+        "topic": "Tool-Calling 为什么要用 Schema？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 让模型按结构化 JSON 输出参数，减少自由文本幻觉；**②** 便于程序校验（类型/必填/枚举）、默认值填充；**③** 可做权限拦截（工具名白名单）。**话术**：\"我们把 20 个工具都定义了 JSON Schema，参数错误率从 15% 降到 3%。\""
+    },
+    {
+        "id": "ai-interview-085",
+        "topic": "Agent 从 0 到 1 的落地路径是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 先 Workflow 后 Agent：把高频场景固化成固定流程上线，验证价值；**②** 再在流程节点引入模型决策（意图识别、工具选择）；**③** 小范围灰度→评测→迭代，逐步扩大自主性。**话术**：\"我们第一版其实就是硬编码工作流，跑通后一个月才逐步换成 LangGraph Agent。\""
+    },
+    {
+        "id": "ai-interview-086",
+        "topic": "Agent 项目整体架构怎么设计？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 分层：接入层（API/SSE）→ 编排层（LangGraph 流程）→ 能力层（RAG/工具网关）→ 模型层（多模型接入）→ 数据层（向量库/Redis/DB）；**②** 横切：权限/鉴权、可观测、限流熔断、评测；**③** 关键：编排层无业务逻辑，业务都在工具层，便于扩展。**话术**：\"我们把工具层做成独立网关服务，新增业务方工具不用动 Agent 主流程。\""
+    },
+    {
+        "id": "ai-interview-087",
+        "topic": "Supervisor 怎么做任务拆解和流程编排？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** Supervisor（规划器）把用户请求拆成子任务清单；**②** 按依赖关系编排：可并行子任务并行（asyncio.gather），有依赖串行；**③** 汇总子结果由 Supervisor 统一组织答案；**④** 控制：限制子任务数量、深度，防止拆太碎。**话术**：\"我们限定最多拆 5 个子任务，超过就分轮处理，防止任务爆炸。\""
+    },
+    {
+        "id": "ai-interview-088",
+        "topic": "Sub-Agent 子智能体什么场景用，什么场景不用？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 用：工具集差异大（财务 Agent vs 客服 Agent）、需要权限隔离、专业流程复杂；**②** 不用：单轮能解决、工具简单、增加延迟和成本不划算；**③** 建议：先单体 Agent，出现\"工具太多模型选不准\"再拆。**话术**：\"我们拆了财务查询子 Agent，因为它的工具权限要单独管控，准确率也提升了。\""
+    },
+    {
+        "id": "ai-interview-089",
+        "topic": "Agent 系统熔断降级怎么做？举实际例子",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 熔断：LLM API 连续 5 次 5xx/超时 → 熔断 10s（半开试探）；**②** 降级：主模型挂→切备用模型；实时检索挂→用缓存/静态 FAQ；**③** 例子：DeepSeek 高峰限流时，自动切到备用模型并限流提示，服务不中断。**话术**：\"我们靠多模型 failover + 限流，服务商故障时可用性仍保持 99.5%。\""
+    },
+    {
+        "id": "ai-interview-090",
+        "topic": "Agent 和 Workflow 到底怎么选型？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 流程确定、步骤固定、可枚举 → Workflow（可控、可测、便宜）；**②** 路径不确定、需要动态决策/多轮推理 → Agent；**③** 混合：先 Workflow 兜底，复杂分支交给 Agent 节点。**话术**：\"我们 70% 的请求走固定 Workflow，只有 30% 复杂问题走 Agent，成本和稳定性都更好。\""
+    },
+    {
+        "id": "ai-interview-091",
+        "topic": "什么时候用 Agent？什么时候用 Workflow？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 用 Agent：开放问题、多工具组合、需要自主决策（\"帮我对比两款游戏的充值活动\"）；**②** 用 Workflow：固定流程（\"查订单→判断状态→回复\"）；**③** 判断标准：步骤是否可预知、失败是否需要自主调整。**话术**：\"客服分流这类场景就是标准 Workflow，写死比让模型自由发挥稳得多。\""
+    },
+    {
+        "id": "ai-interview-092",
+        "topic": "Agent 评估指标有哪些？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 任务成功率：端到端目标达成率；**②** 过程指标：工具调用准确率、检索命中率、意图识别准确率；**③** 成本指标：单轮 token 消耗、调用次数；**④** 体验指标：首 token 延迟、总延迟、用户满意度/好评率。**话术**：\"我们每周看'任务成功率+单均成本'双指标，优化时两个一起监控防失衡。\""
+    },
+    {
+        "id": "ai-interview-093",
+        "topic": "Agent 链路可观测性怎么设计？需要埋哪些指标？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 全链路 trace：一个 request_id 贯穿 API→编排→检索→LLM→工具，OpenTelemetry 落库；**②** 关键埋点：每步延迟、token 数、模型名、工具名、检索命中数、错误类型；**③** 日志：结构化 JSON 存 LLM 输入输出（脱敏）。**话术**：\"线上答非所问，我们靠 trace 5 分钟定位到是检索片段为空，而不是模型问题。\""
+    },
+    {
+        "id": "ai-interview-094",
+        "topic": "用户反馈答非所问，如何排查定位？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 用 request_id 拉全链路 trace，先定位是哪一环：意图识别错/检索空/模型生成差；**②** 查检索日志：是否命中相关 chunk，命中但答错=生成问题，没命中=检索问题；**③** 归类后进评测集，修复后回归。**话术**：\"我们 60% 的'答非所问'最终定位在检索召回，不是模型，这类问题靠换检索策略解决。\""
+    },
+    {
+        "id": "ai-interview-095",
+        "topic": "如何防止 Agent 越权操作？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 工具白名单+租户权限校验：调用前检查工具权限和租户数据域；**②** 敏感操作（改单/退款）二次确认+审批流；**③** 全程审计日志（谁、何时、调了什么工具、参数）。**话术**：\"我们把权限下沉到工具网关统一校验，Agent 本身无权限概念，越权天然被拦。\""
+    },
+    {
+        "id": "ai-interview-096",
+        "topic": "长任务多步 Agent 如何防止死循环、无限调用工具？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 硬限制：最大步数（如 10 步）、单任务工具调用上限、全局超时；**②** 循环检测：若 State 快照重复（相同查询+相同工具）则强制跳出；**③** 用户侧：提供\"停止生成\"入口。**话术**：\"我们线上 Agent 平均 3.2 步，上限设 10 步，极端循环也能兜住。\""
+    },
+    {
+        "id": "ai-interview-097",
+        "topic": "记忆体系：短期记忆、长期记忆怎么落地？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 短期：会话内 messages 存 Redis（TTL 1 天），超长做摘要压缩；**②** 长期：用户偏好/画像/历史结论存 DB，下次会话加载进系统提示；**③** 更新策略：会话结束由 LLM 提取关键记忆点入库，注意隐私脱敏。**话术**：\"长期记忆我们只存'用户常玩哪个游戏、偏好哪种风格'这种稳定画像，避免噪音。\""
+    },
+    {
+        "id": "ai-interview-098",
+        "topic": "Agent 如何规划工具调用顺序与选择策略？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 选择依据：工具名称+描述+参数 Schema 一起给模型，靠语义匹配；工具多了先做意图粗分类缩小候选集；**②** 顺序规划：依赖工具先调（先查订单再查物流），并行无依赖工具一次发多个 tool_calls；**③** 兜底：候选工具拿不准时先让模型追问用户，而不是瞎调。**话术**：\"我们 20+ 工具按领域分组描述，模型选错率从 8% 降到 2%。\""
+    },
+    {
+        "id": "ai-interview-099",
+        "topic": "AI 幻觉问题是怎么降低的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 检索增强+强制引源：回答必须引用检索片段，无据可依就拒答；**②** Prompt 约束：低 temperature（0.2-0.3）、明确\"只基于给定资料回答\"；**③** 模型侧：选幻觉率低的模型；**④** 事后校验：LLM-as-Judge 抽检忠实度。**话术**：\"加引源+拒答机制后，幻觉类问题下降 70%，代价是 5% 的'不知道'，可接受。\""
+    },
+    {
+        "id": "ai-interview-100",
+        "topic": "使用什么模型？为什么选择这个模型？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 主力：DeepSeek-V3（中文好、便宜、推理快），复杂推理/代码用 Claude；**②** 依据：按任务类型评测+成本测算，不是追新；**③** 多模型路由：简单问答走便宜模型，复杂任务走高配模型。**话术**：\"我们 80% 请求走 DeepSeek，单均成本比全用 Claude 降了 60%。\""
+    },
+    {
+        "id": "ai-interview-101",
+        "topic": "大模型调用层是有状态还是无状态？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 调用层设计成无状态：模型 API 本身无状态，上下文由应用层维护；**②** 好处：服务可水平扩展、重启不丢会话；**③** 会话状态外置 Redis/DB。**话术**：\"我们所有实例无状态，扩容就是加 pod，会话都在 Redis。\""
+    },
+    {
+        "id": "ai-interview-102",
+        "topic": "长对话上下文堆积，token 越来越大怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 滑动窗口：只保留最近 N 轮完整消息；**②** 历史摘要：超出窗口的早期对话由 LLM 压缩成摘要注入；**③** 关键信息提取：用户偏好、结论单独存 State。**话术**：\"20 轮以上的对话触发摘要压缩，单轮 token 从 8k 降到 3k，回答质量基本不受影响。\""
+    },
+    {
+        "id": "ai-interview-103",
+        "topic": "上下文压缩怎么做？检索侧压缩和对话历史压缩",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 检索侧：只传 Top-K（3-5 条）检索片段，加 rerank 保证质量，片段超长截断；**②** 对话侧：历史摘要化、去重、只保留与当前问题相关的轮次；**③** 工具返回压缩：大 JSON 只传摘要字段。**话术**：\"检索片段从 10 条降到 3 条高质量片段后，准确率反而升了 5%，因为上下文噪声少了。\""
+    },
+    {
+        "id": "ai-interview-104",
+        "topic": "同一个用户连续问两次同样的问题，处理流程完全一样吗？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 不完全一样：第二次会命中缓存（语义缓存/结果缓存），直接返回；**②** 若上下文有变化（如\"刚才那个问题换个角度\"），则走完整流程；**③** 幂等：重复请求不重复计费/重复调工具。**话术**：\"我们加了语义缓存，重复问题命中率约 20%，省了不少 token。\""
+    },
+    {
+        "id": "ai-interview-105",
+        "topic": "怎么进行的缓存？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 三层缓存：结果缓存（Redis，相同 query 直接返回）、语义缓存（embedding 相似度>0.95 命中）、Prompt 前缀缓存（服务商支持则复用 KV）；**②** 失效策略：TTL+知识库变更时按文档失效；**③** 只缓存确定性场景，个性化回答不缓存。**话术**：\"知识库更新时我们按 doc_id 批量失效缓存，避免旧答案残留。\""
+    },
+    {
+        "id": "ai-interview-106",
+        "topic": "在节约 token 方面怎么处理的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** Prompt 精简：去冗长角色设定，指令精炼；**②** 上下文压缩：历史摘要+Top-K 检索；**③** 工具返回瘦身；**④** 缓存复用+模型路由（简单问题用小模型）。**话术**：\"综合这些手段，单均 token 从 6k 降到 3.5k，月度成本降 40%。\""
+    },
+    {
+        "id": "ai-interview-107",
+        "topic": "Function Calling 是什么？和 React 有什么区别？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** Function Calling：模型按 JSON Schema 输出结构化函数调用，是协议级能力；**②** ReAct：思维链文本推理（Thought-Action-Observation 循环），可解释但慢且易漂移；**③** 项目：优先 FC（结构化稳定），ReAct 只用于复杂推理场景。**话术**：\"我们工具调用全走 FC，只有需要多步推理的对比分析才用 ReAct 风格。\""
+    },
+    {
+        "id": "ai-interview-108",
+        "topic": "Streaming 流式输出怎么实现？断线恢复怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 实现：FastAPI StreamingResponse + SSE，后端逐 token 转发模型输出；**②** 断线：SSE 用 lastEventId 重连，服务端缓存未消费片段；**③** 兜底：重连失败前端展示已生成部分+\"重试\"按钮。**话术**：\"我们加了 5s 心跳，断线自动重连，前端基本无感知。\""
+    },
+    {
+        "id": "ai-interview-109",
+        "topic": "大模型接口调用超时，链路如何降级？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 超时分层：连接 3s/响应 30s/流式首字 5s；**②** 超时后：重试 1 次 → 切备用模型 → 缓存答案兜底 → 友好报错；**③** 熔断：连续超时触发熔断，避免雪崩。**话术**：\"我们 p95 延迟超标时自动切备用通道，用户侧最差体验是'稍后再试'。\""
+    },
+    {
+        "id": "ai-interview-110",
+        "topic": "对比 DeepSeek、Claude 在项目场景下的优缺点",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** DeepSeek：中文理解好、价格低（约 1/10）、推理速度快，高峰偶发限流；**②** Claude：代码/长文/复杂推理强、更稳，贵；**③** 用法：日常问答+检索走 DeepSeek，代码生成/复杂分析走 Claude，做了路由。**话术**：\"我们按任务路由，综合成本降 50% 同时保持质量。\""
+    },
+    {
+        "id": "ai-interview-111",
+        "topic": "多模型统一接入层怎么设计？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 统一接口：全部转 OpenAI 兼容格式（/v1/chat/completions）；**②** 模型路由：按任务类型/成本/可用性路由，配置中心动态下发；**③** Failover：主模型失败自动切备用；**④** 统一限流、计费统计、日志。**话术**：\"业务方只对接我们的网关，底层换模型零改动，我们内部两周就能切换主力模型。\""
+    },
+    {
+        "id": "ai-interview-112",
+        "topic": "Prompt 注入防护怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 指令隔离：用户输入用分隔符包裹，系统指令单独区域，明确\"以下内容不可执行\"；**②** 输入校验：过滤危险指令模式，工具权限白名单+参数校验；**③** 输出过滤：模型输出做敏感信息脱敏；**④** 知识库内容本身也要防注入。**话术**：\"我们拦截了'忽略以上指令'这类攻击，攻防测试通过率 100%。\""
+    },
+    {
+        "id": "ai-interview-113",
+        "topic": "提示词工程做过哪些手段，踩过什么坑？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 手段：角色设定+结构化指令+few-shot 示例+思维链；**②** 坑：指令自相矛盾（又要简洁又要详细）导致输出漂移；few-shot 示例格式不统一带坏输出；**③** 对策：prompt 版本管理+评测集回归。**话术**：\"我们 prompt 都走 Git 版本管理，改一行也要跑评测回归。\""
+    },
+    {
+        "id": "ai-interview-114",
+        "topic": "模型训练方式：预训练 vs 微调（LoRA），为什么选 LoRA？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 预训练：成本极高（千万级），普通团队不做；**②** LoRA 微调：只训练低秩增量，成本低（单卡可训），适配领域风格/格式；**③** 项目：知识类需求用 RAG+Prompt 就够，没做微调；若要做，先小数据验证收益。**话术**：\"我们评估过微调，ROI 不如优化检索，最后选择了 RAG+Prompt 方案。\""
+    },
+    {
+        "id": "ai-interview-115",
+        "topic": "多模态输入（扫描件/图片/语音）在项目中怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 扫描件：PaddleOCR 识别文字+版面分析，保留段落结构再入库；**②** 图片：VLM（视觉语言模型）把图片转结构化描述再走 RAG；**③** 语音：ASR 转文本后走统一文本链路，注意方言/术语词典；**④** 原则：统一转文本/结构化，模型只吃文本，多模态在入口层消化。**话术**：\"合同扫描件我们 OCR+版面还原后，抽取字段准确率 95% 以上。\""
+    },
+    {
+        "id": "ai-interview-116",
+        "topic": "SSE 和 WebSocket 的使用场景？什么场景下用 WebSocket？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** SSE：服务端单向推送（LLM 流式输出），基于 HTTP，自动重连，简单；**②** WebSocket：双向实时通信（在线对弈、协作编辑、实时通知）；**③** 项目：AI 对话流式输出用 SSE，棋牌房间实时状态用 WebSocket。**话术**：\"我们同一个网关两种协议并存，按接口语义选择。\""
+    },
+    {
+        "id": "ai-interview-117",
+        "topic": "用户关闭浏览器但模型还在生成怎么办？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 检测断开：SSE error/连接关闭事件触发取消生成（调用模型 cancel）；**②** 未取消则白烧钱——设置生成超时+预算上限；**③** 重要结果（如生成报告）异步保存，用户回来可查。**话术**：\"我们断开即 cancel，实测能省约 15% 无效 token。\""
+    },
+    {
+        "id": "ai-interview-118",
+        "topic": "SSE 的结构有什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 协议：text/event-stream，每个事件含 event/data/id/retry 字段，事件间空行分隔；**②** 格式：`data: {...}\\n\\n`；**③** 项目：用 data 传内容块（delta），用 event 区分\"开始/内容/结束/错误\"。**话术**：\"我们自定义了 event 类型，前端按事件类型分别处理渲染和错误态。\""
+    },
+    {
+        "id": "ai-interview-119",
+        "topic": "SSE 断线恢复机制怎么设计？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "必考"
+        ],
+        "answerContent": "**①** 服务端：给每条消息加 id，缓存未消费片段（Redis，TTL 10 分钟）；**②** 客户端：重连时带 Last-Event-ID，服务端续推；**③** 兜底：重连 3 次失败，前端展示已生成内容并提示重试。**话术**：\"我们断线续推命中率 90%，长回答体验稳定。\""
+    },
+    {
+        "id": "ai-interview-120",
+        "topic": "SaaS 多租户，从知识库、工具调用、会话三个角度讲 AI 侧如何做数据隔离？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 知识库：向量按 tenant_id 过滤（metadata 过滤）或独立 collection，检索前强制带租户条件；**②** 工具调用：工具权限按租户配置，调用时校验数据域；**③** 会话：会话记录按租户分表/分区，Redis key 带租户前缀。**话术**：\"我们三层隔离都基于 tenant_id 贯穿，审计时能查任意租户的数据边界。\""
+    },
+    {
+        "id": "ai-interview-121",
+        "topic": "RAG 检索时权限怎么控制？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 入库时把权限级别写进 metadata；**②** 检索时先按用户权限过滤（SQL filter）再向量检索；**③** 回答前再校验引用片段权限，双保险。**话术**：\"权限过滤放在向量检索前，既安全又不浪费算力。\""
+    },
+    {
+        "id": "ai-interview-122",
+        "topic": "多租户场景，向量库数据泄露风险怎么层层防护？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 应用层：租户过滤是必须项，缺失直接拒绝查询；**②** 存储层：敏感租户独立集合+加密；**③** 运维层：最小权限账号、网络隔离、审计日志；**④** 测试：定期做跨租户渗透自测。**话术**：\"我们自动化测试里专门有跨租户查询用例，防止过滤条件被绕过。\""
+    },
+    {
+        "id": "ai-interview-123",
+        "topic": "AI 侧和业务侧权限怎么打通？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 统一身份：AI 服务通过 JWT 携带用户/租户/角色，不自己建账号体系；**②** 权限映射：业务 RBAC 角色映射到 AI 侧能力（哪些工具、哪些知识库可见）；**③** 校验点：工具网关统一鉴权，业务方传 token 即可。**话术**：\"AI 侧不存密码，只认业务侧签发的 JWT，权限模型完全复用业务 RBAC。\""
+    },
+    {
+        "id": "ai-interview-124",
+        "topic": "Docker 镜像构建与部署怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 多阶段构建：构建层（装依赖）→ 运行层（精简镜像，瘦身 50%+）；**②** 健康检查：HEALTHCHECK 探活 LLM 服务；**③** 部署：K8s Deployment+滚动更新，镜像 tag 用 commit 号可回滚。**话术**：\"我们镜像从 1.8G 压到 600M，冷启动快了 3 倍。\""
+    },
+    {
+        "id": "ai-interview-125",
+        "topic": "Docker 日志挂载怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 容器内日志写 stdout，由采集器（Filebeat/Fluentd）收集，不落盘；**②** 或 volume 挂载日志目录到宿主机再采集；**③** 结构化 JSON 日志便于检索。**话术**：\"我们日志全走 stdout + ELK，排障直接查 trace_id，不用进容器。\""
+    },
+    {
+        "id": "ai-interview-126",
+        "topic": "CI/CD 上线流程怎么做的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 提交触发：lint+单测+构建镜像；**②** 自动部署到测试环境，跑评测回归（黄金数据集）；**③** 人工确认后灰度（10%→50%→100%）→ 全量；**④** 失败自动回滚上一版本。**话术**：\"AI 项目必须有评测回归这道门，否则 prompt 改动随时可能带崩线上。\""
+    },
+    {
+        "id": "ai-interview-127",
+        "topic": "容器部署，AI 服务资源怎么评估（CPU、内存）？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 按 QPS×单请求耗时×并发系数估算 CPU；**②** 内存按\"模型常驻+并发请求峰值\"评估，预留 30% 余量；**③** 压测验证：先压测再定 request/limit，避免超卖。**话术**：\"我们压测发现单实例 50 QPS 时内存峰值 2G，按 3 倍冗余给 6G。\""
+    },
+    {
+        "id": "ai-interview-128",
+        "topic": "如果私有化整套 Agent 项目，要考虑哪些点？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 部署形态：docker-compose/K8s 离线包，依赖全部内网化；**②** 模型：本地部署/专有通道，注意 GPU 资源；**③** 升级：版本管理+平滑升级+回滚；**④** 运维：日志采集、监控告警、License/授权。**话术**：\"我们私有化做了离线安装包，客户环境无外网也能 2 天跑起来。\""
+    },
+    {
+        "id": "ai-interview-129",
+        "topic": "线上监控告警主要关注哪些指标？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** LLM 侧：调用成功率、p95 延迟、token 消耗速率、限流次数；**②** 服务侧：接口错误率、QPS、GC/内存、队列积压；**③** 业务侧：任务成功率、拒答率、用户差评率。**话术**：\"我们最关注'LLM 失败率+单均 token'，这两个直接反映成本和可用性。\""
+    },
+    {
+        "id": "ai-interview-130",
+        "topic": "AI 推理资源（GPU）怎么管理与弹性扩缩容？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 方式：GPU 共享/按需加载，小模型可 CPU 推理+量化（int8）降本；**②** 扩缩容：K8s HPA 按队列长度/利用率自动扩缩 GPU pod，避免高峰排队；**③** 成本：闲时缩容到 0，冷启动用模型预加载+缓存。**话术**：\"我们把 embedding 和重排模型量化后放 CPU，GPU 只留给生成模型，推理成本降 40%。\""
+    },
+    {
+        "id": "ai-interview-131",
+        "topic": "它并发只能处理10个但前端有100个用户同时发送请求怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 排队：请求进队列（Redis/Celery）异步处理，前端轮询/SSE 拿结果；**②** 限流+降级：超阈值返回排队提示或走缓存/简化回答；**③** 扩容：多实例横向扩展，LLM 并发靠服务商配额或自建代理池。**话术**：\"100 并发时我们队列+异步处理，用户体验是'排队中'，不丢请求。\""
+    },
+    {
+        "id": "ai-interview-132",
+        "topic": "FastAPI 并发量高时怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 异步：接口用 async def + httpx 异步调用模型，不阻塞事件循环；**②** 部署：gunicorn+uvicorn 多 worker，按 CPU 核配比；**③** 连接池：DB/Redis 连接池复用；**④** 缓存热点数据。**话术**：\"全异步化后单实例 QPS 从 30 提到 120。\""
+    },
+    {
+        "id": "ai-interview-133",
+        "topic": "访问流量突然暴涨10倍如何处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 预案先行：扩容脚本、限流阈值、降级开关提前备好；**②** 入口：CDN+网关限流，保护后端；**③** 分层降级：缓存答案、关闭非核心功能、排队；**④** 事后：扩容回缩、复盘容量模型。**话术**：\"我们演练过 10 倍流量剧本，限流+降级一开，核心链路可用性保持 99%。\""
+    },
+    {
+        "id": "ai-interview-134",
+        "topic": "线上接口偶发504超时怎么排查？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 看 trace：网关→服务→DB/LLM 哪一环超时；**②** 常见：LLM 响应慢（上游抖动）、DB 慢查询、线程池打满、GC 停顿；**③** 对策：调超时阈值、加缓存、异步化慢链路。**话术**：\"我们遇到 504 最终定位是 LLM 上游抖动，加了超时重试+备用通道后消失。\""
+    },
+    {
+        "id": "ai-interview-135",
+        "topic": "Redis 在项目中用在了哪些地方？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 会话存储（对话历史，TTL）；**②** 缓存（LLM 结果、热点知识、用户信息）；**③** 分布式锁（防重复任务）；**④** 限流计数（令牌桶）；**⑤** 队列（轻量任务）。**话术**：\"Redis 是我们 AI 链路的'神经中枢'，挂了有完整降级方案。\""
+    },
+    {
+        "id": "ai-interview-136",
+        "topic": "Redis 压力变大怎么优化会话存储？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 数据结构：长对话拆小 key 或只存摘要+最近 N 轮；**②** 分片/集群：按租户或会话 ID 分片；**③** 冷热分离：活跃会话在 Redis，历史会话落 DB；**④** 淘汰策略+监控内存。**话术**：\"我们把超过 24h 的会话异步迁到 DB，Redis 内存占用降 60%。\""
+    },
+    {
+        "id": "ai-interview-137",
+        "topic": "5000万数据量查询优化怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 索引：覆盖索引+复合索引，避免回表；**②** 分页：游标分页替代 offset（深翻页慢）；**③** 分区/分表：按时间/租户分区；**④** 只查必要字段，避免 SELECT *；**⑤** 归档冷数据。**话术**：\"对话记录 5000 万行，按租户+时间分区+游标分页后，查询从 3s 降到 100ms。\""
+    },
+    {
+        "id": "ai-interview-138",
+        "topic": "接口性能问题排查思路（五步法）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 看监控：先确认是普遍慢还是偶发、哪个时段；**②** 复现：压测/回放复现问题；**③** 链路分析：trace 定位耗时大头（网络/DB/LLM/CPU）；**④** 定位根因：慢 SQL、锁等待、上游抖动等；**⑤** 优化+验证：改完压测对比，回归监控。**话术**：\"我们用这套五步法定位过 90% 的性能问题，核心是先量化再动手。\""
+    },
+    {
+        "id": "ai-interview-139",
+        "topic": "接口的幂等性是什么？用什么方式实现？举例",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 幂等：同请求多次执行结果一致；**②** 实现：唯一请求 ID+Redis 去重（SETNX）、DB 唯一约束、状态机校验；**③** 例子：Agent 任务触发接口带 task_id，重复提交直接返回已存在。**话术**：\"用户双击提交导致重复开任务，靠 request_id 唯一约束根治了。\""
+    },
+    {
+        "id": "ai-interview-140",
+        "topic": "怎么保证数据的一致性？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 本地事务：单库用 DB 事务 ACID；**②** 跨服务：本地消息表+MQ 最终一致性，或 Outbox 模式；**③** 重试补偿：失败重试+对账任务兜底。**话术**：\"知识库文档入库跨了 DB 和向量库，我们用消息表+重试保证两边最终一致。\""
+    },
+    {
+        "id": "ai-interview-141",
+        "topic": "LLM 已产生费用但 DB 事务失败怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 原则：LLM 调用不可回滚，先记录费用（异步记账）再执行业务事务；**②** 失败处理：业务失败但已消耗 token，计入成本并按失败原因重试/降级；**③** 兜底：费用独立于业务流水记账，对账时分开核算。**话术**：\"我们 LLM 费用和业务结果分开记账，业务失败不会吞掉成本记录，对账一目了然。\""
+    },
+    {
+        "id": "ai-interview-142",
+        "topic": "如何避免重复启动 Agent 任务？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 任务唯一 ID+Redis 分布式锁（SETNX+TTL）；**②** DB 唯一约束兜底；**③** 幂等消费：任务队列消费前查状态。**话术**：\"用户狂点'生成报告'，靠分布式锁保证同一任务只有一个在跑。\""
+    },
+    {
+        "id": "ai-interview-143",
+        "topic": "上下文管理层级设计（请求级、会话级、持久化）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 请求级：单次调用上下文（检索片段、工具结果），用完即清；**②** 会话级：对话历史+用户画像，Redis 存短期；**③** 持久化：会话归档到 DB，可恢复、可审计。**话术**：\"三层各管各的，请求级不落库、会话级带 TTL、持久化才进 DB，成本可控。\""
+    },
+    {
+        "id": "ai-interview-144",
+        "topic": "State 持久化字段有哪些？服务重启恢复机制",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 持久化字段：会话 ID、messages、当前节点、工具结果快照、任务状态；**②** 机制：LangGraph checkpointer 存 Redis/DB，重启后按会话 ID 恢复；**③** 注意：快照数据脱敏、过期清理。**话术**：\"服务发布重启，用户会话能接着聊，就是靠 checkpointer 恢复的。\""
+    },
+    {
+        "id": "ai-interview-145",
+        "topic": "如果 Redis 挂了会话怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "高频"
+        ],
+        "answerContent": "**①** 降级：会话降级为\"单轮无记忆\"模式，仍能回答问题；**②** 读 DB 兜底：近期会话从 DB 恢复（稍慢）；**③** Redis 高可用：主从+哨兵/集群，降低单点概率。**话术**：\"Redis 故障时我们自动降级单轮模式+提示，服务不中断。\""
+    },
+    {
+        "id": "ai-interview-146",
+        "topic": "Metadata 增强效果如何？为什么不直接让 AI 写 SQL？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** Metadata 过滤可大幅缩小检索范围、提升精度，是廉价有效的\"权限+时效+类型\"过滤；**②** 不直接 AI 写 SQL：权限难控、幻觉 SQL 风险高、表结构复杂时准确率低；**③** 折中：Metadata 过滤+RAG 生成，结构化查询走受控模板。**话术**：\"我们把'最近 30 天'这类条件做成 metadata 过滤，比让模型拼 SQL 稳定得多。\""
+    },
+    {
+        "id": "ai-interview-147",
+        "topic": "为什么不直接用 Serverless 工作流而用 LangGraph？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** Serverless 工作流（如 AWS Step Functions）适合确定性强、节点重的流程；**②** LangGraph 优势：LLM 节点原生集成、状态上下文共享、循环/条件边灵活、调试成本低；**③** 结论：AI 动态决策场景 LangGraph 更贴合，重 I/O 流程才考虑工作流引擎。**话术**：\"我们评估过 Step Functions，LLM 节点要来回序列化状态，太绕，最后选了 LangGraph。\""
+    },
+    {
+        "id": "ai-interview-148",
+        "topic": "Harness In Memory 是什么？生产为什么不能直接用？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** Harness 指 LangGraph 运行框架，In Memory 即状态存内存；**②** 生产问题：多实例下状态不同步、重启丢失、无法横向扩展；**③** 生产要用持久化 checkpointer（Redis/Postgres）+ 无状态化部署。**话术**：\"我们本地调试用 In Memory，生产换 Redis checkpointer 才能多副本。\""
+    },
+    {
+        "id": "ai-interview-149",
+        "topic": "从 GPT/Claude 迁移到 DeepSeek 的方案可行性分析",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 可行性：DeepSeek 支持 OpenAI 兼容 API，代码层改动小；**②** 风险：输出格式/工具调用风格差异、中文长文差异——需跑评测集回归；**③** 策略：统一接入层+按任务灰度切换+Failover 保留旧模型。**话术**：\"我们两周内完成 DeepSeek 全量切换，靠的是统一网关+评测集把关。\""
+    },
+    {
+        "id": "ai-interview-150",
+        "topic": "RAG 和 Agent 边界怎么划分？哪些走 RAG、哪些走 Tool-Calling？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 知识问答（静态文档、规则、FAQ）→ RAG；**②** 实时/操作类（查订单、改状态、调接口）→ Tool-Calling；**③** 混合：先意图识别，再决定检索还是调工具，或都做融合。**话术**：\"我们规则问答走 RAG、业务操作走工具，意图识别层做分流。\""
+    },
+    {
+        "id": "ai-interview-151",
+        "topic": "什么场景会考虑微调？为什么没做微调？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 考虑微调：输出格式强约束（JSON/特定话术）、领域术语理解差、需要稳定风格；**②** 没做原因：知识更新频繁（微调跟不上）、成本高、RAG+Prompt 已达标；**③** 结论：先 RAG+Prompt，评测不达标再考虑小参数量 LoRA。**话术**：\"我们知识库周更，微调根本不现实，RAG 是性价比最优解。\""
+    },
+    {
+        "id": "ai-interview-152",
+        "topic": "Guardrails 防护怎么落地？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 输入侧：Prompt 注入检测、敏感词、内容安全（黄赌毒/政治）；**②** 输出侧：PII 脱敏、格式校验、敏感内容拦截；**③** 行为侧：工具权限白名单+高危操作二次确认；**④** 落地：Guardrails 服务独立部署，规则可配置。**话术**：\"我们输入输出都过 Guardrails，内容安全违规率压到 0.01% 以下。\""
+    },
+    {
+        "id": "ai-interview-153",
+        "topic": "ReAct 和 Function-Calling 的区别，项目怎么选？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** ReAct：思维链+行动循环，灵活但 token 多、输出不稳定；**②** FC：结构化输出函数调用，稳定省 token；**③** 项目：工具调用用 FC，复杂推理链才用 ReAct，做了混合。**话术**：\"我们默认 FC，遇到'需要分步推理的对比题'才切 ReAct。\""
+    },
+    {
+        "id": "ai-interview-154",
+        "topic": "多 Agent 协作 Supervisor 监督模式怎么理解？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** Supervisor 是\"老板\"，负责拆任务、派给子 Agent、收结果、汇总；**②** 子 Agent 各司其职（检索/计算/写作），结果回传 Supervisor；**③** 模式：星型拓扑，子 Agent 不互相通信，避免混乱。**话术**：\"我们的运营助手就是 Supervisor+3 个子 Agent（检索/计算/生成），职责清晰。\""
+    },
+    {
+        "id": "ai-interview-155",
+        "topic": "对比自研状态机 vs LangGraph，什么场景选自研？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** LangGraph：开发快、生态全、适合快速迭代；**②** 自研：流程极简单（几个状态）、强定制需求、不想引入重依赖时；**③** 场景：自研适合固定 3-5 状态机，复杂图编排还是 LangGraph。**话术**：\"我们简单工单流程用自研状态机，复杂 Agent 编排用 LangGraph。\""
+    },
+    {
+        "id": "ai-interview-156",
+        "topic": "MCP 协议理解，什么场景选、什么场景不选？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** MCP：模型上下文协议，标准化\"模型↔工具/数据源\"连接，生态共享；**②** 选：需要接入外部服务/多 Agent 共享工具、想用社区现成工具时；**③** 不选：内部强耦合工具、安全和性能要求极高（MCP 有额外传输开销）、工具数量少时。**话术**：\"我们内部工具走 RPC 直连，对外集成才用 MCP，兼顾性能与生态。\""
+    },
+    {
+        "id": "ai-interview-157",
+        "topic": "如果重构这套 Agent 系统，会做哪些优化？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 架构：编排与执行彻底分离、工具网关插件化；**②** 可靠性：全链路 trace 完善、评测自动化进 CI；**③** 成本：模型路由更细粒度、缓存策略升级。**话术**：\"重构第一件事就是补齐离线评测体系，没有评测谈优化都是拍脑袋。\""
+    },
+    {
+        "id": "ai-interview-158",
+        "topic": "如果业务方希望 Agent 支持退款、改订单这种高危操作，怎么应对？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 权限最小化：高危工具单独配置，仅限特定角色/会话；**②** 二次确认：Agent 执行前向用户复述动作+确认；**③** 风控：退款金额上限、频次限制、人工审批流；**④** 全量审计日志。**话术**：\"高危操作我们做成'确认单'模式，Agent 只生成操作请求，真正执行走审批流。\""
+    },
+    {
+        "id": "ai-interview-159",
+        "topic": "知识库版本管理、文档更新流程怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 入库即版本：文档带 version 字段，更新走\"新版本入库→灰度→切换→旧版下线\"；**②** 变更影响：更新后按 doc_id 失效缓存、重建索引；**③** 审批：业务文档变更走审批+审计。**话术**：\"我们支持文档回滚，出问题一键切回旧版本，线上无感。\""
+    },
+    {
+        "id": "ai-interview-160",
+        "topic": "业务方快速新增一批知识库文档，要注意什么风险？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 质量风险：格式杂乱/扫描件/重复文档——先清洗去重再入库；**②** 冲突风险：与旧文档矛盾——需人工/模型校验冲突；**③** 容量与性能：大批量导入限流，避免拖垮线上检索；**④** 权限：确认新文档权限正确，防止越权泄露。**话术**：\"批量导入前我们强制跑文档质检（重复率、可解析率、权限标注），不合格打回。\""
+    },
+    {
+        "id": "ai-interview-161",
+        "topic": "向量库线上出现查询慢，排查思路？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 看监控：QPS、p95、资源（CPU/内存/磁盘 IO）曲线，判断是突发还是持续；**②** 定位：数据量暴涨（HNSW 图大）、过滤条件复杂、无索引字段、并发打满；**③** 对策：调 HNSW 参数（ef_search/m）、加字段索引、扩容/分片、优化过滤。**话术**：\"我们遇到一次查询慢，根因是 metadata 过滤字段没建索引，建索引后 p95 降 70%。\""
+    },
+    {
+        "id": "ai-interview-162",
+        "topic": "两种方案：混存+元数据过滤 vs 独立集合，优缺点？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 混存+过滤：一份数据、租户靠 metadata 过滤——运维简单、资源省，但过滤慢且大数据量性能下降；**②** 独立集合：每租户/每类独立集合——隔离强、查询快，但集合多、管理复杂、成本高；**③** 选型：租户少用独立，租户多+数据量大用混存+分区过滤。**话术**：\"我们中型租户混存+tenant 过滤，超大客户单独集合，折中方案。\""
+    },
+    {
+        "id": "ai-interview-163",
+        "topic": "Agent 如何保证回答的可解释性与溯源？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 溯源：答案后附引用来源（文档名+章节+页码），前端可点击查看原文；**②** 结构化输出：回答带\"结论+依据+置信度\"字段，依据缺失自动降级；**③** 审计：全链路日志留痕，方便事后追责和复盘。**话术**：\"我们所有 RAG 回答都带来源角标，用户点击能跳到原文位置，信任度大幅提升。\""
+    },
+    {
+        "id": "ai-interview-164",
+        "topic": "MySQL 和 PostgreSQL 的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 生态：MySQL 运维简单、社区大；PG 功能强（JSONB、数组、全文检索）；**②** 场景：业务核心用 PG 更稳，MySQL 存量迁移成本低；**③** 并发：PG 的 MVCC 对读写并发更友好。**话术**：\"我们会话数据用 PG（JSONB 存消息），业务流水用 MySQL，各取所长。\""
+    },
+    {
+        "id": "ai-interview-165",
+        "topic": "索引失效的发现与解决",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 发现：EXPLAIN 看 type（ALL=全表扫描）、rows 估算、key 是否为空；**②** 常见失效：函数包裹列、隐式类型转换、LIKE '%xx'、OR 条件；**③** 解决：改写法/加函数索引/拆分查询。**话术**：\"我们排查过 phone 字段隐式转换导致索引失效，改写后查询从 2s 降到 20ms。\""
+    },
+    {
+        "id": "ai-interview-166",
+        "topic": "EXPLAIN 重点关注哪些字段？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** type：const/ref/range 优，ALL 要警惕；**②** key：实际用的索引；**③** rows：扫描行数预估；**④** Extra：Using filesort/Using temporary 是性能杀手。**话术**：\"我看到 type=ALL 或 Extra 有 filesort 就直接进优化清单。\""
+    },
+    {
+        "id": "ai-interview-167",
+        "topic": "B+ 树底层结构是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 多路平衡树，非叶节点只存索引键，叶子存数据；**②** 叶子节点链表有序，支持范围扫描；**③** 树高约 3-4 层，IO 次数少。**话术**：\"千万级表 B+树查询也就 3-4 次磁盘 IO，这是它快的原因。\""
+    },
+    {
+        "id": "ai-interview-168",
+        "topic": "B 树和 B+ 树的区别？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** B 树：所有节点都存数据，范围查询要回溯；**②** B+树：数据只在叶子，非叶更宽、树更矮，范围查询走链表；**③** 数据库选 B+树因为范围查询+IO 少。**话术**：\"面试直接答：B+树叶子链表+非叶只存键，专为范围查询优化。\""
+    },
+    {
+        "id": "ai-interview-169",
+        "topic": "MySQL 事务隔离级别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 四级：读未提交/读已提交/可重复读（默认）/串行化；**②** 对应问题：脏读/不可重复读/幻读；**③** 项目默认 RR，配 MVCC 解决快照读，写冲突用锁。**话术**：\"我们订单类强一致场景会用串行化或显式锁，普通查询 RR 就够。\""
+    },
+    {
+        "id": "ai-interview-170",
+        "topic": "四大特性 ACID",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 原子性：undo log 回滚；**②** 一致性：约束+事务保证；**③** 隔离性：MVCC+锁；**④** 持久性：redo log 落盘。**话术**：\"答 ACID 最好带上底层机制（undo/redo/MVCC），显得有深度。\""
+    },
+    {
+        "id": "ai-interview-171",
+        "topic": "MVCC、RR（可重复读）原理",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** MVCC：每行有事务版本号，读快照版本，读写不互斥；**②** RR：事务内快照一致，解决不可重复读；**③** 幻读：RR 下靠间隙锁/Next-Key Lock 防幻读。**话术**：\"我说清楚'快照读'和'当前读'两个概念，面试官基本满意。\""
+    },
+    {
+        "id": "ai-interview-172",
+        "topic": "如何进行锁？有哪些锁？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 粒度：表锁/行锁/间隙锁；**②** 类型：共享锁/排他锁/意向锁；**③** 使用：更新走行锁+索引（无索引锁全表）、避免长事务。**话术**：\"更新语句一定要走索引，否则行锁变表锁，这是线上死锁高发原因。\""
+    },
+    {
+        "id": "ai-interview-173",
+        "topic": "SQL 性能优化（案例）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 案例：会话表分页慢——游标分页替代 offset；**②** 加复合索引（租户+时间）覆盖查询；**③** 避免 SELECT *，大字段拆分。**话术**：\"5000 万行会话查询，加复合索引+游标分页后从 3s 降到 80ms。\""
+    },
+    {
+        "id": "ai-interview-174",
+        "topic": "表结构设计原则和经验",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 三范式兜底、适度冗余换性能；**②** 主键用自增/雪花，避免 UUID 主键；**③** 大字段拆表、枚举用数字/短串、时间统一类型；**④** 预留扩展字段要克制。**话术**：\"我们消息表把 content 拆到独立表，主表查询轻快很多。\""
+    },
+    {
+        "id": "ai-interview-175",
+        "topic": "两张表关联关系设计（一对多、多对多等）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 一对多：子表带父表外键；**②** 多对多：中间表（双外键+唯一约束）；**③** 一对一：主键复用/唯一外键。**话术**：\"用户-角色-权限就是典型多对多，中间表加唯一索引防重复。\""
+    },
+    {
+        "id": "ai-interview-176",
+        "topic": "字段冗余是否允许？优缺点？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 允许：高并发读场景冗余冗余字段（如订单存商品名快照）省 JOIN；**②** 代价：一致性维护成本（更新要同步）；**③** 原则：只冗余低频变更字段。**话术**：\"订单表冗余商品名，虽然要同步更新，但查询省了一次 JOIN。\""
+    },
+    {
+        "id": "ai-interview-177",
+        "topic": "读写分离，读库宕机恢复步骤",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 读库宕机：流量切回主库（降级读主），服务不中断；**②** 恢复：重建从库（备份恢复+binlog 追平）；**③** 验证：主从延迟归零后再切回。**话术**：\"我们读库故障自动切主，延迟 10s 内完成，业务无感知。\""
+    },
+    {
+        "id": "ai-interview-178",
+        "topic": "大表清理：TRUNCATE vs DELETE",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** TRUNCATE：DDL，整体清空、快、释放空间，不可按条件；**②** DELETE：DML，可带条件、走事务、慢且产生 binlog；**③** 场景：全清用 TRUNCATE，部分删用 DELETE+分批。**话术**：\"清空测试数据用 TRUNCATE，线上删老数据必须分批 DELETE 避免锁表。\""
+    },
+    {
+        "id": "ai-interview-179",
+        "topic": "几百万条数据快速插入 PostgreSQL",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 用 COPY 批量导入（比逐条 INSERT 快 10 倍+）；**②** 分批提交、临时关闭索引/约束后重建；**③** 并行导入分片。**话术**：\"我们文档块批量入库用 COPY+分批，百万条 10 分钟内完成。\""
+    },
+    {
+        "id": "ai-interview-180",
+        "topic": "Redis 支持哪些数据类型？有序集合内部数据结构？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 类型：String/Hash/List/Set/ZSet/Stream 等；**②** ZSet 内部：跳表+哈希表，O(logN) 查排名；**③** 场景：排行榜、延迟队列。**话术**：\"我们用它做会话 TTL 和简单排行榜，够用且稳定。\""
+    },
+    {
+        "id": "ai-interview-181",
+        "topic": "Redis 分布式锁怎么实现？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** SET key value NX EX 原子命令；**②** value 用唯一 ID，释放时 Lua 脚本校验防误删；**③** 续期：看门狗/Redisson 自动续期；**④** 高可用用 Redlock 但需谨慎。**话术**：\"我们锁值存 UUID，释放走 Lua 校验，防止超时后误删别人的锁。\""
+    },
+    {
+        "id": "ai-interview-182",
+        "topic": "每科最高分学生（SQL）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 窗口函数：ROW_NUMBER() OVER(PARTITION BY subject ORDER BY score DESC)；**②** 或子查询取 MAX 再关联；**③** 注意并列第一：要全列出用 DENSE_RANK。**话术**：\"窗口函数一行搞定，还顺带能处理并列。\""
+    },
+    {
+        "id": "ai-interview-183",
+        "topic": "每个部门薪资排名前三（SQL）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** RANK()/DENSE_RANK() OVER(PARTITION BY dept ORDER BY salary DESC) 取 rn<=3；**②** 明确需求是否含并列（RANK 会跳号）；**③** 性能：部门多时加索引。**话术**：\"写窗口函数前先问'并列怎么算'，这是送分题的坑。\""
+    },
+    {
+        "id": "ai-interview-184",
+        "topic": "数据库连接池怎么配置？连接池打满怎么排查？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "重点"
+        ],
+        "answerContent": "**①** 配置：连接池大小≈(CPU 核数×2)+磁盘数，设最大等待时间和超时回收；**②** 打满排查：看慢 SQL、长事务、连接泄漏（未归还）、数据库 max_connections；**③** 预防：监控连接水位+泄漏检测。**话术**：\"我们踩过连接池打满，根因是慢查询占着连接不放，加了慢 SQL 告警后根治。\""
+    },
+    {
+        "id": "ai-interview-185",
+        "topic": "Python 可变与不可变类型",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 不可变：int/str/tuple/frozenset——值变则新对象；**②** 可变：list/dict/set——原地修改；**③** 坑：函数默认参数用可变对象会共享状态。**话术**：\"默认参数写 [] 是经典 bug，我都用 None+判空。\""
+    },
+    {
+        "id": "ai-interview-186",
+        "topic": "元组 tuple 和集合 set 的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** tuple：有序、不可变、可重复；**②** set：无序、可变、去重、哈希；**③** 场景：固定配置用 tuple，去重/成员判断用 set。**话术**：\"判断元素在不在集合里用 set，O(1)。\""
+    },
+    {
+        "id": "ai-interview-187",
+        "topic": "__new__ vs __init__ 执行顺序",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** __new__ 先执行（创建实例），__init__ 后执行（初始化）；**②** __new__ 返回实例才触发 __init__；**③** 场景：单例模式、不可变类型子类。**话术**：\"实现单例就在 __new__ 里控实例，__init__ 只做初始化。\""
+    },
+    {
+        "id": "ai-interview-188",
+        "topic": "装饰器应用场景",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 场景：鉴权、日志、重试、限流、缓存；**②** 注意：functools.wraps 保留元信息；**③** 带参装饰器工厂。**话术**：\"我们 LLM 调用重试就是装饰器实现，一处定义到处复用。\""
+    },
+    {
+        "id": "ai-interview-189",
+        "topic": "多进程、多线程、异步的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 多进程：CPU 密集，隔离强，开销大；**②** 多线程：IO 密集但 GIL 限制 CPU；**③** 异步：单线程事件循环，最适合网络 IO（LLM 调用）。**话术**：\"我们调用 LLM 全用 asyncio，几百并发不阻塞。\""
+    },
+    {
+        "id": "ai-interview-190",
+        "topic": "Python 模块与包的概念",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 模块：单个 .py 文件；**②** 包：含 __init__.py 的目录，可嵌套；**③** 命名空间与导入机制（绝对/相对导入）。**话术**：\"我们按 service/repository 分层建包，靠 __init__ 统一导出。\""
+    },
+    {
+        "id": "ai-interview-191",
+        "topic": "Python 实现深拷贝怎么写？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** copy.deepcopy(obj)；**②** 手写递归：区分可变/不可变、处理循环引用；**③** 场景：State 快照防篡改。**话术**：\"LangGraph State 拷贝我用 deepcopy，防止节点间意外串改。\""
+    },
+    {
+        "id": "ai-interview-192",
+        "topic": "Java 和 Python 分别怎么实现深拷贝？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** Java：实现 Cloneable+重写 clone（浅），深拷贝用序列化或手动复制；**②** Python：copy.deepcopy；**③** 对比：Python 内置更省事，Java 需注意序列化性能。**话术**：\"Java 我常用 JSON 序列化往返做深拷贝，简单但注意性能。\""
+    },
+    {
+        "id": "ai-interview-193",
+        "topic": "前端怎么实现深拷贝？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** structuredClone()（现代浏览器原生）；**②** JSON.parse(JSON.stringify())——丢函数/undefined/循环引用；**③** lodash.cloneDeep。**话术**：\"线上数据没循环引用就 JSON 方案，有就用 structuredClone。\""
+    },
+    {
+        "id": "ai-interview-194",
+        "topic": "Python 异步编程中 asyncio 的核心概念与踩坑",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 核心：事件循环+协程+Task，await 让出控制权；**②** 坑：阻塞调用（requests/sync DB）卡死事件循环——用 httpx/async 驱动；**③** 并发控制：Semaphore 限流并发数，防止打爆上游；**④** 超时：asyncio.timeout 包裹。**话术**：\"我们并行调 20 个工具的检索，用 Semaphore(5) 限流，稳定不超时。\""
+    },
+    {
+        "id": "ai-interview-195",
+        "topic": "Vue vs React 核心区别？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 响应式：Vue 依赖追踪自动更新，React 手动 setState 触发；**②** 模板：Vue 模板语法，React JSX 更灵活；**③** 生态：React 社区大、Vue 上手快。**话术**：\"我们管理后台用 Vue，AI 对话页用 React，都是成熟方案按团队选。\""
+    },
+    {
+        "id": "ai-interview-196",
+        "topic": "组件通信方式对比（Vue vs React）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 父→子：props；**②** 子→父：Vue emit / React 回调函数；**③** 跨层：Vue provide/inject、React Context；**④** 全局：Pinia/Redux 状态库。**话术**：\"跨组件状态我优先状态库，避免 props 层层传递。\""
+    },
+    {
+        "id": "ai-interview-197",
+        "topic": "React 虚拟 DOM 工作原理",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 用 JS 对象描述 UI 结构（虚拟 DOM 树）；**②** 状态变化生成新树，diff 后只更新差异部分到真实 DOM；**③** 收益：批量更新、跨平台渲染。**话术**：\"AI 对话流式渲染就靠虚拟 DOM 高效更新，几千条消息也不卡。\""
+    },
+    {
+        "id": "ai-interview-198",
+        "topic": "Diff 算法三大策略",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 树分层比较（跨层少动）；**②** 组件类型不同直接替换；**③** key 优化列表 diff。**话术**：\"回答这题顺带提 key 的重要性，和列表渲染优化呼应。\""
+    },
+    {
+        "id": "ai-interview-199",
+        "topic": "key 的设置规则，能否用 index？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** key 要稳定唯一，用业务 ID；**②** 不用 index：插入/删除/重排时复用错误导致状态错乱；**③** 静态列表可用 index。**话术**：\"消息列表用消息 ID 做 key，流式更新不会闪烁错位。\""
+    },
+    {
+        "id": "ai-interview-200",
+        "topic": "React Hooks 使用规则与原理",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 规则：顶层调用、不在条件/循环里用；**②** 原理：按调用顺序存 hook 链表；**③** 常用：useState/useEffect/useMemo/useCallback。**话术**：\"useMemo 用在对大列表的派生计算，避免每次渲染重算。\""
+    },
+    {
+        "id": "ai-interview-201",
+        "topic": "Vue 响应式 vs React 响应式的差异",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** Vue：数据代理+依赖收集，细粒度自动更新（Vue3 Proxy）；**②** React：不可变数据+setState 触发全组件重渲染（靠 memo 优化）；**③** 结论：Vue 更新细、React 数据流更明确。**话术**：\"流式对话场景 React 要小心每 token 重渲染，我们会节流合并。\""
+    },
+    {
+        "id": "ai-interview-202",
+        "topic": "React Fiber 是什么？引入 Fiber 的目的是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** Fiber：可中断的渲染调度架构（链表结构）；**②** 目的：分片渲染不阻塞主线程，优先级调度（输入优先于渲染）；**③** 收益：大页面交互更流畅。**话术**：\"长列表渲染不卡顿就是 Fiber 的功劳，配合虚拟列表更稳。\""
+    },
+    {
+        "id": "ai-interview-203",
+        "topic": "React 项目性能优化从哪些维度入手？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 渲染层：memo/useMemo/useCallback、虚拟列表、懒加载；**②** 包体：代码分割（React.lazy）、tree shaking；**③** 网络：图片压缩、CDN、接口合并；**④** 工具：Lighthouse/Profiler 定位。**话术**：\"AI 对话页我们做了消息虚拟滚动+渲染节流，千条消息不卡。\""
+    },
+    {
+        "id": "ai-interview-204",
+        "topic": "Vue 模板渲染做了哪些优化？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 编译期静态标记（patchFlag）、静态提升；**②** diff 只比较动态节点；**③** 缓存事件处理函数。**话术**：\"Vue3 编译优化让模板渲染比 Vue2 快不少，动态绑定越少越好。\""
+    },
+    {
+        "id": "ai-interview-205",
+        "topic": "Vue 列表渲染优化怎么做的？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** key 必须稳定唯一；**②** v-for 避免与 v-if 同用；**③** 大数据量用虚拟滚动；**④** 计算属性缓存。**话术**：\"千级列表虚拟滚动后首屏 2s 内，滚动流畅。\""
+    },
+    {
+        "id": "ai-interview-206",
+        "topic": "路由守卫怎么写？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** Vue Router：beforeEach 全局守卫做登录校验/权限；**②** React：路由组件包裹 AuthGuard 或 useNavigate 拦截；**③** 注意：前端守卫只是体验，后端必须鉴权。**话术**：\"AI 管理后台按角色渲染菜单+路由守卫，接口层再验一次权限。\""
+    },
+    {
+        "id": "ai-interview-207",
+        "topic": "输入 URL 到页面渲染完成全过程？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** DNS→TCP→TLS→HTTP 请求→服务器响应；**②** HTML 解析→CSSOM→DOM→渲染树→布局→绘制；**③** 优化点：CDN、HTTP/2、缓存、JS 放底部。**话术**：\"答全流程后主动提'哪步能优化'，展示工程思维。\""
+    },
+    {
+        "id": "ai-interview-208",
+        "topic": "TCP 三次握手、四次挥手",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 三次握手：SYN→SYN+ACK→ACK，确认双方收发能力；**②** 四次挥手：FIN→ACK→FIN→ACK，全双工各自关闭；**③** 状态：TIME_WAIT 等待 2MSL。**话术**：\"SSE 长连接断开会看到大量 TIME_WAIT，调内核参数优化过。\""
+    },
+    {
+        "id": "ai-interview-209",
+        "topic": "HTTP 和 HTTPS 的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** HTTPS=HTTP+TLS 加密（防窃听/防篡改/身份认证）；**②** 握手多 1-2 RTT，有性能损耗；**③** 项目：全站 HTTPS，SSE 必须 HTTPS。**话术**：\"我们全站 HTTPS+HTTP/2，TLS 会话复用后性能损耗可忽略。\""
+    },
+    {
+        "id": "ai-interview-210",
+        "topic": "JS 原型和原型链是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 每个对象有 __proto__ 指向原型，函数有 prototype；**②** 属性查找沿原型链上溯；**③** 顶层 Object.prototype，尽头 null。**话术**：\"手写 instanceof 就是遍历原型链，面试常考。\""
+    },
+    {
+        "id": "ai-interview-211",
+        "topic": "跨页面资源复用策略",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 浏览器缓存（HTTP 缓存/CDN）；**②** Service Worker 缓存；**③** 多页应用公共资源抽公共包。**话术**：\"公共 JS/CSS 走 CDN 长缓存，版本号控制更新。\""
+    },
+    {
+        "id": "ai-interview-212",
+        "topic": "多尺寸图片缓存与生成策略",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 原图存一份，按需生成多尺寸（缩略图/列表图/大图）；**②** CDN+URL 参数动态裁剪；**③** 懒加载+WebP 格式。**话术**：\"游戏封面按尺寸预生成 3 档，列表页只加载小图，流量省 60%。\""
+    },
+    {
+        "id": "ai-interview-213",
+        "topic": "微前端会遇到什么问题？怎么解决？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 问题：样式隔离、JS 沙箱、公共依赖、路由冲突；**②** 解决：qiankun/模块联邦、CSS Module、运行时沙箱；**③** 取舍：不是所有项目都需要微前端，团队多才值得。**话术**：\"我们三个子应用用模块联邦共享公共组件，构建物减了 30%。\""
+    },
+    {
+        "id": "ai-interview-214",
+        "topic": "H5 和小程序双端通信怎么实现？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** WebView JSBridge：postMessage + 注入方法；**②** 统一 Bridge 封装（promise 化）；**③** 消息协议约定（事件名+参数+回调）。**话术**：\"我们封装了统一的 invoke 方法，H5 和小程序各实现一套，上层业务无感。\""
+    },
+    {
+        "id": "ai-interview-215",
+        "topic": "Lighthouse 前端性能怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "熟悉"
+        ],
+        "answerContent": "**①** 指标：FCP/LCP/CLS/INP/TBT；**②** 流程：Lighthouse 跑分→定位瓶颈（大图/长任务/未压缩）→优化→复测；**③** 进 CI：性能回归防劣化。**话术**：\"我们 LCP 从 4s 优化到 1.8s，主要靠图片裁剪+首屏懒加载。\""
+    },
+    {
+        "id": "ai-interview-216",
+        "topic": "Spring Boot 热部署怎么实现？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** devtools 依赖+自动重启；**②** 生产不用热部署，用滚动发布；**③** 原理：类加载器替换。**话术**：\"本地开发用 devtools，线上走 CI/CD 滚动更新。\""
+    },
+    {
+        "id": "ai-interview-217",
+        "topic": "Spring Cloud 核心组件有哪些？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 注册中心 Nacos/Eureka、配置中心、网关 Gateway；**②** 熔断限流 Sentinel/Hystrix、链路 Sleuth；**③** 我们 Java 侧网关复用这套做业务入口。**话术**：\"AI 服务接入业务侧走 Spring Cloud 网关，鉴权限流统一。\""
+    },
+    {
+        "id": "ai-interview-218",
+        "topic": "Spring IOC 核心原理和重点",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 容器管理 Bean 生命周期（创建/注入/销毁）；**②** 依赖注入方式：构造器/Setter/字段；**③** 重点：作用域、循环依赖（三级缓存）。**话术**：\"答出三级缓存解决循环依赖，能体现深度。\""
+    },
+    {
+        "id": "ai-interview-219",
+        "topic": "RabbitMQ 怎么避免消息丢失？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 生产者：confirm 确认+失败重发；**②** Broker：持久化队列+消息；**③** 消费者：手动 ack+消费幂等；**④** 兜底：死信队列。**话术**：\"我们文档入库任务走 MQ，三层保障后丢消息率为 0。\""
+    },
+    {
+        "id": "ai-interview-220",
+        "topic": "async/await 和 Promise 的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** Promise 是对象，async/await 是语法糖；**②** async 函数返回 Promise，await 暂停执行；**③** 错误处理：try/catch 更直观。**话术**：\"前端调 SSE 流式接口用 async/await + ReadableStream 解析。\""
+    },
+    {
+        "id": "ai-interview-221",
+        "topic": "async 函数并发执行怎么写？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** Promise.all（并行）、Promise.allSettled（容错并行）；**②** 控制并发：分批或 p-limit；**③** 注意：await 串行 vs 并行差异。**话术**：\"批量上传图片用 allSettled，单个失败不影响整体。\""
+    },
+    {
+        "id": "ai-interview-222",
+        "topic": "Monorepo 怎么用？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 多包一仓：pnpm workspace/turborepo；**②** 优点：共享代码、统一依赖、原子提交；**③** 坑：构建缓存、依赖地狱要管好。**话术**：\"我们 AI 服务的 SDK+服务端+管理端用 Monorepo，公共类型一处维护。\""
+    },
+    {
+        "id": "ai-interview-223",
+        "topic": "Electron + React 怎么理解？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** Electron 桌面壳（主进程+渲染进程），React 管 UI；**②** 通信：IPC；**③** 场景：AI 桌面助手/客服工作台。**话术**：\"桌面端场景才用 Electron，Web 够用就 Web。\""
+    },
+    {
+        "id": "ai-interview-224",
+        "topic": "AI coding 工具有哪些？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** Copilot/Cursor/通义灵码/Codeium；**②** 用法：补全、单元测试生成、代码审查、重构；**③** 管理：AI 生成代码必须过 review+测试。**话术**：\"我们团队 AI 编码提效约 30%，但核心逻辑仍人工 review。\""
+    },
+    {
+        "id": "ai-interview-225",
+        "topic": "LLM 已产生费用但 DB 事务失败怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 先记账后业务：LLM 调用结果+费用先落独立流水；**②** 业务失败重试/补偿，不吞费用记录；**③** 成本对账按账本核对。**话术**：\"和 80 题同源，核心是费用与业务解耦记账。\""
+    },
+    {
+        "id": "ai-interview-226",
+        "topic": "Python 和 Java、Nodejs 的区别",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** Python：AI 生态强、开发快，性能一般；**②** Java：高并发/企业级稳，开发重；**③** Node：异步 IO 强，适合 I/O 密集。**话术**：\"AI 服务 Python，业务核心 Java，工具链 Node，按场景选型。\""
+    },
+    {
+        "id": "ai-interview-227",
+        "topic": "如何做 AI 项目的成本核算与降本？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 核算：按接口/按会话/按租户计量 token 和成本，出日/月报表；**②** 降本：模型路由（简单任务小模型）、缓存复用、上下文压缩、批量非实时任务走便宜时段；**③** 预算控制：租户级预算+超限熔断告警。**话术**：\"我们做了成本看板，发现 30% token 浪费在冗余上下文，压缩后月度成本降 25%。\""
+    },
+    {
+        "id": "ai-interview-228",
+        "topic": "项目负责人定位？带多少人？团队怎么分配任务？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 定位：定方向、拆任务、管进度、扛结果，不是最忙的人；**②** 带 3-5 人，按模块/专长分配（后端/算法/前端）；**③** 机制：周会同步+每日站会+任务看板。**话术**：\"我带 4 人团队做 AI 助手，按 RAG/Agent/工程三条线分工。\""
+    },
+    {
+        "id": "ai-interview-229",
+        "topic": "能力强的人是否需要承担更多工作？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 辩证答：关键任务优先，但要有回报（晋升/绩效/成长机会）；**②** 防过载：合理调配，避免能者多劳变能者多死；**③** 管理视角：让强的人带人，放大杠杆。**话术**：\"我会让强的人啃硬骨头并给足认可，同时帮他带新人减负。\""
+    },
+    {
+        "id": "ai-interview-230",
+        "topic": "如何做好团队协调？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 信息透明：需求/进展/风险同步；**②** 冲突处理：对齐目标，先共识再行动；**③** 工具：看板+IM+文档沉淀。**话术**：\"跨组依赖我习惯拉对齐会+书面确认，避免口头承诺扯皮。\""
+    },
+    {
+        "id": "ai-interview-231",
+        "topic": "换工作主要原因是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 正向表达：追求更大平台/更核心的业务/技术成长；**②** 不踩雷：不吐槽前司、不暴露薪资敏感；**③** 结合岗位：说明与目标岗位的匹配动机。**话术**：\"我想做更复杂的 AI 应用落地，当前岗位偏工具型，成长见顶。\""
+    },
+    {
+        "id": "ai-interview-232",
+        "topic": "前端出身后端如何学习？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 先补基础：HTTP/数据库/操作系统/网络；**②** 项目驱动：用全栈小项目练手（前端已有优势）；**③** 体系化：跟着后端课程/源码精读。**话术**：\"我从前端转全栈，第一个后端项目就是给 AI 助手写服务端，边做边补。\""
+    },
+    {
+        "id": "ai-interview-233",
+        "topic": "从前端开发转项目负责人最大的收获是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 视角转变：从\"写好代码\"到\"做成业务\"；**②** 学会取舍：资源有限时优先级管理；**③** 沟通能力：向上管理、跨团队协同。**话术**：\"最大的收获是学会用结果说话，而不是用代码量说话。\""
+    },
+    {
+        "id": "ai-interview-234",
+        "topic": "日会管理怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 15 分钟站会：昨天/今天/阻塞；**②** 聚焦阻塞问题，细节线下聊；**③** 不变成汇报会，控制节奏。**话术**：\"我们日会只聊阻塞和风险，具体方案会后拉小会，效率高。\""
+    },
+    {
+        "id": "ai-interview-235",
+        "topic": "AI 编程工具的管理与质量把控",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 统一工具+规范（可用的库/风格）；**②** 强制 review+单测覆盖率门槛；**③** 沉淀提示词模板和代码规范，减少 AI 产出垃圾代码。**话术**：\"我们要求 AI 生成代码必须过 review，单测覆盖核心逻辑 80%+。\""
+    },
+    {
+        "id": "ai-interview-236",
+        "topic": "AI 项目上线后怎么迭代调优？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 数据闭环：线上 badcase 回流到评测集；**②** 指标驱动：成功率/满意度/成本持续监控；**③** 小步快跑：prompt/检索策略灰度对比。**话术**：\"我们每周从客服工单抽 badcase 进评测集，迭代有依据。\""
+    },
+    {
+        "id": "ai-interview-237",
+        "topic": "三个月预期产出是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 第一个月：熟悉业务+代码，交付小需求；**②** 第二个月：独立负责一个模块（如 RAG 优化）；**③** 第三个月：主导一次性能/体验优化并量化结果。**话术**：\"三个月内我期望把问答准确率提升 10% 并沉淀一套评测体系。\""
+    },
+    {
+        "id": "ai-interview-238",
+        "topic": "职业规划：AI 应用 + 全栈方向",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 短期：成为 AI 应用落地专家（RAG/Agent 实战）；**②** 中期：全栈+AI 架构，能带产品闭环；**③** 长期：AI 应用方向技术负责人/架构师。**话术**：\"我的路线是纵深 AI 应用，横向补全栈，最终能独立带 AI 产品。\""
+    },
+    {
+        "id": "ai-interview-239",
+        "topic": "薪资谈判策略",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 先问清结构（base/绩效/股票），报数给合理区间；**②** 用市场行情+自身亮点支撑；**③** 综合看涨幅，不要只盯 base。**话术**：\"我会给区间并说明依据，同时关注总包而非单看月薪。\""
+    },
+    {
+        "id": "ai-interview-240",
+        "topic": "项目是否完成交付？离职原因？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "了解"
+        ],
+        "answerContent": "**①** 交付事实+数据：上线时间、用户量、稳定性指标；**②** 离职原因正向化：成长/平台/方向匹配；**③** 不贬低前司。**话术**：\"项目按时上线，日活 5 万，离职是想做更核心的 AI 业务。\""
+    },
+    {
+        "id": "ai-interview-241",
+        "topic": "从零设计这套棋牌 SaaS 的 AI 助手，整体架构怎么拆分？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 分层：接入层（对话/SSE）→ 编排层（意图识别+流程）→ 能力层（RAG 规则问答/工具调用查订单）→ 模型层；**②** 隔离：租户级知识库+权限；**③** 可靠性：评测集+监控+降级。**话术**：\"我会先画一张架构图：前端→网关→Agent 编排→工具/知识库，再讲每层的关键设计。\""
+    },
+    {
+        "id": "ai-interview-242",
+        "topic": "用户量暴涨，知识库文档百万级别，方案会遇到什么瓶颈，怎么演进？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 瓶颈：向量检索变慢（HNSW 图大）、存储成本、导入性能、过滤慢；**②** 演进：分片/独立集合→层级检索（先粗筛再精排）→缓存热数据→异步批量入库；**③** 监控容量提前扩容。**话术**：\"百万级我会按租户+文档类型分片，热门文档加缓存，检索 p95 控制在 200ms 内。\""
+    },
+    {
+        "id": "ai-interview-243",
+        "topic": "工具网关的核心能力有哪些？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 注册发现：工具定义（Schema）统一管理；**②** 鉴权权限：调用方/租户/工具级校验；**③** 治理：限流熔断、超时重试、审计日志；**④** 可观测：调用量/成功率/耗时指标。**话术**：\"工具网关是 Agent 的安全边界，所有工具调用必须过它。\""
+    },
+    {
+        "id": "ai-interview-244",
+        "topic": "公有云 SaaS + 私有化部署，代码层面如何兼容？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 配置驱动：模型/存储/部署模式全部配置化；**②** 依赖内网化：私有化离线包+内网模型通道；**③** 特性开关：SaaS 专属功能（多租户中心化）按开关启用。**话术**：\"我们同一套代码，靠配置中心区分 SaaS/私有化，避免两套维护。\""
+    },
+    {
+        "id": "ai-interview-245",
+        "topic": "Streaming 流式输出链路中间报错，怎么保证前端体验？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 事件协议：内容/结束/错误分开事件；**②** 错误处理：保留已输出内容+提示重试/续传；**③** 重试策略：断点续传（缓存已生成片段）；**④** 兜底：降级为一次性返回。**话术**：\"我们错误时发 error 事件，前端展示已生成部分+重试按钮，体验无损。\""
+    },
+    {
+        "id": "ai-interview-246",
+        "topic": "大模型输出幻觉编造不存在的工具参数，链路怎么防御？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** Schema 严格校验（pydantic），非法参数拦截；**②** 枚举/引用数据校验（如订单号必须存在）；**③** 失败反馈给模型重生成；**④** 兜底：拒绝执行并明确告知。**话术**：\"我们工具参数全过 Schema+业务校验，编造参数根本到不了执行层。\""
+    },
+    {
+        "id": "ai-interview-247",
+        "topic": "RAG-Agent 链路风险点分别讲会出什么问题，对应兜底手段？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 检索空：降级宽松检索/拒答；**②** 检索噪声：rerank+Top-K 控制；**③** 工具失败：重试/降级/转人工；**④** LLM 超时：熔断切备用模型；**⑤** 链路可观测：trace 快速定位。**话术**：\"每个风险点都配了兜底动作，这是线上稳定性的关键。\""
+    },
+    {
+        "id": "ai-interview-248",
+        "topic": "支持多轮追问同时用户中途切换任务，怎么平衡？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 意图识别先行：每轮先判断是追问还是新任务；**②** 状态隔离：任务上下文和会话上下文分开管理；**③** 明确切换：检测到新任务时清空当前任务状态。**话术**：\"我们 State 里 task 和 session 分离，切换任务只重置 task 不丢会话记忆。\""
+    },
+    {
+        "id": "ai-interview-249",
+        "topic": "如果要求 AI 支持退款等高危操作，怎么应对？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 权限+风控：角色校验、金额/频次限制；**②** 二次确认：执行前复述+用户确认；**③** 审批流：超阈值转人工审批；**④** 审计留痕。**话术**：\"高危操作我坚持'Agent 只提建议、执行走审批'，安全和体验兼顾。\""
+    },
+    {
+        "id": "ai-interview-250",
+        "topic": "token 消耗持续走高，从哪些角度排查？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 用量拆解：按接口/模型/租户/时段看 token 分布；**②** 上下文膨胀：历史/检索片段/tool 返回过大；**③** 无效调用：重试过多、缓存命中率低、prompt 冗余；**④** 对症下药：压缩/缓存/路由。**话术**：\"我们发现 40% token 花在工具返回的大 JSON，截断+摘要后成本立降。\""
+    },
+    {
+        "id": "ai-interview-251",
+        "topic": "如果给你三个月，系统要支撑10倍流量，从哪些维度改造？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 容量：压测摸清瓶颈，扩容/分片；**②** 架构：无状态化、队列削峰、缓存；**③** LLM 侧：配额管理、限流排队、多模型冗余；**④** 监控预案：告警+自动扩缩容。**话术**：\"三个月我会按'压测→瓶颈→扩容+优化'推进，先保可用性再谈成本。\""
+    },
+    {
+        "id": "ai-interview-252",
+        "topic": "如果给你两周做私有化交付，优先级怎么做？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 第一周：核心链路（对话+检索+工具）跑通+离线包；**②** 第二周：部署文档、验收测试、缺陷修复；**③** 砍掉：非核心功能（高级报表/复杂管理端）延后。**话术**：\"两周交付我会锁定 MVP 范围，先交付核心闭环，其余走二期。\""
+    },
+    {
+        "id": "ai-interview-253",
+        "topic": "怎么评估一个开源 Agent 框架？主要看哪些点？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 功能：状态管理、工具调用、持久化、可观测；**②** 工程：活跃度、维护频率、社区、文档；**③** 生产：稳定性、性能、License、迁移成本；**④** 方法：拿真实业务 POC 跑评测。**话术**：\"评估框架我不看 star，直接拿 20 个真实用例跑一轮，对比成功率。\""
+    },
+    {
+        "id": "ai-interview-254",
+        "topic": "线上出现大量大模型服务商限流，降级方案？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 多供应商冗余：主备模型+自动切换；**②** 流量整形：限流排队、优先级队列（VIP 优先）；**③** 降级内容：缓存答案、简化回答（小模型）、拒答引导；**④** 预案演练。**话术**：\"我们限流时自动切备用供应商+排队，核心用户不受影响。\""
+    },
+    {
+        "id": "ai-interview-255",
+        "topic": "向量库查询耗时突然飙升，是什么原因？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 数据量暴涨（HNSW 图重建）；**②** 并发突增打满 CPU/IO；**③** 过滤条件复杂/无索引；**④** 大向量批次导入干扰查询；**⑤** 排查：监控曲线+慢查询日志+参数检查。**话术**：\"先看监控区分'持续慢'和'偶发慢'，再查数据量/并发/过滤条件。\""
+    },
+    {
+        "id": "ai-interview-256",
+        "topic": "如何设计 Agent 的灰度发布与 A/B 测试？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "场景"
+        ],
+        "answerContent": "**①** 分流：网关按用户/租户比例分流到新旧策略（Prompt/模型/检索参数）；**②** 对比：成功率/满意度/成本/token 多指标对比；**③** 机制：可随时一键回滚，实验数据留档；**④** 注意：同一用户尽量固定实验组，避免体验抖动。**话术**：\"我们 Prompt 改动都走 A/B，胜出率不达标就回滚，线上从不拍脑袋上线。\""
+    },
+    {
+        "id": "ai-interview-257",
+        "topic": "使用的向量数据库为什么使用？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 选 Qdrant：开源、过滤强、易部署、内存可控；**②** 对比过 Milvus（重）、FAISS（无服务）、pgvector（简单场景）；**③** 生产验证稳定。**话术**：\"Qdrant 的 payload 过滤对我们多租户场景是刚需。\""
+    },
+    {
+        "id": "ai-interview-258",
+        "topic": "还了解哪些向量数据库，对比优势？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** Milvus：分布式/大规模强，运维重；**②** pgvector：和 PG 一体，简单场景；**③** FAISS：库非服务，需自建；**④** Weaviate/Chroma：各有侧重。**话术**：\"按规模选：小用 pgvector，中大型 Qdrant/Milvus。\""
+    },
+    {
+        "id": "ai-interview-259",
+        "topic": "如结果重新选型会选择什么向量数据库？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 仍选 Qdrant：已满足需求+踩坑成本已付；**②** 若数据量到千万级+多地域：考虑 Milvus 或云托管；**③** 原则：不轻易换库，除非量化收益明确。**话术**：\"除非规模质变，否则迁移成本大于收益。\""
+    },
+    {
+        "id": "ai-interview-260",
+        "topic": "文本有哪些类型的文档？PDF 排版复杂的怎么处理？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 类型：Word/PDF/Markdown/HTML/扫描件/表格；**②** 复杂 PDF：OCR+版面分析（保留表格/多栏）、转 Markdown 结构化；**③** 表格：转 CSV/结构化描述再入库。**话术**：\"复杂 PDF 我们走 OCR+版面还原，表格转 Markdown 表格，入库可查。\""
+    },
+    {
+        "id": "ai-interview-261",
+        "topic": "Embedding 最终选用哪个模型？做过什么调研对比？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 选 bge-large-zh-v1.5：中文效果好、可本地部署；**②** 对比：m3e、text-embedding-v3、bge 系列，用领域数据集测召回；**③** 结果：bge 在领域术语上领先。**话术**：\"我们拿 500 条业务问题做评测，bge 的 Recall@10 领先 5 个点。\""
+    },
+    {
+        "id": "ai-interview-262",
+        "topic": "评测结果是否准确？评测标准是什么？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 标准：标注集质量+指标（准确率/召回/忠实度/满意度）；**②** 保证准确：双人标注+抽检一致率、评测集定期更新；**③** 线上线下结合：离线跑分+线上抽样评审。**话术**：\"我们评测集 500 条，双人标注一致率 90%+，结果可信。\""
+    },
+    {
+        "id": "ai-interview-263",
+        "topic": "节流函数 interval 100毫秒快速点击能否触发？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 节流：间隔 100ms 内最多触发一次，快速点击会被合并；**②** 边界：首次是否立即执行、末尾是否补执行；**③** 防抖 vs 节流区分。**话术**：\"100ms 节流下狂点只触发约 10 次/秒，防抖则等停止后才触发。\""
+    },
+    {
+        "id": "ai-interview-264",
+        "topic": "打印顺序/代码问题",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 考察：事件循环/宏任务微任务/作用域；**②** 方法：先标出同步、微任务（Promise）、宏任务（setTimeout）顺序；**③** 输出顺序按\"同步→微任务→宏任务\"推。**话术**：\"这类题我按队列规则推一遍，再验证，基本不丢分。\""
+    },
+    {
+        "id": "ai-interview-265",
+        "topic": "项目哪些地方用到 AI 能力？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 智能客服/FAQ 问答（RAG）；**②** 运营助手（工具调用：查数据、生成报表）；**③** 内容生成（活动文案、公告）；**④** 意图识别/信息抽取（结构化）。**话术**：\"核心是客服问答和运营助手两块，都跑在统一 Agent 平台。\""
+    },
+    {
+        "id": "ai-interview-266",
+        "topic": "最大的技术难点是什么，怎么解决？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 挑有数据支撑的难点（如 RAG 准确率低/多租户隔离）；**②** 讲清：现象→排查→方案→结果数据；**③** 展示方法论而非抱怨。**话术**：\"最大的难点是知识库准确率，通过评测闭环+混合检索从 70% 提到 90%。\""
+    },
+    {
+        "id": "ai-interview-267",
+        "topic": "印象最深的线上 bug，怎么定位修复？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** STAR 结构：背景→现象→排查→修复→复盘；**②** 要有细节：trace/日志/指标定位过程；**③** 体现复盘改进（监控/测试补位）。**话术**：\"印象最深是 SSE 断线导致前端白屏，最终定位到代理超时，加了心跳+重连解决。\""
+    },
+    {
+        "id": "ai-interview-268",
+        "topic": "为什么选择 LangGraph，评估过别的方案吗？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 对比：LangChain 链（线性不够）、CrewAI（编排弱）、自研（成本高）；**②** LangGraph 胜出：图编排+状态持久化+社区活跃；**③** 留后路：抽象编排层，可替换。**话术**：\"我们对比后选 LangGraph，同时封装了编排接口，框架可替换。\""
+    },
+    {
+        "id": "ai-interview-269",
+        "topic": "项目 QPS 大概多少，瓶颈在哪？",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** 数据：单机 QPS、峰值、p95 延迟；**②** 瓶颈：LLM 上游配额/延迟、向量检索、DB 连接；**③** 优化方向。**话术**：\"对话接口单机约 30 QPS，瓶颈在 LLM 响应延迟，靠异步+队列削峰。\""
+    },
+    {
+        "id": "ai-interview-270",
+        "topic": "Prompt 踩过什么坑？（prompt 过长、指令模糊等）",
+        "notes": "",
+        "renderType": "markdown",
+        "isShowAnswer": false,
+        "classifyIds": [
+            "classify7"
+        ],
+        "tagList": [
+            "AI 前端",
+            "面试",
+            "低频"
+        ],
+        "answerContent": "**①** prompt 过长：挤占输出空间+成本高——精简+分层；**②** 指令模糊：输出格式飘——给 few-shot 示例+结构化约束；**③** 自相矛盾：既要求简洁又要求详细——明确优先级；**④** 版本管理+评测。**话术**：\"我们 prompt 从 3k 字精简到 1.2k 字，效果反而更好，关键是结构化。\""
     }
 ]
